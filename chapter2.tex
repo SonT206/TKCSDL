@@ -23,61 +23,15 @@ The SmartDroneDelivery platform supports five main human actors. Each actor inte
 \subsection{System Administrator}
 
 \section{Functional Requirements}
-This section describes the main functions that the SmartDroneDelivery platform must support. The functional requirements are grouped according to the core modules of the system and form the basis for identifying the data that the database must store and manage.
-
 \subsection{User Management}
-The user management module handles account registration, authentication, and role-based access control for all system actors.
-\begin{enumerate}
-    \item The system shall allow customers to register and manage their own accounts.
-    \item The system shall allow administrators to create, update, and deactivate accounts for staff members, including dispatchers, station operators, and logistics managers.
-    \item The system shall authenticate users through a login mechanism and support password reset.
-    \item The system shall assign a role to each account and restrict access to functions according to that role.
-    \item The system shall allow users to view and update their personal profile information.
-\end{enumerate}
-This module requires the database to store account credentials, roles and permissions, and profile information for every actor.
 
 \subsection{Customer and Delivery Management}
-This module supports the management of customer information and delivery orders.
-\begin{enumerate}
-    \item The system shall allow customers to manage one or more delivery addresses.
-    \item The system shall allow customers to create a delivery request by specifying the delivery address and package information.
-    \item The system shall allow dispatchers to review, approve, or reject submitted delivery requests.
-    \item The system shall allow customers to view the current status and history of their delivery orders.
-    \item The system shall allow a delivery order to be modified or cancelled before it is scheduled.
-\end{enumerate}
-This module requires the database to store customer profiles, delivery addresses, delivery orders, package information, and order status history.
 
 \subsection{Delivery Workflow}
-This module supports the scheduling, execution, and confirmation of delivery activities.
-\begin{enumerate}
-    \item The system shall allow dispatchers to schedule an approved delivery order by assigning a drone and a landing station.
-    \item The system shall record the assignment of a drone to a specific delivery activity.
-    \item The system shall record tracking information generated during delivery execution.
-    \item The system shall allow the confirmation of a delivery once the package has reached its destination.
-    \item The system shall record failed deliveries together with the reason for failure and support rescheduling.
-\end{enumerate}
-This module requires the database to store delivery activities, drone assignments, tracking records, delivery confirmations, and failure records.
 
-\subsection{Landing Station Management}
-This module supports the management of landing stations used during delivery operations.
-\begin{enumerate}
-    \item The system shall allow station operators to register and update landing station information, including location and capacity.
-    \item The system shall allow the current availability status of a landing station to be monitored and updated.
-    \item The system shall allow a landing station to be assigned to a delivery activity based on its availability and capacity.
-    \item The system shall record changes in station status, such as maintenance or temporary unavailability.
-\end{enumerate}
-This module requires the database to store landing station information, capacity, and availability history.
+\subsection{Landing Station ManagementLanding Station Management}
 
 \subsection{Dashboard and AI-assisted Services}
-This module provides monitoring and AI-assisted functions to support logistics managers and customers.
-\begin{enumerate}
-    \item The system shall provide a dashboard that displays the status of delivery orders, drones, and landing stations.
-    \item The system shall provide an AI-assisted estimation of delivery time based on historical delivery data.
-    \item The system shall provide AI-generated summaries of delivery activities for logistics managers.
-    \item The system shall provide an AI-assisted customer assistance function to answer common customer questions.
-    \item The system shall provide operational analytics, such as delivery success rate and average delivery time.
-\end{enumerate}
-This module requires the database to store historical delivery data, AI-generated results, and analytical/reporting information.
 
 
 \section{Non-functional Requirements}
@@ -155,21 +109,118 @@ The following business rules are derived from the proposed business processes an
 \section{Data Requirements}
 Based on the system requirements and business rules, the database must manage several major categories of data.
 \subsection{User and Authorization Data}
+The database must store user account and authorization information required to control access to the system. The required data includes:
 
+\begin{itemize}
+    \item User identification and account information.
+    \item Authentication information required for user login.
+    \item User roles within the system.
+    \item Permissions associated with each role.
+    \item User account status.
+\end{itemize}
+
+This data enables the system to identify users and control access to system functions according to their assigned roles and permissions. 
 \subsection{Delivery Order Data}
+  The database must store delivery order information to support the creation, processing, and management of delivery requests. The required data includes:
+
+\begin{itemize}
+    \item Delivery order identification information.
+    \item Customer associated with each delivery order.
+    \item Delivery address associated with each delivery order.
+    \item Order creation date and related delivery information.
+    \item Current delivery order status.
+    \item Status history records for each delivery order.
+\end{itemize}
+
+This data enables the system to manage delivery orders and preserve the history of changes throughout the delivery process.
 
 \subsection{Package Data}
+The database must store package information associated with delivery orders. The required data includes:
+
+\begin{itemize}
+    \item Package identification information.
+    \item Delivery order associated with the package.
+    \item Package description and related information.
+    \item Package weight and dimensions.
+    \item Package status information.
+\end{itemize}
+
+This data enables the system to manage package information and determine the package details required for drone-based delivery operations.
+
 
 \subsection{Drone and Delivery Data}
+ The database must store drone and delivery activity information required for delivery execution. The required data includes:
+
+\begin{itemize}
+    \item Drone identification information.
+    \item Drone status and availability information.
+    \item Delivery activity information.
+    \item Drone assigned to each delivery activity.
+    \item Delivery order associated with each delivery activity.
+    \item Delivery activity status and time information.
+\end{itemize}
+
+This data enables the system to associate drones with delivery activities and manage delivery execution over time.
+
 
 \subsection{Landing Station Data}
+The database must store information about landing stations used in delivery operations. The required data includes:
+
+\begin{itemize}
+    \item Landing station identification information.
+    \item Landing station location information.
+    \item Station capacity information.
+    \item Current station availability.
+    \item Delivery operations associated with the landing station.
+    \item Historical station availability information when required.
+\end{itemize}
+
+This data enables the system to manage landing stations and determine their availability for delivery operations.
+
 
 \subsection{Tracking and Confirmation Data}
+The database must store tracking and confirmation information generated during and after delivery execution. The required data includes:
+
+\begin{itemize}
+    \item Delivery order associated with each tracking record.
+    \item Tracking time information.
+    \item Delivery progress and status information.
+    \item Historical tracking records.
+    \item Delivery confirmation information.
+    \item Confirmation time and completion status.
+\end{itemize}
+
+This data enables the system to monitor delivery progress, preserve historical tracking information, and record successful delivery confirmation.
+
 
 \subsection{AI-assisted Service Data}
+The database must provide delivery-related data required by AI-assisted services. The required data includes:
+
+\begin{itemize}
+    \item Delivery order information.
+    \item Package and delivery activity information.
+    \item Historical delivery and tracking information.
+    \item Delivery time information used for estimation.
+    \item Operational data used for analytics.
+    \item Information required for delivery summarization and customer assistance.
+\end{itemize}
+
+This data supports AI-assisted services such as estimated delivery time, delivery summarization, customer assistance, and operational analytics.
+
 
 \subsection{Audit Data}
 
+The database must preserve audit information required for monitoring and accountability. The required data includes:
+
+\begin{itemize}
+    \item User associated with an important system action.
+    \item Type of action performed.
+    \item Date and time of the action.
+    \item Relevant record or operation affected by the action.
+    \item Historical information required for monitoring and auditing.
+\end{itemize}
+
+This data enables the system to maintain traceability of important operations and support monitoring and auditing activities.
 \section{Chapter Summary}
 
 This chapter analyzed the main requirements of the SmartDroneDelivery platform from a database perspective. The system actors, functional requirements, non-functional requirements, business processes, business rules, and major data requirements were identified.
