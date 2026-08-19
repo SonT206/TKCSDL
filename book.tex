@@ -1,0 +1,110 @@
+\documentclass[letterpaper,11pt,leqno]{book}
+\usepackage{book}
+\bibliographystyle{book}
+
+% Enter book title to populate PDF metadata:
+\hypersetup {pdftitle={Minimalist LaTeX Template for Academic Books}}
+
+% Enter path to BibTeX file with references:
+\newcommand{\bib}{book.bib}
+
+% Enter path to PDF file with figures:
+\newcommand{\pdf}{figures.pdf}
+
+\begin{document}
+
+% Enter title:
+\title{AI-powered Drone Delivery Management Platform }
+
+% Enter subtitle (can be commented out):
+
+\subtitle{Group 4}
+
+% Enter author:
+\author{089206011070 - Tran Tan Phat\\
+        079206000967 - Tran Hoang Son\\
+        056206000983 - Nguyen Duy Quy\\
+        054206007389 - Nguyen Quoc Dung\\
+        079206004792 - Le Huy Hoang}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\frontmatter
+
+\tableofcontents
+
+% Enter book structure
+\chapter{Preface}
+
+\input{preface}
+
+
+\chapter{Introduction}\label{c:introduction}
+
+\input{chapter1}
+
+\chapter{Sections and content}\label{c:section}
+
+\input{chapter2}
+
+\chapter{Math}\label{c:math}
+
+\input{chapter3}
+
+\part{Second half of the book}\label{p:second}
+
+\chapter{Lists, figures, and tables}\label{c:figures}
+
+\input{chapter4}
+
+\chapter{Cross-references and quotes}\label{c:conclusion}
+
+\input{chapter5}
+
+\chapter{Further results}\label{c:further}
+
+\input{chapter6}
+
+\chapter{Extensions}\label{c:extensions}
+
+\input{chapter7}
+
+\part{Conclusion}\label{p:conclusion}
+
+\chapter{Summary}\label{c:summary}
+
+\input{chapter8}
+
+\chapter{Future research}\label{c:future}
+
+\input{chapter9}
+
+\appendix
+
+\part{Technical appendix}\label{p:appendix}
+
+\chapter{Generic technical topic}\label{a:appendix1}
+
+\input{appendixA}
+
+\chapter{Another technical topic}\label{a:appendix2}
+
+\input{appendixB}
+
+\chapter{Last technical topic}\label{a:appendix3}
+
+\input{appendixC}
+
+\backmatter
+
+\bibliography{\bib}
+
+\chapter{Acknowledgments}
+
+\input{acknowledgements}
+
+\printindex
+
+\end{document}

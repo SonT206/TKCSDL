@@ -1,0 +1,82 @@
+\contentsline {chapter}{Preface}{v}{chapter*.1}%
+\contentsline {chapter}{Introduction}{vii}{chapter*.2}%
+\contentsline {section}{\numberline {0.1}SmartDroneDelivery Platform }{vii}{section*.3}%
+\contentsline {section}{\numberline {0.2}Answer to the question}{viii}{section*.19}%
+\contentsline {section}{\numberline {0.3}Positioning in the literature}{viii}{section*.21}%
+\contentsline {section}{\numberline {0.4}A section}{ix}{section*.23}%
+\contentsline {subsection}{\numberline {0.4.1}A subsection}{ix}{subsection*.24}%
+\contentsline {subsection}{\numberline {0.4.2}Yet another subsection}{ix}{subsection*.25}%
+\contentsline {section}{\numberline {0.5}A final introduction section}{x}{section*.26}%
+\contentsline {paragraph}{Pellentesque habitant morbi tristique}{x}{paragraph*.27}%
+\contentsline {paragraph}{Nullam varius nisi vel ipsum vehicula, at finibus justo ultrices}{x}{paragraph*.28}%
+\contentsline {chapter}{Sections and content}{xi}{chapter*.29}%
+\contentsline {section}{\numberline {0.6}Generic section}{xi}{section*.31}%
+\contentsline {subsection}{\numberline {0.6.1}Generic subsection}{xi}{subsection*.32}%
+\contentsline {subsection}{\numberline {0.6.2}Another generic subsection}{xi}{subsection*.33}%
+\contentsline {section}{\numberline {0.7}Paragraphs}{xii}{section*.34}%
+\contentsline {paragraph}{Paragraph heading}{xii}{paragraph*.35}%
+\contentsline {paragraph}{Another paragraph with some numbers and special characters}{xii}{paragraph*.36}%
+\contentsline {section}{\numberline {0.8}References}{xii}{section*.37}%
+\contentsline {section}{\numberline {0.9}URL}{xiii}{section*.39}%
+\contentsline {chapter}{Math}{xv}{chapter*.40}%
+\contentsline {section}{\numberline {0.10}Roman letters}{xv}{section*.41}%
+\contentsline {section}{\numberline {0.11}Digits}{xv}{section*.43}%
+\contentsline {section}{\numberline {0.12}Greek letters}{xvi}{section*.44}%
+\contentsline {section}{\numberline {0.13}Calligraphic letters}{xvi}{section*.46}%
+\contentsline {section}{\numberline {0.14}Blackboard-bold letters}{xvi}{section*.48}%
+\contentsline {section}{\numberline {0.15}Symbols}{xvi}{section*.49}%
+\contentsline {section}{\numberline {0.16}Bold characters}{xvii}{section*.52}%
+\contentsline {section}{\numberline {0.17}Operators}{xvii}{section*.53}%
+\contentsline {section}{\numberline {0.18}Some equations}{xvii}{section*.55}%
+\contentsline {section}{\numberline {0.19}Some propositions, theorems, and lemmas}{xviii}{section*.56}%
+\contentsline {part}{I\hspace {1em}Second half of the book}{xxiii}{part*.63}%
+\contentsline {chapter}{Lists, figures, and tables}{xxv}{chapter*.64}%
+\contentsline {section}{\numberline {0.20}Some itemized lists}{xxv}{section*.65}%
+\contentsline {section}{\numberline {0.21}Some numbered lists}{xxvi}{section*.66}%
+\contentsline {section}{\numberline {0.22}Figures and graphs}{xxvii}{section*.75}%
+\contentsline {subsection}{\numberline {0.22.1}Graphs at the top of the page}{xxvii}{subsection*.77}%
+\contentsline {subsection}{\numberline {0.22.2}References to figures and panels}{xxvii}{subsection*.79}%
+\contentsline {subsection}{\numberline {0.22.3}A full-page figure}{xxviii}{subsection*.80}%
+\contentsline {section}{\numberline {0.23}A simple table}{xxviii}{section*.82}%
+\contentsline {section}{\numberline {0.24}A multi-panel table}{xxx}{section*.84}%
+\contentsline {chapter}{Cross-references and quotes}{xxxiii}{chapter*.86}%
+\contentsline {section}{\numberline {0.25}Cross-references}{xxxiii}{section*.87}%
+\contentsline {section}{\numberline {0.26}Quotes}{xxxiii}{section*.88}%
+\contentsline {section}{\numberline {0.27}Another section with text}{xxxiv}{section*.89}%
+\contentsline {subsection}{\numberline {0.27.1}Text}{xxxiv}{subsection*.90}%
+\contentsline {paragraph}{At vero eos et accusamus}{xxxiv}{paragraph*.91}%
+\contentsline {paragraph}{Quos dolores et quas}{xxxiv}{paragraph*.92}%
+\contentsline {subsection}{\numberline {0.27.2}Text again}{xxxiv}{subsection*.93}%
+\contentsline {section}{\numberline {0.28}Yet more text}{xxxiv}{section*.94}%
+\contentsline {chapter}{Further results}{xxxvii}{chapter*.95}%
+\contentsline {section}{\numberline {0.29}Additional equations}{xxxvii}{section*.96}%
+\contentsline {section}{\numberline {0.30}Discussion}{xxxviii}{section*.101}%
+\contentsline {chapter}{Extensions}{xxxix}{chapter*.102}%
+\contentsline {section}{\numberline {0.31}First extension}{xxxix}{section*.103}%
+\contentsline {section}{\numberline {0.32}Second extension}{xl}{section*.109}%
+\contentsline {section}{\numberline {0.33}Third extension}{xl}{section*.110}%
+\contentsline {part}{II\hspace {1em}Conclusion}{xli}{part*.111}%
+\contentsline {chapter}{Summary}{xliii}{chapter*.112}%
+\contentsline {section}{\numberline {0.34}Main findings}{xliii}{section*.113}%
+\contentsline {section}{\numberline {0.35}Key takeaways}{xliii}{section*.114}%
+\contentsline {section}{\numberline {0.36}Closing remark}{xliii}{section*.115}%
+\contentsline {chapter}{Future research}{xlv}{chapter*.116}%
+\contentsline {section}{\numberline {0.37}Open questions}{xlv}{section*.117}%
+\contentsline {section}{\numberline {0.38}Related literature}{xlv}{section*.118}%
+\contentsline {section}{\numberline {0.39}Concluding remarks}{xlv}{section*.119}%
+\contentsline {part}{III\hspace {1em}Technical appendix}{xlvii}{part*.120}%
+\contentsline {chapter}{Generic technical topic}{xlix}{appendix*.121}%
+\contentsline {section}{\numberline {.1}Generic appendix section}{xlix}{section*.122}%
+\contentsline {section}{\numberline {.2}Assumptions and theorems and proofs}{l}{section*.123}%
+\contentsline {section}{\numberline {.3}More math}{li}{section*.128}%
+\contentsline {chapter}{Another technical topic}{liii}{appendix*.131}%
+\contentsline {section}{\numberline {.4}Larger figure, without panel, in the appendix}{liii}{section*.132}%
+\contentsline {section}{\numberline {.5}A foonote}{liv}{section*.135}%
+\contentsline {section}{\numberline {.6}References}{lv}{section*.138}%
+\contentsline {chapter}{Last technical topic}{lvii}{appendix*.139}%
+\contentsline {section}{\numberline {.7}A first section}{lvii}{section*.140}%
+\contentsline {section}{\numberline {.8}A second section}{lvii}{section*.141}%
+\contentsline {section}{\numberline {.9}A third section}{lviii}{section*.146}%
+\contentsline {chapter}{Bibliography}{lix}{appendix*.147}%
+\contentsline {chapter}{Acknowledgments}{lxi}{appendix*.148}%
+\contentsline {chapter}{Index}{lxiii}{section*.149}%
