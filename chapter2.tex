@@ -75,6 +75,37 @@ A delivery may fail for various operational reasons.
 
 \section{Business Rules}
 The following business rules are derived from the proposed business processes and are used as the basis for database design.
+\begin{enumerate}
+    \item A customer can create multiple delivery orders.
+    
+    \item Each delivery order belongs to one customer.
+    
+    \item A customer may have multiple delivery addresses.
+    
+    \item Each delivery order is associated with a delivery address.
+    
+    \item A delivery order contains package information.
+    
+    \item A delivery order can have multiple status history records.
+    
+    \item A delivery order can have multiple tracking records during delivery execution.
+    
+    \item A delivery order may have one delivery confirmation after successful completion.
+    
+    \item A drone can be assigned to multiple delivery activities over time.
+    
+    \item A delivery activity is associated with a specific delivery order.
+    
+    \item A landing station can support multiple delivery operations depending on its capacity.
+    
+    \item Station availability may change over time.
+    
+    \item Delivery tracking records represent historical delivery progress.
+    
+    \item Delivery information must preserve historical records required for monitoring and auditing.
+    
+    \item Users may have different roles and permissions according to the responsibilities defined by the system.
+\end{enumerate}
 \section{Data Requirements}
 Based on the system requirements and business rules, the database must manage several major categories of data.
 \subsection{User and Authorization Data}
