@@ -1,10 +1,6 @@
-This chapter shows how to introduce \textbf{sections, subsections, and paragraphs}.\footnote{A short footnote. The numbering of the footnotes restarts at the beginning of each chapter. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.} It also shows how to introduce various references into the book.
-
-Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. 
-
 \section{System Overview}\label{s:section}
 
-The SmartDroneDelivery platform is an AI-powered Drone Delivery Management Platform designed to support the management of drone-based delivery operations. The system focuses on business and logistics management rather than direct drone control.
+\qquad The SmartDroneDelivery platform is an AI-powered Drone Delivery Management Platform designed to support the management of drone-based delivery operations. The system focuses on business and logistics management rather than direct drone control.
 
 The platform supports the complete delivery lifecycle, beginning with the creation of a delivery request and continuing through package management, delivery scheduling, delivery execution, delivery tracking, and delivery confirmation.
 
@@ -12,32 +8,93 @@ The system is designed to provide a centralized platform for managing customers,
 
 From a database perspective, the system requires a structured and reliable data management layer capable of storing and maintaining information generated throughout these business processes.
 
-\subsection{Generic subsection}
+\section{System Actors}
 
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam erat volutpat. Donec tincidunt, quam sed pellentesque fermentum, lorem dolor consequat lectus, at pulvinar arcu ipsum in ligula. Mauris pretium ipsum id sapien posuere vehicula. Vivamus consectetur, turpis vitae pellentesque molestie, libero odio venenatis mauris, id vestibulum nisl nulla sit amet enim.
+The SmartDroneDelivery platform supports five main human actors. Each actor interacts with different functions of the system and generates or accesses different types of data.
 
-\subsection{Another generic subsection}
+\subsection{Customer}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ullamcorper justo nec sem blandit, ac interdum libero convallis. Nulla facilisi. Etiam euismod, purus eget tempor feugiat, lectus ex vehicula justo, ut feugiat odio nisi sit amet lorem\index{lorem}. Vivamus id lobortis justo. Sed varius scelerisque nibh, ut finibus quam vehicula nec. Cras ultricies consectetur ex, sit amet vestibulum lacus hendrerit vel. Sed lacinia eleifend purus. Nunc dignissim eros et sapien lacinia eleifend. Curabitur sit amet velit eu metus suscipit tempus. Maecenas in libero felis. Sed quis eros sapien. Suspendisse potenti. Curabitur porta est sed enim efficitur, a tempor justo fermentum. Vivamus pulvinar enim vitae semper rutrum. Aenean non mauris sed lectus vestibulum feugiat eget et ipsum. Donec semper vitae enim at ultricies. Sed eu arcu justo.
+\subsection{Dispatcher}
 
-\section{Paragraphs}
+\subsection{Station Operator}
 
-Here's the example of a run-in paragraph heading (italic, on same line as text).
+\subsection{Logistics Manager}
 
-\paragraph{Paragraph heading} Aenean fermentum purus id lacus volutpat, a eleifend mi posuere! Mauris nec nunc commodo, vehicula enim nec; vehicula ex. Nullam euismod lorem at eros efficitur: ut ultricies ante fringilla? Nam sagittis sapien id tortor commodo---a pulvinar velit ultricies\ldots Integer ac magna velorci mollis vestibulum. Fusce id ipsum vel magna placerat vehicula. Curabitur ac lobortis justo. 
+\subsection{System Administrator}
 
-\paragraph{Another paragraph with some numbers and special characters} Pellentesque habitant 25\% morbi tristique senectus 1837--1905 et netus et malesuada fames ac turpis egestas. Integer semper euismod sapien vel dictum \#1 and \#6. Vivamus nec nunc sed metus interdum suscipit. (Maecenas tristique felis sed eleifend aliquet.) Donec et ipsum 3/4 in mauris ultricies pulvinar 9/2. Nullam quis ``sapien a justo'' vestibulum fermentum. Cras sed odio \& vitae mi placerat mollis: \$23.
+\section{Functional Requirements}
+\subsection{User Management}
 
-\section{References} 
+\subsection{Customer and Delivery Management}
 
-References can be appended at the end of a sentence, in parenthesis \citep{MS15}.\footnote{This is a longer footnote to show how the page shape changes when footnotes occupy several lines. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat\index{consequat}. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa.} References can also include page numbers or other bibliographical information \citep[p. 1305]{MS19}.  References can be in text: for instance, \citet{M12} found this and \citet[figure 1]{M14} found that. It's also possible to collate several references to the same author: for instance, \citet{M12,M14} found things. References from the same authors and same year appear as follows: \citet{LMS18a,LMS18b} wrote something. It is also possible to cite the authors of a study by name, or the year of a study: for instance, \citeauthor{EMM21} wrote a paper in \citeyear{EMM21} on this topic.
+\subsection{Delivery Workflow}
 
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam erat volutpat. Donec tincidunt, quam sed pellentesque fermentum, lorem dolor consequat lectus, at pulvinar arcu ipsum in ligula. Mauris pretium ipsum id sapien posuere vehicula. Vivamus consectetur, turpis vitae pellentesque molestie, libero odio venenatis mauris, id vestibulum nisl nulla sit amet enim. Integer vitae metus eget risus vulputate consectetur. Suspendisse potenti. Quisque dictum purus non justo aliquet, sed tristique odio dapibus. Sed tincidunt justo vitae leo mattis, a ullamcorper metus vestibulum. Sed ac sapien metus. Sed non mauris nec nisl vehicula iaculis eget eget enim. Suspendisse potenti. Sed ac purus volutpat, venenatis sem eget, fermentum lorem. Suspendisse eu convallis tortor. Nunc vel dictum libero. Cras eleifend, orci non faucibus gravida, sapien quam pharetra ligula, nec tincidunt elit ex at sapien.
+\subsection{Landing Station ManagementLanding Station Management}
 
-\section{URL}
+\subsection{Dashboard and AI-assisted Services}
 
-It is possible to insert URLs, such as the URL for this book template's repository: \url{https://github.com/pmichaillat/latex-book}. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-Curabitur maximus libero id magna bibendum fringilla. Curabitur ultricies dictum justo. Nam efficitur lobortis sapien a tristique. Vivamus vestibulum, sem nec dignissim scelerisque, purus nunc volutpat ligula, vitae aliquam libero orci nec augue. Nullam semper pulvinar turpis eget finibus. Suspendisse potenti. Nunc posuere arcu eget mauris venenatis, id pharetra sapien dapibus. Etiam at dictum urna. Integer gravida, odio sit amet mattis scelerisque, ipsum arcu ullamcorper sem, in vehicula sapien elit in tellus. Cras nec justo eu mauris volutpat dignissim. Curabitur malesuada purus sed tortor sollicitudin, in ullamcorper risus suscipit. Sed auctor tortor non libero suscipit, nec vehicula velit consequat. Integer nec est at lacus venenatis malesuada sed nec tortor.
+\section{Non-functional Requirements}
+In addition to functional requirements, the system must satisfy several non-functional requirements that affect database design.
+\subsection{Security}
+The system shall provide secure authentication and role-based authorization. Database design must support access control and protection of sensitive information.
+\subsection{Performance}
+The system is expected to provide a response time of less than three seconds for common operations. Appropriate database structures, indexes, and query design should therefore be considered.
+\subsection{Concurrency}
+The system shall support concurrent users while maintaining stable performance and data consistency.
+\subsection{Integration}
+The platform shall provide RESTful APIs for integration with external services. The database must therefore provide a consistent and structured data layer for backend services.
+\subsection{Scalability and Maintainability}
+The database should be designed in a modular and maintainable manner so that additional services and business functions can be introduced in the future.
+\subsection{Audit and Backup}
+The system shall support system monitoring, audit logging, and backup. The database design must therefore consider the storage of audit information and support reliable data recovery.
+
+\section{Business Processes}
+The main business processes supported by the SmartDroneDelivery platform are described below.
+\subsection{Delivery Request Process}
+The delivery request process begins when a customer creates a delivery order.
+The general process is:
+\begin{enumerate}
+    \item Customer creates a delivery request.
+    \item Customer provides delivery address and package information.
+    \item The system stores the delivery request.
+    \item Dispatcher reviews the request.
+    \item Dispatcher approves or rejects the request.
+\end{enumerate}
+
+This process requires the database to store customer information, delivery address, package information, order information, and order status.
+
+\subsection{Delivery Scheduling Process}
+After a delivery request is approved, the delivery can be scheduled.
+\subsection{Delivery Execution and Tracking Process}
+During delivery execution, the system records the progress of the delivery.
+\subsection{Delivery Confirmation Process}
+When the package reaches its destination, the delivery must be confirmed.
+\subsection{Failed Delivery Process}
+A delivery may fail for various operational reasons.
+
+\section{Business Rules}
+The following business rules are derived from the proposed business processes and are used as the basis for database design.
+\section{Data Requirements}
+Based on the system requirements and business rules, the database must manage several major categories of data.
+\subsection{User and Authorization Data}
+
+\subsection{Delivery Order Data}
+
+\subsection{Package Data}
+
+\subsection{Drone and Delivery Data}
+
+\subsection{Landing Station Data}
+
+\subsection{Tracking and Confirmation Data}
+
+\subsection{AI-assisted Service Data}
+
+\subsection{Audit Data}
+
+\section{Chapter Summary}
+
+This chapter analyzed the main requirements of the SmartDroneDelivery platform from a database perspective. The system actors, functional requirements, non-functional requirements, business processes, business rules, and major data requirements were identified.
+
+These requirements provide the foundation for the next stage of the project, in which the main entities, attributes, relationships, and cardinalities will be identified and transformed into a conceptual database model.
