@@ -95,29 +95,36 @@ The database should be designed in a modular and maintainable manner so that add
 \subsection{Audit and Backup}
 The system shall support system monitoring, audit logging, and backup. The database design must therefore consider the storage of audit information and support reliable data recovery.
 
-\section{Business Processes}
-The main business processes supported by the SmartDroneDelivery platform are described below.
-\subsection{Delivery Request Process}
-The delivery request process begins when a customer creates a delivery order.
-The general process is:
+\section{URL}
+
+The drone delivery request process begins when a customer creates a
+delivery request on the platform. The general process is:
+
 \begin{enumerate}
-    \item Customer creates a delivery request.
-    \item Customer provides delivery address and package information.
-    \item The system stores the delivery request.
-    \item Dispatcher reviews the request.
-    \item Dispatcher approves or rejects the request.
+    \item Customer creates a drone delivery request.
+    
+    \item Customer provides the delivery address and package information.
+    
+    \item The system validates and stores the delivery request.
+    
+    \item The AI system analyzes the request and recommends a suitable
+    drone and delivery route.
+    
+    \item The dispatcher reviews the AI-generated delivery plan.
+    
+    \item The dispatcher approves or rejects the request.
+    
+    \item If approved, the system assigns the drone and starts the delivery.
+    
+    \item The system monitors the drone and updates the delivery status.
+    
+    \item The system marks the order as completed when the package is
+    successfully delivered.
 \end{enumerate}
 
-This process requires the database to store customer information, delivery address, package information, order information, and order status.
-
-\subsection{Delivery Scheduling Process}
-After a delivery request is approved, the delivery can be scheduled.
-\subsection{Delivery Execution and Tracking Process}
-During delivery execution, the system records the progress of the delivery.
-\subsection{Delivery Confirmation Process}
-When the package reaches its destination, the delivery must be confirmed.
-\subsection{Failed Delivery Process}
-A delivery may fail for various operational reasons.
+This process requires the database to store customer information,
+delivery address, package information, order information, drone
+information, delivery route, AI recommendation, and order status.
 
 \section{Business Rules}
 The following business rules are derived from the proposed business processes and are used as the basis for database design.
