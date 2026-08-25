@@ -5,29 +5,54 @@ The main entities include:
 
 \begin{itemize}
     \item \textbf{Customer}(\underline{CustomerID}, CustomerName, PhoneNumber, Address)
-    \item \textbf{DeliveryOrder}(\underline{OrderID}, CustomerID, Status, ETA)
-    \item \textbf{Package}(\underline{PackageID}, OrderID, Weight, Dimensions)
-    \item \textbf{Confirmation}(\underline{ConfirmationID}, OrderID, ReceiverName, TimeConfirmed)
+    \item \textbf{DeliveryOrder}(\underline{OrderID}, CustomerID FK, Status, ETA)
+    \item \textbf{Package}(\underline{PackageID}, OrderID FK, Weight, Dimensions)
+    \item \textbf{Confirmation}(\underline{ConfirmationID}, OrderID FK, CustomerID FK, ReceiverName, TimeConfirmed)
     \item \textbf{LandingStation}(\underline{StationID}, Location, Capacity)
-    \item \textbf{Tracking}(\underline{TrackingID}, OrderID, CurrentLocation, Timestamp)
-    \item \textbf{Drone}(\underline{DroneID}, Status)
-    \item \textbf{DeliveryWorkflow}(\underline{WorkflowID}, OrderID, CurrentStatus, AssignedUserID, Timestamp)
-    \item \textbf{User}(\underline{UserID}, UserRole, UserPassword, PhoneNumber)
-    \item \textbf{AuditLog}(\underline{LogID}, UserID, ActionType, ActionTime, AffectedRecord)
+    \item \textbf{DeliveryOrderStation}(OrderID FK, StationID FK, \underline{(OrderID, StationID)})
+    \item \textbf{Drone}(\underline{DroneID}, Status, StationID FK, OrderID FK)
+    \item \textbf{Tracking}(\underline{TrackingID}, OrderID FK, DroneID FK, CurrentLocation, Timestamp)
+    \item \textbf{DeliveryWorkflow}(\underline{WorkflowID}, OrderID FK, CurrentStatus, AssignedUserID FK, Timestamp)
+    \item \textbf{User}(\underline{UserID}, UserName, UserRole, UserPassword, PhoneNumber)
+    \item \textbf{AuditLog}(\underline{LogID}, UserID FK, OrderID FK, ActionType, ActionTime)
 \end{itemize}
+\section{Entity Roles in Business}
+
+\begin{itemize}
+    \item \textbf{Customer}: Stores customer information; the source of delivery orders.
+    \item \textbf{DeliveryOrder}: Central entity representing each order placed by a customer.
+    \item \textbf{Package}: Details individual packages belonging to an order.
+    \item \textbf{Confirmation}: Records customer confirmations of delivery or receipt.
+    \item \textbf{LandingStation}: Represents drone stations where drones are based or land.
+    \item \textbf{DeliveryOrderStation}: Links orders to multiple stations, reflecting real transport routes.
+    \item \textbf{Drone}: Manages delivery drones, their status, and assigned orders.
+    \item \textbf{Tracking}: Logs the location and time updates of orders and drones during delivery.
+    \item \textbf{DeliveryWorkflow}: Captures the step-by-step process of fulfilling an order.
+    \item \textbf{User}: Represents system users (employees) with roles and credentials.
+    \item \textbf{AuditLog}: Maintains a record of user actions for accountability and auditing.
+\end{itemize}
+
 
 \section{Relationships}
 \begin{itemize}
     \item Customer $\to$ DeliveryOrder (1:N)
     \item DeliveryOrder $\to$ Package (1:N)
-    \item DeliveryOrder $\to$ Confirmation (1:1)
-    \item DeliveryOrder $\leftrightarrow$ LandingStation (N:N)
+    \item DeliveryOrder $\to$ Confirmation (1:N)
+    \item DeliveryOrder $\to$ DeliveryOrderStation (1:N), DeliveryOrderStation $\to$ LandingStation (N:1) \\
+          \textit{(represents the many-to-many relationship between DeliveryOrder and LandingStation)}
     \item DeliveryOrder $\to$ Tracking (1:N)
     \item DeliveryOrder $\to$ Drone (1:1)
     \item DeliveryOrder $\to$ DeliveryWorkflow (1:N)
     \item DeliveryWorkflow $\to$ User (N:1)
     \item User $\to$ AuditLog (1:N)
+    \item Drone $\to$ Tracking (1:N)
+    \item LandingStation $\to$ Drone (1:N)
+    \item Customer $\to$ Confirmation (1:N)
+    \item AuditLog $\to$ DeliveryOrder (N:1)
 \end{itemize}
+
+
+
 
 \section{Logical Design}
 From the conceptual model, we derive the relational schema:
@@ -36,13 +61,14 @@ From the conceptual model, we derive the relational schema:
     \item Customer(CustomerID PK, CustomerName, PhoneNumber, Address)
     \item DeliveryOrder(OrderID PK, CustomerID FK, Status, ETA)
     \item Package(PackageID PK, OrderID FK, Weight, Dimensions)
-    \item Confirmation(ConfirmationID PK, OrderID FK, ReceiverName, TimeConfirmed)
+    \item Confirmation(ConfirmationID PK, OrderID FK, ReceiverName, TimeConfirmed, CustomerID FK)
     \item LandingStation(StationID PK, Location, Capacity)
-    \item Tracking(TrackingID PK, OrderID FK, CurrentLocation, Timestamp)
-    \item Drone(DroneID PK, Status)
+    \item DeliveryOrderStation(OrderID FK, StationID FK, PRIMARY KEY(OrderID, StationID))
+    \item Tracking(TrackingID PK, OrderID FK, DroneID FK, CurrentLocation, Timestamp)
+    \item Drone(DroneID PK, Status, StationID FK, OrderID FK)
     \item DeliveryWorkflow(WorkflowID PK, OrderID FK, CurrentStatus, AssignedUserID FK, Timestamp)
-    \item User(UserID PK, UserRole, UserPassword, PhoneNumber)
-    \item AuditLog(LogID PK, UserID FK, ActionType, ActionTime, AffectedRecord)
+    \item User(UserID PK, UserName, UserRole, UserPassword, PhoneNumber)
+    \item AuditLog(LogID PK, UserID FK, OrderID FK, ActionType, ActionTime)
 \end{itemize}
 
 \section{Physical Design}
