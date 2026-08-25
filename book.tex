@@ -1,15 +1,27 @@
-\documentclass[letterpaper,11pt,leqno]{book}
+\documentclass[letterpaper,11pt,leqno,openany]{book}
 \usepackage{book}
 \bibliographystyle{book}
 
 % Enter book title to populate PDF metadata:
-\hypersetup {pdftitle={Minimalist LaTeX Template for Academic Books}}
+\hypersetup {pdftitle={AI-powered Drone Delivery Management Platform}}
 
 % Enter path to BibTeX file with references:
 \newcommand{\bib}{book.bib}
 
 % Enter path to PDF file with figures:
 \newcommand{\pdf}{figures.pdf}
+
+\usepackage{iftex}
+\ifXeTeX
+  \usepackage{fontspec}
+  \setmainfont{Times New Roman}
+\else\ifLuaTeX
+  \usepackage{fontspec}
+  \setmainfont{Times New Roman}
+\else
+  \usepackage[vietnamese,english]{babel}
+\fi\fi
+
 
 \begin{document}
 
@@ -37,74 +49,21 @@
 
 % Enter book structure
 \chapter{Preface}
-
 \input{preface}
 
-
 \chapter{Introduction}\label{c:introduction}
-
 \input{chapter1}
 
-\chapter{Sections and content}\label{c:section}
-
+\chapter{System Requirements Analysis}\label{c:analysis}
 \input{chapter2}
 
-\chapter{Math}\label{c:math}
-
+\chapter{System Design}\label{c:design}
 \input{chapter3}
 
-\part{Second half of the book}\label{p:second}
-
-\chapter{Lists, figures, and tables}\label{c:figures}
-
+\chapter{Test and Evaluation}\label{c:test}
 \input{chapter4}
 
-\chapter{Cross-references and quotes}\label{c:conclusion}
-
+\chapter{Conclusion} \label{c:conclusion}
 \input{chapter5}
-
-\chapter{Further results}\label{c:further}
-
-\input{chapter6}
-
-\chapter{Extensions}\label{c:extensions}
-
-\input{chapter7}
-
-\part{Conclusion}\label{p:conclusion}
-
-\chapter{Summary}\label{c:summary}
-
-\input{chapter8}
-
-\chapter{Future research}\label{c:future}
-
-\input{chapter9}
-
-\appendix
-
-\part{Technical appendix}\label{p:appendix}
-
-\chapter{Generic technical topic}\label{a:appendix1}
-
-\input{appendixA}
-
-\chapter{Another technical topic}\label{a:appendix2}
-
-\input{appendixB}
-
-\chapter{Last technical topic}\label{a:appendix3}
-
-\input{appendixC}
-
-\backmatter
-
-\bibliography{\bib}
-
-\chapter{Acknowledgments}
-
-\input{acknowledgements}
-
-\printindex
 
 \end{document}
