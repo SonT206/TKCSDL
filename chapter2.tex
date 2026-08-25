@@ -162,7 +162,114 @@ The following business rules are derived from the proposed business processes an
 \section{Data Requirements}
 Based on the system requirements and business rules, the database must manage several major categories of data.
 \subsection{User and Authorization Data}
+The database must store user account and authorization information required to control access to the system. The required data includes:
 
+\begin{itemize}
+    \item User identification and account information.
+    \item Authentication information required for user login.
+    \item User roles within the system.
+    \item Permissions associated with each role.
+    \item User account status.
+\end{itemize}
+
+This data enables the system to identify users and control access to system functions according to their assigned roles and permissions. 
+\subsection{Delivery Order Data}
+  The database must store delivery order information to support the creation, processing, and management of delivery requests. The required data includes:
+
+\begin{itemize}
+    \item Delivery order identification information.
+    \item Customer associated with each delivery order.
+    \item Delivery address associated with each delivery order.
+    \item Order creation date and related delivery information.
+    \item Current delivery order status.
+    \item Status history records for each delivery order.
+\end{itemize}
+
+This data enables the system to manage delivery orders and preserve the history of changes throughout the delivery process.
+
+\subsection{Package Data}
+The database must store package information associated with delivery orders. The required data includes:
+
+\begin{itemize}
+    \item Package identification information.
+    \item Delivery order associated with the package.
+    \item Package description and related information.
+    \item Package weight and dimensions.
+    \item Package status information.
+\end{itemize}
+
+This data enables the system to manage package information and determine the package details required for drone-based delivery operations.
+
+\subsection{Drone and Delivery Data}
+ The database must store drone and delivery activity information required for delivery execution. The required data includes:
+
+\begin{itemize}
+    \item Drone identification information.
+    \item Drone status and availability information.
+    \item Delivery activity information.
+    \item Drone assigned to each delivery activity.
+    \item Delivery order associated with each delivery activity.
+    \item Delivery activity status and time information.
+\end{itemize}
+
+This data enables the system to associate drones with delivery activities and manage delivery execution over time.
+
+\subsection{Landing Station Data}
+The database must store information about landing stations used in delivery operations. The required data includes:
+
+\begin{itemize}
+    \item Landing station identification information.
+    \item Landing station location information.
+    \item Station capacity information.
+    \item Current station availability.
+    \item Delivery operations associated with the landing station.
+    \item Historical station availability information when required.
+\end{itemize}
+
+This data enables the system to manage landing stations and determine their availability for delivery operations.
+
+\subsection{Tracking and Confirmation Data}
+The database must store tracking and confirmation information generated during and after delivery execution. The required data includes:
+
+\begin{itemize}
+    \item Delivery order associated with each tracking record.
+    \item Tracking time information.
+    \item Delivery progress and status information.
+    \item Historical tracking records.
+    \item Delivery confirmation information.
+    \item Confirmation time and completion status.
+\end{itemize}
+
+This data enables the system to monitor delivery progress, preserve historical tracking information, and record successful delivery confirmation.
+
+
+\subsection{AI-assisted Service Data}
+The database must provide delivery-related data required by AI-assisted services. The required data includes:
+
+\begin{itemize}
+    \item Delivery order information.
+    \item Package and delivery activity information.
+    \item Historical delivery and tracking information.
+    \item Delivery time information used for estimation.
+    \item Operational data used for analytics.
+    \item Information required for delivery summarization and customer assistance.
+\end{itemize}
+
+This data supports AI-assisted services such as estimated delivery time, delivery summarization, customer assistance, and operational analytics.
+
+\subsection{Audit Data}
+
+The database must preserve audit information required for monitoring and accountability. The required data includes:
+
+\begin{itemize}
+    \item User associated with an important system action.
+    \item Type of action performed.
+    \item Date and time of the action.
+    \item Relevant record or operation affected by the action.
+    \item Historical information required for monitoring and auditing.
+\end{itemize}
+
+This data enables the system to maintain traceability of important operations and support monitoring and auditing activities.
 \subsection{Delivery Order Data}
 
 \subsection{Package Data}
