@@ -1,10 +1,10 @@
 # AI-powered Drone Delivery Management Platform
 
-## 📌 Introduction
+##  Introduction
 This project designs a database schema for a drone-based delivery system.  
 The goal is to manage the entire workflow: from customer orders, package handling, drone assignment, tracking, delivery confirmation, to auditing employee actions.
 
-## 🏗️ Document Structure
+##  Document Structure
 The LaTeX report is organized into 5 chapters:
 - **Chapter 1: Introduction** – Background, objectives, scope.
 - **Chapter 2: System Analysis** – Business requirements, use cases, conceptual model.
@@ -12,7 +12,7 @@ The LaTeX report is organized into 5 chapters:
 - **Chapter 4: Testing and Evaluation** – Test cases, evaluation criteria, results.
 - **Chapter 5: Conclusion** – Summary and proposed improvements.
 
-## 🔑 Key Entities
+##  Key Entities
 - **Customer**: Stores customer information.
 - **DeliveryOrder**: Central entity representing each order.
 - **Package**: Details of individual packages.
@@ -25,7 +25,7 @@ The LaTeX report is organized into 5 chapters:
 - **User**: System employees with roles and credentials.
 - **AuditLog**: Records user actions for accountability.
 
-## 🧪 Testing and Evaluation
+##  Testing and Evaluation
 - **Functional Testing**: Verify entity relationships and constraints.  
 - **Integrity Testing**: Ensure foreign keys prevent invalid data.  
 - **Performance Testing**: Measure query execution time for Tracking and Workflow.  
@@ -43,7 +43,7 @@ The LaTeX report is organized into 5 chapters:
 - Performance stable under simulated high load.  
 - AuditLog ensures transparency and accountability.  
 
-## 🚀 Conclusion and Future Work
+##  Conclusion and Future Work
 **Conclusion:**  
 The schema successfully models the drone delivery workflow, ensuring consistency, reliability, scalability, and transparency.  
 
