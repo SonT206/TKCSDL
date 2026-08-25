@@ -13,14 +13,19 @@ From a database perspective, the system requires a structured and reliable data 
 The SmartDroneDelivery platform supports five main human actors. Each actor interacts with different functions of the system and generates or accesses different types of data.
 
 \subsection{Customer}
+Customers are the end-users who initiate the delivery lifecycle. They interact with the mobile application to manage personal profiles, add delivery addresses, and create new delivery requests. Customers also need real-time access to track their active orders, view AI-estimated arrival times, and provide final confirmation once a package is received.
 
 \subsection{Dispatcher}
+Dispatchers are the operational controllers responsible for coordinating delivery execution. They review customer requests, evaluate AI-generated route recommendations, and approve or reject orders. Dispatchers also manually assign drones and landing stations to specific delivery activities and handle any exceptions or rescheduling needed during the transit process.
 
 \subsection{Station Operator}
+Station Operators manage the physical ground infrastructure at the landing stations. They use the system to log the real-time availability and package capacity of their assigned stations. Their role also includes registering maintenance updates for drones and confirming the physical dispatch or arrival of packages at the facility.
 
 \subsection{Logistics Manager}
+Logistics Managers focus on high-level oversight and network optimization. They utilize the system's dashboard to monitor global operations across all drones and stations. Managers rely on AI-assisted services to review delivery summaries and analyze operational metrics, such as success rates and average delivery times, to improve overall efficiency.
 
 \subsection{System Administrator}
+System Administrators ensure the technical stability and security of the platform. They are responsible for user management, which includes creating staff accounts, assigning role-based access control, and handling password resets. Administrators also monitor system audit logs, manage data backups, and configure global system settings.
 
 \section{Functional Requirements}
 This section describes the main functions that the SmartDroneDelivery platform must support. The functional requirements are grouped according to the core modules of the system and form the basis for identifying the data that the database must store and manage.
