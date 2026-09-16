@@ -1,24 +1,55 @@
-\section{Conclusion}
-Through the design and testing process, the database schema for the drone delivery system 
-has been successfully developed. The schema covers all critical aspects of the business workflow:
-customers, orders, packages, drones, landing stations, tracking, workflows, confirmations, 
-and audit logs. Testing confirmed that the schema maintains referential integrity, supports 
-error handling (such as drone replacement), and ensures transparency through audit logging.
+% !TeX root = book.tex
 
-The evaluation demonstrated that the database is consistent, reliable, and scalable. 
-It can handle multiple drones and stations simultaneously, while providing accountability 
-for user actions. Overall, the design meets the operational requirements of a modern drone 
-delivery business.
+\section{Database Design Results}\label{s:results}
 
-\section{Future Development}
-Although the current schema is functional and robust, several improvements can be considered:
+\qquad This document has presented the complete database design for the SmartDroneDelivery platform, covering the analysis of data requirements and business rules, the conceptual entity model, the logical relational schema, and the physical PostgreSQL implementation.
+
+The final database consists of twenty-three tables organized into seven functional groups: user and authorization, customer and address, delivery order and package, landing station and operator management, delivery execution and telemetry, delivery confirmation, and audit, route, and AI recommendation tables. The conceptual and logical database design covers all thirty-nine identified business requirements and rules. Database-level enforcement is implemented for structural constraints, while cross-record business rules such as status transactions, drone concurrency, payload validation, and operational authorization require trigger or transaction-level enforcement. 
+
+The most significant structural improvement introduced in this design is the replacement of a direct 1:1 relationship between a delivery order and a drone with the \texttt{delivery\_activity} entity as an intermediary. This change enables the following capabilities:
+
 \begin{itemize}
-    \item \textbf{IoT Integration}: Connect real-time telemetry from drones directly into the Tracking table.
-    \item \textbf{Advanced Security}: Implement role-based access control and encryption for sensitive data.
-    \item \textbf{Analytics}: Extend the schema to support predictive analytics for delivery times and drone maintenance.
-    \item \textbf{Customer Feedback}: Add a module for customer reviews and service quality monitoring.
-    \item \textbf{Automation}: Integrate automated alerts for lost packages or drone failures to improve responsiveness.
+    \item A single delivery order can be attempted multiple times. Each attempt is recorded as a separate \texttt{delivery\_activity} row.
+    \item When a delivery fails and is rescheduled, a new activity is created. The original failed activity and its exception and tracking records are preserved.
+    \item The self-referencing foreign key \texttt{previous\_activity\_id} in \texttt{delivery\_activity} maintains the unbroken lineage across consecutive rescheduling attempts.
+    \item A drone can be assigned to multiple orders over time without storing redundant order information in the drone table.
+    \item Tracking records and delivery exceptions are associated with a specific delivery activity, providing granular, per-attempt history.
 \end{itemize}
 
-These enhancements would increase the system’s resilience, improve customer satisfaction, 
-and provide valuable insights for business optimization.
+Additional improvements include:
+
+\begin{itemize}
+    \item Customer addresses are stored in a separate \texttt{customer\_address} table, supporting multiple addresses per customer and enabling geographic coordinates to be stored as separate numeric columns for query and validation purposes.
+    \item Station staffing and package handling are formalized through \texttt{station\_operator\_assignment} and \texttt{package\_station\_event}, enabling end-to-end verification of package pickup before drone departure.
+    \item The \texttt{order\_status\_history} and \texttt{station\_status\_history} tables provide complete, append-only records of all status transitions. Business history and audit log data are maintained in separate tables serving distinct purposes.
+    \item The \texttt{delivery\_confirmation} table enforces \texttt{UNIQUE} constraints on both \texttt{order\_id} and \texttt{activity\_id}, implementing the business rule that each order has at most one confirmation and linking it directly to the successful attempt.
+    \item The schema uses \texttt{evidence\_object\_key} to reference external object storage (e.g., MinIO/S3) for signatures and delivery photos, preventing binary bloat in PostgreSQL.
+    \item All primary key columns use \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} and all timestamp columns use \texttt{TIMESTAMPTZ}, in accordance with PostgreSQL best practices.
+    \item The table named \texttt{system\_user} avoids the reserved keyword \texttt{USER} in SQL.
+\end{itemize}
+
+\section{Limitations}\label{s:limitations}
+
+The following limitations are acknowledged in the current design:
+
+\begin{itemize}
+    \item \textbf{No soft-delete mechanism}: The current schema does not implement soft deletion (e.g., an \texttt{is\_deleted} flag). Deleted records cannot be recovered unless a backup is available. Future versions may add soft-delete support for critical entities.
+    \item \textbf{Status values as check constraints}: Order, drone, station, and activity statuses are enforced through \texttt{CHECK} constraints on \texttt{VARCHAR} columns. If new status values are needed in the future, an \texttt{ALTER TABLE} statement is required. An alternative approach would be to use PostgreSQL \texttt{ENUM} types or a reference table, which would allow status values to be managed through \texttt{INSERT} statements rather than schema changes.
+    \item \textbf{No partitioning}: The \texttt{tracking\_record} table is expected to grow rapidly in production. The current design does not implement table partitioning. For production deployments at scale, range partitioning on \texttt{recorded\_at} should be considered.
+    \item \textbf{Performance tests on limited dataset}: Performance tests were conducted on a dataset of representative but limited size. Tests at production scale with millions of tracking records would require additional evaluation.
+    \item \textbf{Optional tables not yet tested at scale}: The \texttt{delivery\_route}, \texttt{route\_point}, and \texttt{ai\_recommendation} tables are included in the schema but were not the subject of dedicated performance tests in this document.
+\end{itemize}
+
+\section{Future Database Improvements}\label{s:future}
+
+Several improvements can be considered for future versions of the database design:
+
+\begin{itemize}
+    \item \textbf{Table Partitioning}: Implement range partitioning on \texttt{tracking\_record(recorded\_at)} and \texttt{audit\_log(action\_time)} to manage data growth efficiently and improve query performance on time-bounded queries.
+    \item \textbf{Status Reference Tables}: Replace \texttt{CHECK} constraints on status columns with dedicated reference tables, making status value management more flexible without requiring schema alterations.
+    \item \textbf{Full-text Search}: Add PostgreSQL full-text search indexes on \texttt{delivery\_exception.description} and \texttt{audit\_log} fields to support operational analytics queries.
+    \item \textbf{Database Triggers}: Implement database triggers to automatically insert rows into \texttt{order\_status\_history} and \texttt{station\_status\_history} whenever the corresponding status columns are updated, ensuring that history records are never omitted.
+    \item \textbf{Materialized Views}: Create materialized views for common analytical queries, such as delivery success rates by station or average delivery duration by drone model, to reduce the overhead of repeated aggregation queries.
+    \item \textbf{Connection Pooling and Read Replicas}: For production deployments, configure a connection pooler and read replicas to distribute query load and improve availability.
+    \item \textbf{IoT Telemetry Integration}: Connect real-time telemetry from drone hardware directly into the \texttt{tracking\_record} table through a dedicated ingestion pipeline, replacing or supplementing manual tracking updates.
+\end{itemize}
