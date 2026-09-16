@@ -9,7 +9,7 @@ The report focuses exclusively on the **database design** of an AI-powered Drone
 | Field | Detail |
 |---|---|
 | **Project name** | SmartDroneDelivery — AI-powered Drone Delivery Management Platform |
-| **Subject** | Database Search and Design (Tìm kiếm cơ sở dữ liệu) |
+| **Subject** | Database Search and Design (Thiết kế cơ sở dữ liệu) |
 | **Group** | Group 4 |
 | **Members** | 089206011070 – Tran Tan Phat |
 | | 079206000967 – Tran Hoang Son |
