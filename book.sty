@@ -1,20 +1,17 @@
 % ---- Select text fonts ----
-\RequirePackage{iftex}
 
-\ifPDFTeX
-  % Make PDF searchable and copyable in pdfTeX
-  \input{glyphtounicode}
-  \pdfgentounicode=1
-  % Select font encoding 
-  \usepackage[T5,T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  % Select text font
-  \usepackage{sourceserifpro}
-  % Select monospaced font
-  \usepackage{sourcecodepro}
-\else
-  % XeTeX / LuaTeX handles Unicode natively via fontspec
-\fi
+% Make PDF searchable and copyable
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+% Select font encoding 
+\usepackage[T1]{fontenc}
+
+% Select text font
+\usepackage{sourceserifpro}
+
+% Select monospaced font
+\usepackage{sourcecodepro}
 
 % ---- Select math fonts ----
 

@@ -1,949 +1,164 @@
-% !TeX root = book.tex
-\section{Conceptual Database Design}\label{s:conceptual}
-
-This section presents the conceptual database model for the SmartDroneDelivery platform. The conceptual model identifies the main entities, their attributes, the relationships between entities, and the cardinalities of those relationships. The conceptual model serves as the basis for the logical relational schema developed in Section~\ref{s:logical}.
-
-\subsection{Entity Identification}\label{s:entities}
-
-Based on the requirements and business rules documented in Chapter~\ref{c:analysis}, the following twenty-three entities are identified. They are organized into seven functional groups to ensure comprehensive coverage without operational redundancy.
-
-\paragraph{1. User and Authorization Group.}
-\begin{itemize}
-    \item \textbf{system\_user} — Stores authentication credentials and account statuses for all actors. Avoids reserved SQL keywords.
-    \item \textbf{role} — Defines standard operational roles (\texttt{CUSTOMER}, \texttt{DISPATCHER}, \texttt{STATION\_OPERATOR}, \texttt{LOGISTICS\_MANAGER}, \texttt{SYSTEM\_ADMIN}).
-    \item \textbf{permission} — Defines granular permissions (e.g., \texttt{CREATE\_ORDER}, \texttt{ASSIGN\_DRONE}, \texttt{CONFIRM\_PICKUP}).
-    \item \textbf{user\_role} — Bridge table implementing the many-to-many relationship between users and roles.
-    \item \textbf{role\_permission} — Bridge table implementing the many-to-many relationship between roles and permissions.
-\end{itemize}
-
-\paragraph{2. Customer and Address Group.}
-\begin{itemize}
-    \item \textbf{customer} — Stores customer profile information, optionally linked to a system user account.
-    \item \textbf{customer\_address} — Stores one or more delivery addresses per customer, including precise geographic coordinates for drone navigation.
-\end{itemize}
-
-\paragraph{3. Delivery Order and Package Group.}
-\begin{itemize}
-    \item \textbf{delivery\_order} — Represents customer delivery requests, tracking customer requested time, estimated arrival, and lifecycle state.
-    \item \textbf{package} — Stores physical package specifications (weight and dimensions in centimeters) associated with an order.
-    \item \textbf{order\_status\_history} — Append-only record capturing every status transition of a delivery order.
-\end{itemize}
-
-\paragraph{4. Landing Station and Drone Management Group.}
-\begin{itemize}
-    \item \textbf{landing\_station} — Stores physical takeoff/landing stations, coordinates, and drone capacity.
-    \item \textbf{station\_status\_history} — Records the history of station status transitions (maintenance, availability).
-    \item \textbf{station\_operator\_assignment} — Records staffing assignments of station operators to landing stations over defined time periods.
-    \item \textbf{drone} — Stores drone serial numbers, models, operational statuses, battery levels, and payload capacities.
-\end{itemize}
-
-\paragraph{5. Delivery Execution and Telemetry Group.}
-\begin{itemize}
-    \item \textbf{delivery\_activity} — Central operational entity representing each discrete execution attempt for an order, linking the drone, departure station, and destination station.
-    \item \textbf{package\_station\_event} — Records package physical handling events at landing stations (arrival, pickup confirmation, loading, unloading).
-    \item \textbf{tracking\_record} — Stores high-frequency GPS and telemetry data captured during drone flight.
-    \item \textbf{delivery\_exception} — Records flight failures, anomalies, or disruptions during a delivery activity.
-\end{itemize}
-
-\paragraph{6. Delivery Confirmation Group.}
-\begin{itemize}
-    \item \textbf{delivery\_confirmation} — Records formal handover proof upon successful delivery, linked 1:0..1 with the order and referencing digital proof in object storage.
-\end{itemize}
-
-\paragraph{7. Audit, Route, and AI Assistance Group.}
-\begin{itemize}
-    \item \textbf{audit\_log} — Immutable system audit trail capturing user actions, before/after JSON snapshots, and IP addresses.
-    \item \textbf{delivery\_route} — Stores planned flight path metadata for a delivery activity.
-    \item \textbf{route\_point} — Stores ordered waypoints along a planned delivery route.
-    \item \textbf{ai\_recommendation} — Stores persistent outputs of AI recommendation models (drone recommendations and ETA predictions).
-\end{itemize}
-
-\subsection{Entity Attributes}\label{s:attributes}
-
-This section specifies the attributes and data types of each identified entity.
-
-\paragraph{system\_user.}
-Stores user account credentials and authentication state.
-\begin{itemize}
-    \item \texttt{user\_id} — Primary key (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}).
-    \item \texttt{username} — Unique username (\texttt{VARCHAR(100)}).
-    \item \texttt{password\_hash} — Cryptographic password hash (\texttt{VARCHAR(255)}).
-    \item \texttt{email} — Unique email address (\texttt{VARCHAR(255)}).
-    \item \texttt{phone\_number} — Unique phone number (\texttt{VARCHAR(20)}).
-    \item \texttt{is\_active} — Account active flag (\texttt{BOOLEAN}).
-    \item \texttt{created\_at}, \texttt{updated\_at} — Account audit timestamps (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{role.}
-Defines system roles.
-\begin{itemize}
-    \item \texttt{role\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{role\_name} — Unique role identifier (\texttt{VARCHAR(50)}).
-    \item \texttt{description} — Description of role responsibilities (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{permission.}
-Defines functional permissions.
-\begin{itemize}
-    \item \texttt{permission\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{permission\_name} — Unique permission code (\texttt{VARCHAR(100)}).
-    \item \texttt{description} — Permission explanation (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{user\_role.}
-Associates users with roles.
-\begin{itemize}
-    \item \texttt{user\_id}, \texttt{role\_id} — Composite primary key and foreign keys.
-    \item \texttt{assigned\_at} — Timestamp of role assignment (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{role\_permission.}
-Associates roles with permissions.
-\begin{itemize}
-    \item \texttt{role\_id}, \texttt{permission\_id} — Composite primary key and foreign keys.
-\end{itemize}
-
-\paragraph{customer.}
-Stores customer profiles.
-\begin{itemize}
-    \item \texttt{customer\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Foreign key to \texttt{system\_user} (\texttt{BIGINT UNIQUE NULL}).
-    \item \texttt{customer\_name} — Full name (\texttt{VARCHAR(100)}).
-    \item \texttt{phone\_number} — Primary contact number (\texttt{VARCHAR(20) UNIQUE}).
-    \item \texttt{email} — Contact email (\texttt{VARCHAR(255) UNIQUE}).
-    \item \texttt{created\_at} — Registration timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{customer\_address.}
-Stores customer delivery locations.
-\begin{itemize}
-    \item \texttt{address\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Foreign key to \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{address\_label} — Label such as ``Home'' or ``Office'' (\texttt{VARCHAR(50)}).
-    \item \texttt{address\_line} — Street address (\texttt{VARCHAR(255) NOT NULL}).
-    \item \texttt{ward}, \texttt{district}, \texttt{city} — Administrative divisions (\texttt{VARCHAR(100)}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{is\_default} — Default address flag (\texttt{BOOLEAN NOT NULL DEFAULT FALSE}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{delivery\_order.}
-Represents delivery requests.
-\begin{itemize}
-    \item \texttt{order\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Foreign key to \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{delivery\_address\_id} — Foreign key to \texttt{customer\_address} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{order\_status} — Current lifecycle state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{requested\_delivery\_time} — Customer desired delivery time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{estimated\_arrival\_at} — System estimated arrival time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{created\_at} — Order placement timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{completed\_at}, \texttt{cancelled\_at} — Finalization timestamps (\texttt{TIMESTAMPTZ}).
-    \item \texttt{cancellation\_reason} — Explanation if cancelled (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{package.}
-Stores package specifications.
-\begin{itemize}
-    \item \texttt{package\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{description} — Content description (\texttt{VARCHAR(500)}).
-    \item \texttt{weight\_kg} — Weight in kilograms (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm} — Dimensions in centimeters (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{package\_status} — Status code (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{order\_status\_history.}
-Maintains immutable order lifecycle audit.
-\begin{itemize}
-    \item \texttt{status\_history\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Recorded status value (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Foreign key to \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Transition reason (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Transition timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{landing\_station.}
-Stores physical landing stations.
-\begin{itemize}
-    \item \texttt{station\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_code} — Unique station code (\texttt{VARCHAR(50) UNIQUE NOT NULL}).
-    \item \texttt{station\_name} — Human-readable name (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{address} — Physical address (\texttt{VARCHAR(255)}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{capacity} — Maximum drone capacity (\texttt{INTEGER >= 0}).
-    \item \texttt{status} — Operational state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{station\_status\_history.}
-Maintains station operational history.
-\begin{itemize}
-    \item \texttt{history\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Recorded station state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Foreign key to \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Transition reason (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Transition timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{station\_operator\_assignment.}
-Records operator staffing at stations.
-\begin{itemize}
-    \item \texttt{assignment\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{user\_id} — Foreign key to \texttt{system\_user} representing the operator (\texttt{BIGINT NOT NULL}).
-    \item \texttt{assigned\_from}, \texttt{assigned\_to} — Assignment validity window (\texttt{TIMESTAMPTZ}).
-    \item \texttt{is\_active} — Flag indicating active assignment (\texttt{BOOLEAN NOT NULL DEFAULT TRUE}).
-    \item \texttt{created\_at} — Assignment timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{drone.}
-Stores drone specifications and status.
-\begin{itemize}
-    \item \texttt{drone\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{serial\_number} — Physical identifier (\texttt{VARCHAR(100) UNIQUE NOT NULL}).
-    \item \texttt{model} — Model designation (\texttt{VARCHAR(100)}).
-    \item \texttt{status} — Operational status (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{max\_payload\_kg} — Maximum payload capacity (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{battery\_level} — Current battery level (\texttt{NUMERIC(5,2)} between 0 and 100).
-    \item \texttt{station\_id} — Foreign key to current \texttt{landing\_station} (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Registration timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-Note: Drones do not store an \texttt{order\_id}; drone assignment is mediated via \texttt{delivery\_activity}.
-
-\paragraph{delivery\_activity.}
-The operational mediator representing delivery execution attempts.
-\begin{itemize}
-    \item \texttt{activity\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{drone\_id} — Foreign key to \texttt{drone} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{pickup\_station\_id} — Foreign key to origin \texttt{landing\_station} (\texttt{BIGINT}).
-    \item \texttt{destination\_station\_id} — Foreign key to destination \texttt{landing\_station} (\texttt{BIGINT}).
-    \item \texttt{assigned\_by} — Foreign key to dispatching \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{scheduled\_at} — Planned execution time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{activity\_status} — Execution state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{started\_at}, \texttt{ended\_at} — Execution timestamps (\texttt{TIMESTAMPTZ}).
-    \item \texttt{previous\_activity\_id} — Self-referencing foreign key linking preceding failed attempt (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{package\_station\_event.}
-Records package handling at stations.
-\begin{itemize}
-    \item \texttt{event\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{package\_id} — Foreign key to \texttt{package} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{event\_type} — Handling event type (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{performed\_by} — Foreign key to station operator \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{occurred\_at} — Event timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Operational remarks (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{tracking\_record.}
-Stores high-frequency in-flight telemetry.
-\begin{itemize}
-    \item \texttt{tracking\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{altitude\_m} — Altitude in meters (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{speed\_kmh} — Ground speed in km/h (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{battery\_level} — Battery percentage (\texttt{NUMERIC(5,2)}).
-    \item \texttt{recorded\_at} — Telemetry capture timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{delivery\_confirmation.}
-Formal delivery proof.
-\begin{itemize}
-    \item \texttt{confirmation\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{activity\_id} — Foreign key to successful \texttt{delivery\_activity} (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{confirmed\_by} — Foreign key to verifying \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{receiver\_name} — Name of package recipient (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{receiver\_phone} — Recipient contact phone (\texttt{VARCHAR(20)}).
-    \item \texttt{confirmation\_method} — Method code (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{evidence\_object\_key} — Object storage key for digital signature/photo proof (\texttt{VARCHAR(255)}).
-    \item \texttt{confirmed\_at} — Handover timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Delivery remarks (\texttt{VARCHAR(500)}).
-\end{itemize}
-
-\paragraph{delivery\_exception.}
-Records flight failures and incidents.
-\begin{itemize}
-    \item \texttt{exception\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{exception\_type} — Incident category (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{description} — Detailed incident narrative (\texttt{TEXT}).
-    \item \texttt{detected\_at} — Incident detection timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{resolved\_at} — Resolution timestamp (\texttt{TIMESTAMPTZ}).
-    \item \texttt{resolved\_by} — Foreign key to resolving \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{resolution} — Corrective action explanation (\texttt{TEXT}).
-\end{itemize}
-
-\paragraph{audit\_log.}
-System-wide security and modification audit log.
-\begin{itemize}
-    \item \texttt{log\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Foreign key to actor \texttt{system\_user} (\texttt{BIGINT NULL}).
-    \item \texttt{entity\_name} — Target table name (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{record\_id} — Target record primary key (\texttt{BIGINT}).
-    \item \texttt{action\_type} — Operation type (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{old\_value}, \texttt{new\_value} — Before/after JSON snapshots (\texttt{JSONB}).
-    \item \texttt{action\_time} — Audit timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{ip\_address} — Client network address (\texttt{INET}).
-\end{itemize}
-
-\paragraph{delivery\_route and route\_point.}
-Planned flight trajectories and waypoints.
-\begin{itemize}
-    \item \texttt{delivery\_route}: \texttt{route\_id} (PK), \texttt{activity\_id} (FK UNIQUE), \texttt{total\_distance\_km}, \texttt{estimated\_duration\_min}, \texttt{created\_at}.
-    \item \texttt{route\_point}: \texttt{route\_point\_id} (PK), \texttt{route\_id} (FK), \texttt{sequence\_number}, \texttt{latitude}, \texttt{longitude}, \texttt{altitude\_m}.
-\end{itemize}
-
-\paragraph{ai\_recommendation.}
-Persistent outputs from AI analytics services.
-\begin{itemize}
-    \item \texttt{recommendation\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NULL}).
-    \item \texttt{recommendation\_type} — Recommendation category (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{recommended\_drone\_id} — Foreign key to suggested \texttt{drone} (\texttt{BIGINT NULL}).
-    \item \texttt{estimated\_duration\_min} — Model estimated flight minutes (\texttt{NUMERIC(10,2)}).
-    \item \texttt{confidence\_score} — Confidence level (\texttt{NUMERIC(5,4)} between 0 and 1).
-    \item \texttt{model\_version} — Version identifier of the AI service (\texttt{VARCHAR(50)}).
-    \item \texttt{created\_at} — Recommendation generation timestamp (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\subsection{Relationships and Cardinalities}\label{s:relationships}
-
-The relationships and cardinalities between the twenty-three entities are defined as follows, strictly conforming to the business rules:
+\section{Database Conceptual Design}
+In this section, we construct the conceptual model (ERD) for the 
+\textbf{Drone Delivery Management Platform}.
+The main entities include:
 
 \begin{itemize}
-    \item \textbf{customer} 1 : N \textbf{customer\_address} — One customer owns many addresses; each address belongs to exactly one customer (BR-01).
-    \item \textbf{customer} 1 : N \textbf{delivery\_order} — One customer creates many delivery orders; each order belongs to one customer (BR-02).
-    \item \textbf{customer\_address} 1 : N \textbf{delivery\_order} — One address can be the destination for many orders; each order specifies one destination address (BR-03, BR-04).
-    \item \textbf{delivery\_order} 1 : N \textbf{package} — One order contains one or more packages; each package belongs to one order (BR-06, BR-07).
-    \item \textbf{delivery\_order} 1 : N \textbf{order\_status\_history} — One order accumulates multiple historical status records (BR-10, BR-11).
-    \item \textbf{delivery\_order} 1 : N \textbf{delivery\_activity} — One order can have multiple execution attempts (initial and rescheduled) (BR-19, BR-20).
-    \item \textbf{delivery\_order} 1 : 0..1 \textbf{delivery\_confirmation} — One order has at most one successful delivery confirmation (BR-33).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_confirmation} — A confirmation is tied to exactly one successful delivery activity attempt (BR-35).
-    \item \textbf{delivery\_activity} 0..1 : 1 \textbf{delivery\_activity} — Rescheduled activities link to their preceding attempt via \texttt{previous\_activity\_id} (BR-22).
-    \item \textbf{drone} 1 : N \textbf{delivery\_activity} — A drone serves many delivery activities over time, but only one active flight at any instant (BR-15, BR-16).
-    \item \textbf{landing\_station} 1 : N \textbf{drone} — A station accommodates multiple parked drones (BR-25).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_status\_history} — A station preserves its operational status changes (BR-26).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_operator\_assignment} — A station has multiple operator staffing assignments over time (BR-27).
-    \item \textbf{system\_user} 1 : N \textbf{station\_operator\_assignment} — A station operator user can be assigned to multiple stations over time (BR-27).
-    \item \textbf{package} 1 : N \textbf{package\_station\_event} — A package undergoes multiple station handling events (arrival, pickup, loading) (BR-29, BR-30).
-    \item \textbf{landing\_station} 1 : N \textbf{package\_station\_event} — A station processes events for many packages (BR-31).
-    \item \textbf{delivery\_activity} 1 : N \textbf{tracking\_record} — Each activity generates an immutable series of flight telemetry points (BR-12).
-    \item \textbf{delivery\_activity} 1 : N \textbf{delivery\_exception} — An activity may encounter zero, one, or multiple exception incidents (BR-13, BR-21).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_route} — An activity has at most one planned route.
-    \item \textbf{delivery\_route} 1 : N \textbf{route\_point} — A route is composed of an ordered sequence of waypoints.
-    \item \textbf{delivery\_order} 1 : N \textbf{ai\_recommendation} — An order may receive recommendations from multiple AI models over time.
-    \item \textbf{system\_user} N : N \textbf{role} — Mediated by \textbf{user\_role}.
-    \item \textbf{role} N : N \textbf{permission} — Mediated by \textbf{role\_permission}.
-    \item \textbf{system\_user} 1 : N \textbf{audit\_log} — Users generate audit log entries across the system (BR-37, BR-38).
+    \item \textbf{Customer}(\underline{CustomerID}, CustomerName, PhoneNumber, Address)
+    \item \textbf{DeliveryOrder}(\underline{OrderID}, CustomerID FK, Status, ETA)
+    \item \textbf{Package}(\underline{PackageID}, OrderID FK, Weight, Dimensions)
+    \item \textbf{Confirmation}(\underline{ConfirmationID}, OrderID FK, CustomerID FK, ReceiverName, TimeConfirmed)
+    \item \textbf{LandingStation}(\underline{StationID}, Location, Capacity)
+    \item \textbf{DeliveryOrderStation}(OrderID FK, StationID FK, \underline{(OrderID, StationID)})
+    \item \textbf{Drone}(\underline{DroneID}, Status, StationID FK, OrderID FK)
+    \item \textbf{Tracking}(\underline{TrackingID}, OrderID FK, DroneID FK, CurrentLocation, Timestamp)
+    \item \textbf{DeliveryWorkflow}(\underline{WorkflowID}, OrderID FK, CurrentStatus, AssignedUserID FK, Timestamp)
+    \item \textbf{User}(\underline{UserID}, UserName, UserRole, UserPassword, PhoneNumber)
+    \item \textbf{AuditLog}(\underline{LogID}, UserID FK, OrderID FK, ActionType, ActionTime)
+\end{itemize}
+\section{Entity Roles in Business}
+
+\begin{itemize}
+    \item \textbf{Customer}: Stores customer information; the source of delivery orders.
+    \item \textbf{DeliveryOrder}: Central entity representing each order placed by a customer.
+    \item \textbf{Package}: Details individual packages belonging to an order.
+    \item \textbf{Confirmation}: Records customer confirmations of delivery or receipt.
+    \item \textbf{LandingStation}: Represents drone stations where drones are based or land.
+    \item \textbf{DeliveryOrderStation}: Links orders to multiple stations, reflecting real transport routes.
+    \item \textbf{Drone}: Manages delivery drones, their status, and assigned orders.
+    \item \textbf{Tracking}: Logs the location and time updates of orders and drones during delivery.
+    \item \textbf{DeliveryWorkflow}: Captures the step-by-step process of fulfilling an order.
+    \item \textbf{User}: Represents system users (employees) with roles and credentials.
+    \item \textbf{AuditLog}: Maintains a record of user actions for accountability and auditing.
 \end{itemize}
 
-\section{Logical Database Design}\label{s:logical}
 
-This section derives the logical relational schema from the conceptual model. The relational schema is presented in standard notation, with primary keys denoted by (PK), foreign keys by (FK), and unique constraints by UNIQUE.
+\section{Relationships}
+\begin{itemize}
+    \item Customer $\to$ DeliveryOrder (1:N)
+    \item DeliveryOrder $\to$ Package (1:N)
+    \item DeliveryOrder $\to$ Confirmation (1:N)
+    \item DeliveryOrder $\to$ DeliveryOrderStation (1:N), DeliveryOrderStation $\to$ LandingStation (N:1) \\
+          \textit{(represents the many-to-many relationship between DeliveryOrder and LandingStation)}
+    \item DeliveryOrder $\to$ Tracking (1:N)
+    \item DeliveryOrder $\to$ Drone (1:1)
+    \item DeliveryOrder $\to$ DeliveryWorkflow (1:N)
+    \item DeliveryWorkflow $\to$ User (N:1)
+    \item User $\to$ AuditLog (1:N)
+    \item Drone $\to$ Tracking (1:N)
+    \item LandingStation $\to$ Drone (1:N)
+    \item Customer $\to$ Confirmation (1:N)
+    \item AuditLog $\to$ DeliveryOrder (N:1)
+\end{itemize}
 
-\subsection{Relational Schema}
+
+
+
+\section{Logical Design}
+From the conceptual model, we derive the relational schema:
+
+\begin{itemize}
+    \item Customer(CustomerID PK, CustomerName, PhoneNumber, Address)
+    \item DeliveryOrder(OrderID PK, CustomerID FK, Status, ETA)
+    \item Package(PackageID PK, OrderID FK, Weight, Dimensions)
+    \item Confirmation(ConfirmationID PK, OrderID FK, ReceiverName, TimeConfirmed, CustomerID FK)
+    \item LandingStation(StationID PK, Location, Capacity)
+    \item DeliveryOrderStation(OrderID FK, StationID FK, PRIMARY KEY(OrderID, StationID))
+    \item Tracking(TrackingID PK, OrderID FK, DroneID FK, CurrentLocation, Timestamp)
+    \item Drone(DroneID PK, Status, StationID FK, OrderID FK)
+    \item DeliveryWorkflow(WorkflowID PK, OrderID FK, CurrentStatus, AssignedUserID FK, Timestamp)
+    \item User(UserID PK, UserName, UserRole, UserPassword, PhoneNumber)
+    \item AuditLog(LogID PK, UserID FK, OrderID FK, ActionType, ActionTime)
+\end{itemize}
+
+\section{Physical Design}
+The tables are implemented in SQL as follows:
 
 \begin{verbatim}
-SYSTEM_USER(user_id PK, username UNIQUE, password_hash,
-  email UNIQUE, phone_number UNIQUE, is_active,
-  created_at, updated_at)
-
-ROLE(role_id PK, role_name UNIQUE, description)
-
-PERMISSION(permission_id PK, permission_name UNIQUE,
-  description)
-
-USER_ROLE(user_id PK/FK, role_id PK/FK, assigned_at)
-
-ROLE_PERMISSION(role_id PK/FK, permission_id PK/FK)
-
-CUSTOMER(customer_id PK, user_id FK UNIQUE,
-  customer_name, phone_number UNIQUE, email UNIQUE,
-  created_at)
-
-CUSTOMER_ADDRESS(address_id PK, customer_id FK,
-  address_label, address_line, ward, district, city,
-  latitude, longitude, is_default, created_at)
-
-DELIVERY_ORDER(order_id PK, customer_id FK,
-  delivery_address_id FK, order_status,
-  requested_delivery_time, estimated_arrival_at,
-  created_at, completed_at, cancelled_at,
-  cancellation_reason)
-
-PACKAGE(package_id PK, order_id FK, description,
-  weight_kg, length_cm, width_cm, height_cm,
-  package_status, created_at)
-
-ORDER_STATUS_HISTORY(status_history_id PK, order_id FK,
-  status, changed_by FK, reason, changed_at)
-
-LANDING_STATION(station_id PK, station_code UNIQUE,
-  station_name, address, latitude, longitude,
-  capacity, status, created_at)
-
-STATION_STATUS_HISTORY(history_id PK, station_id FK,
-  status, changed_by FK, reason, changed_at)
-
-STATION_OPERATOR_ASSIGNMENT(assignment_id PK,
-  station_id FK, user_id FK, assigned_from,
-  assigned_to, is_active, created_at)
-
-DRONE(drone_id PK, serial_number UNIQUE, model, status,
-  max_payload_kg, battery_level, station_id FK,
-  created_at)
-
-DELIVERY_ACTIVITY(activity_id PK, order_id FK,
-  drone_id FK, pickup_station_id FK,
-  destination_station_id FK, assigned_by FK,
-  scheduled_at, activity_status, started_at, ended_at,
-  previous_activity_id FK, created_at)
-
-PACKAGE_STATION_EVENT(event_id PK, package_id FK,
-  station_id FK, event_type, performed_by FK,
-  occurred_at, note)
-
-TRACKING_RECORD(tracking_id PK, activity_id FK,
-  latitude, longitude, altitude_m, speed_kmh,
-  battery_level, recorded_at)
-
-DELIVERY_CONFIRMATION(confirmation_id PK,
-  order_id FK UNIQUE, activity_id FK UNIQUE,
-  confirmed_by FK, receiver_name, receiver_phone,
-  confirmation_method, evidence_object_key,
-  confirmed_at, note)
-
-DELIVERY_EXCEPTION(exception_id PK, activity_id FK,
-  exception_type, description, detected_at,
-  resolved_at, resolved_by FK, resolution)
-
-AUDIT_LOG(log_id PK, user_id FK, entity_name,
-  record_id, action_type, old_value, new_value,
-  action_time, ip_address)
-
-DELIVERY_ROUTE(route_id PK, activity_id FK UNIQUE,
-  total_distance_km, estimated_duration_min,
-  created_at)
-
-ROUTE_POINT(route_point_id PK, route_id FK,
-  sequence_number, latitude, longitude, altitude_m)
-
-AI_RECOMMENDATION(recommendation_id PK, order_id FK,
-  activity_id FK, recommendation_type,
-  recommended_drone_id FK, estimated_duration_min,
-  confidence_score, model_version, created_at)
-\end{verbatim}
-
-\subsection{Primary Keys, Foreign Keys, and Candidate Keys}
-
-Every base table possesses a single-column surrogate primary key (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}). Bridge tables (\texttt{user\_role}, \texttt{role\_permission}) employ composite primary keys. Candidate natural keys are protected with \texttt{UNIQUE} constraints:
-\begin{itemize}
-    \item \texttt{system\_user.username}, \texttt{system\_user.email}, \texttt{system\_user.phone\_number}
-    \item \texttt{customer.phone\_number}, \texttt{customer.email}
-    \item \texttt{drone.serial\_number}
-    \item \texttt{landing\_station.station\_code}
-    \item \texttt{delivery\_confirmation.order\_id} and \texttt{delivery\_confirmation.activity\_id}
-    \item \texttt{delivery\_route.activity\_id}
-    \item \texttt{route\_point(route\_id, sequence\_number)}
-\end{itemize}
-
-\subsection{Functional Dependencies and Normalization}
-
-All twenty-three relations satisfy Third Normal Form (3NF):
-
-\paragraph{First Normal Form (1NF).}
-All column values are atomic. Address components are separated into discrete attributes; dimensions are stored as individual numeric values (\texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm}); and multiple addresses or packages are represented as separate relational rows rather than composite strings.
-
-\paragraph{Second Normal Form (2NF).}
-Every non-key attribute is fully functionally dependent on the entire primary key. In composite-key tables (\texttt{user\_role}, \texttt{role\_permission}), non-key attributes depend on both component keys.
-
-\paragraph{Third Normal Form (3NF).}
-No transitive dependencies exist between non-key attributes. For example, \texttt{delivery\_order} references \texttt{customer\_id} and does not store customer contact details; \texttt{delivery\_confirmation} does not store customer or drone data; and \texttt{tracking\_record} references \texttt{activity\_id} without redundantly storing drone attributes.
-
-\subsection{Integrity Constraints}
-
-The relational schema enforces six categories of integrity constraints:
-
-\begin{enumerate}
-    \item \textbf{Entity Integrity}: Guaranteed by surrogate primary keys that are automatically generated, non-null, and unique across all tables.
-    \item \textbf{Referential Integrity}: Enforced via foreign key constraints. Operational master data (\texttt{customer}, \texttt{drone}, \texttt{landing\_station}) use \texttt{ON DELETE RESTRICT} to prevent accidental deletion of operational history. Security bridge tables use \texttt{ON DELETE CASCADE}. User audit references use \texttt{ON DELETE SET NULL} to preserve audit trails if user accounts are archived.
-    \item \textbf{Domain Integrity}: Column data types and explicit \texttt{CHECK} constraints ensure valid domain values (coordinates within $[-90, 90]$ and $[-180, 180]$, positive dimensions and payload capacities, battery percentages between $0$ and $100$).
-    \item \textbf{Uniqueness Constraints}: Natural identifiers and 1:0..1 cardinalities are strictly enforced by database-level \texttt{UNIQUE} indexes.
-    \item \textbf{Business Integrity}: Total package weight must not exceed assigned drone capacity (BR-18); address must belong to the ordering customer (BR-04).
-    \item \textbf{Temporal Integrity}: In \texttt{delivery\_activity}, \texttt{started\_at < ended\_at}; in \texttt{station\_operator\_assignment}, \texttt{assigned\_from < assigned\_to}.
-\end{enumerate}
-
-\subsection{State Transition Lifecycle Models}\label{s:lifecycle}
-
-The system defines formal lifecycles for its three central stateful entities:
-
-\paragraph{Delivery Order Lifecycle.}
-\begin{verbatim}
-PENDING
-   |
-   +---> APPROVED ---> ASSIGNED ---> IN_TRANSIT
-   |                                     |
-   |                                     +---> DELIVERED (Terminal)
-   |                                     |
-   |                                     +---> FAILED
-   |                                              |
-   |                                              +---> ASSIGNED (Rescheduled)
-   |                                              |
-   |                                              +---> CANCELLED (Terminal)
-   |
-   +---> REJECTED (Terminal)
-   |
-   +---> CANCELLED (Terminal)
-\end{verbatim}
-
-\paragraph{Package Lifecycle.}
-\begin{verbatim}
-CREATED -> AT_STATION -> PICKED_UP -> IN_TRANSIT -> DELIVERED
-                                         |
-                                         +-> FAILED -> RETURNED / DAMAGED
-\end{verbatim}
-
-\paragraph{Delivery Activity Lifecycle.}
-\begin{verbatim}
-ASSIGNED -> PREPARING -> IN_TRANSIT -> DELIVERED / FAILED / CANCELLED
-\end{verbatim}
-
-\section{Physical Database Design}\label{s:physical}
-
-This section details the physical PostgreSQL implementation. All tables employ \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} for primary keys, \texttt{TIMESTAMPTZ} for time fields, and appropriate numeric and geometric domains.
-
-\subsection{CREATE TABLE Statements}
-
-\begin{verbatim}
--- 1. User and Authorization Group
-
-CREATE TABLE system_user (
-  user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  username      VARCHAR(100) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  email         VARCHAR(255) UNIQUE,
-  phone_number  VARCHAR(20)  UNIQUE,
-  is_active     BOOLEAN      NOT NULL DEFAULT TRUE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE Customer (
+    CustomerID SERIAL PRIMARY KEY,
+    CustomerName VARCHAR(100),
+    PhoneNumber VARCHAR(15) UNIQUE,
+    Address TEXT
 );
 
-CREATE TABLE role (
-  role_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  role_name   VARCHAR(50)  NOT NULL UNIQUE,
-  description VARCHAR(255)
+CREATE TABLE DeliveryOrder (
+    OrderID SERIAL PRIMARY KEY,
+    CustomerID INT REFERENCES Customer(CustomerID),
+    Status VARCHAR(20),
+    ETA TIMESTAMP
 );
 
-CREATE TABLE permission (
-  permission_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  permission_name VARCHAR(100) NOT NULL UNIQUE,
-  description     VARCHAR(255)
+CREATE TABLE Package (
+    PackageID SERIAL PRIMARY KEY,
+    OrderID INT REFERENCES DeliveryOrder(OrderID),
+    Weight DECIMAL(10,2) CHECK (Weight > 0),
+    Dimensions VARCHAR(50)
 );
 
-CREATE TABLE user_role (
-  user_id     BIGINT      NOT NULL,
-  role_id     BIGINT      NOT NULL,
-  assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (user_id, role_id),
-  CONSTRAINT fk_ur_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ur_role FOREIGN KEY (role_id)
-    REFERENCES role(role_id) ON DELETE CASCADE
+CREATE TABLE Confirmation (
+    ConfirmationID SERIAL PRIMARY KEY,
+    OrderID INT REFERENCES DeliveryOrder(OrderID),
+    ReceiverName VARCHAR(100),
+    TimeConfirmed TIMESTAMP
 );
 
-CREATE TABLE role_permission (
-  role_id       BIGINT NOT NULL,
-  permission_id BIGINT NOT NULL,
-  PRIMARY KEY (role_id, permission_id),
-  CONSTRAINT fk_rp_role FOREIGN KEY (role_id)
-    REFERENCES role(role_id) ON DELETE CASCADE,
-  CONSTRAINT fk_rp_perm FOREIGN KEY (permission_id)
-    REFERENCES permission(permission_id) ON DELETE CASCADE
+CREATE TABLE LandingStation (
+    StationID SERIAL PRIMARY KEY,
+    Location VARCHAR(100),
+    Capacity INT CHECK (Capacity >= 0)
 );
 
--- 2. Customer and Address Group
-
-CREATE TABLE customer (
-  customer_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id       BIGINT       UNIQUE,
-  customer_name VARCHAR(100) NOT NULL,
-  phone_number  VARCHAR(20)  UNIQUE,
-  email         VARCHAR(255) UNIQUE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_customer_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT
+CREATE TABLE Tracking (
+    TrackingID SERIAL PRIMARY KEY,
+    OrderID INT REFERENCES DeliveryOrder(OrderID),
+    CurrentLocation VARCHAR(100),
+    Timestamp TIMESTAMP
 );
 
-CREATE TABLE customer_address (
-  address_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  customer_id   BIGINT       NOT NULL,
-  address_label VARCHAR(50),
-  address_line  VARCHAR(255) NOT NULL,
-  ward          VARCHAR(100),
-  district      VARCHAR(100),
-  city          VARCHAR(100),
-  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  is_default    BOOLEAN      NOT NULL DEFAULT FALSE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_addr_customer FOREIGN KEY (customer_id)
-    REFERENCES customer(customer_id) ON DELETE RESTRICT,
-  CONSTRAINT uq_customer_address UNIQUE (address_id, customer_id)
+CREATE TABLE Drone (
+    DroneID SERIAL PRIMARY KEY,
+    Status VARCHAR(20) CHECK (Status IN ('Available','Busy','Maintenance'))
 );
 
--- 3. Landing Station and Operator Group
-
-CREATE TABLE landing_station (
-  station_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_code VARCHAR(50)  NOT NULL UNIQUE,
-  station_name VARCHAR(100) NOT NULL,
-  address      VARCHAR(255),
-  latitude     NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude    NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  capacity     INTEGER      NOT NULL DEFAULT 0 CHECK (capacity >= 0),
-  status       VARCHAR(30)  NOT NULL
-    CHECK (status IN ('AVAILABLE', 'FULL', 'MAINTENANCE', 'OFFLINE')),
-  created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE User (
+    UserID SERIAL PRIMARY KEY,
+    UserRole VARCHAR(50) CHECK (UserRole IN ('Admin','Operator','CustomerService')),
+    UserPassword VARCHAR(255),
+    PhoneNumber VARCHAR(15)
 );
 
-CREATE TABLE station_status_history (
-  history_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_id  BIGINT      NOT NULL,
-  status      VARCHAR(30) NOT NULL,
-  changed_by  BIGINT,
-  reason      VARCHAR(255),
-  changed_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_ssh_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_ssh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+CREATE TABLE DeliveryWorkflow (
+    WorkflowID SERIAL PRIMARY KEY,
+    OrderID INT REFERENCES DeliveryOrder(OrderID),
+    CurrentStatus VARCHAR(50),
+    AssignedUserID INT REFERENCES User(UserID),
+    Timestamp TIMESTAMP
 );
 
-CREATE TABLE station_operator_assignment (
-  assignment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_id    BIGINT      NOT NULL,
-  user_id       BIGINT      NOT NULL,
-  assigned_from TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  assigned_to   TIMESTAMPTZ,
-  is_active     BOOLEAN     NOT NULL DEFAULT TRUE,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_soa_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_soa_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT,
-  CONSTRAINT chk_soa_interval CHECK (assigned_to IS NULL OR assigned_from < assigned_to)
-);
-
--- 4. Drone Group
-
-CREATE TABLE drone (
-  drone_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  serial_number   VARCHAR(100) NOT NULL UNIQUE,
-  model           VARCHAR(100),
-  status          VARCHAR(30)  NOT NULL
-    CHECK (status IN ('AVAILABLE', 'BUSY', 'MAINTENANCE', 'OFFLINE')),
-  max_payload_kg  NUMERIC(10,2) NOT NULL CHECK (max_payload_kg > 0),
-  battery_level   NUMERIC(5,2) CHECK (battery_level BETWEEN 0 AND 100),
-  station_id      BIGINT,
-  created_at      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_drone_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL
-);
-
--- 5. Delivery Order and Package Group
-
-CREATE TABLE delivery_order (
-  order_id                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  customer_id             BIGINT      NOT NULL,
-  delivery_address_id     BIGINT      NOT NULL,
-  order_status            VARCHAR(30) NOT NULL
-    CHECK (order_status IN (
-      'PENDING', 'APPROVED', 'REJECTED', 'ASSIGNED',
-      'IN_TRANSIT', 'DELIVERED', 'FAILED', 'CANCELLED')),
-  requested_delivery_time TIMESTAMPTZ,
-  estimated_arrival_at    TIMESTAMPTZ,
-  created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  completed_at            TIMESTAMPTZ,
-  cancelled_at            TIMESTAMPTZ,
-  cancellation_reason     VARCHAR(255),
-  CONSTRAINT fk_order_customer FOREIGN KEY (customer_id)
-    REFERENCES customer(customer_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_order_address  FOREIGN KEY (delivery_address_id, customer_id)
-    REFERENCES customer_address(address_id, customer_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE package (
-  package_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id       BIGINT        NOT NULL,
-  description    VARCHAR(500),
-  weight_kg      NUMERIC(10,2) NOT NULL CHECK (weight_kg > 0),
-  length_cm      NUMERIC(10,2) CHECK (length_cm > 0),
-  width_cm       NUMERIC(10,2) CHECK (width_cm > 0),
-  height_cm      NUMERIC(10,2) CHECK (height_cm > 0),
-  package_status VARCHAR(30)   NOT NULL
-    CHECK (package_status IN (
-      'CREATED', 'AT_STATION', 'PICKED_UP', 'IN_TRANSIT',
-      'DELIVERED', 'FAILED', 'RETURNED', 'DAMAGED')),
-  created_at     TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_pkg_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE order_status_history (
-  status_history_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id          BIGINT      NOT NULL,
-  status            VARCHAR(30) NOT NULL,
-  changed_by        BIGINT,
-  reason            VARCHAR(255),
-  changed_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_osh_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_osh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
--- 6. Delivery Execution and Event Group
-
-CREATE TABLE delivery_activity (
-  activity_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id               BIGINT      NOT NULL,
-  drone_id               BIGINT      NOT NULL,
-  pickup_station_id      BIGINT,
-  destination_station_id BIGINT,
-  assigned_by            BIGINT,
-  scheduled_at           TIMESTAMPTZ,
-  activity_status        VARCHAR(30) NOT NULL
-    CHECK (activity_status IN (
-      'ASSIGNED', 'PREPARING', 'IN_TRANSIT',
-      'DELIVERED', 'FAILED', 'CANCELLED')),
-  started_at             TIMESTAMPTZ,
-  ended_at               TIMESTAMPTZ,
-  previous_activity_id   BIGINT,
-  created_at             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_act_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_act_drone FOREIGN KEY (drone_id)
-    REFERENCES drone(drone_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_act_pickup FOREIGN KEY (pickup_station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_dest FOREIGN KEY (destination_station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_user FOREIGN KEY (assigned_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_prev FOREIGN KEY (previous_activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
-  CONSTRAINT chk_act_time CHECK (ended_at IS NULL OR started_at <= ended_at)
-);
-
-CREATE TABLE package_station_event (
-  event_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  package_id   BIGINT      NOT NULL,
-  station_id   BIGINT      NOT NULL,
-  event_type   VARCHAR(30) NOT NULL
-    CHECK (event_type IN ('ARRIVED', 'PICKUP_CONFIRMED', 'LOADED', 'UNLOADED')),
-  performed_by BIGINT,
-  occurred_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  note         VARCHAR(255),
-  CONSTRAINT fk_pse_package FOREIGN KEY (package_id)
-    REFERENCES package(package_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_pse_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_pse_user FOREIGN KEY (performed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE tracking_record (
-  tracking_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id   BIGINT       NOT NULL,
-  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  altitude_m    NUMERIC(10,2) CHECK (altitude_m >= 0),
-  speed_kmh     NUMERIC(10,2) CHECK (speed_kmh >= 0),
-  battery_level NUMERIC(5,2)  CHECK (battery_level BETWEEN 0 AND 100),
-  recorded_at   TIMESTAMPTZ  NOT NULL,
-  CONSTRAINT fk_tr_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE delivery_confirmation (
-  confirmation_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id            BIGINT       NOT NULL UNIQUE,
-  activity_id         BIGINT       NOT NULL UNIQUE,
-  confirmed_by        BIGINT,
-  receiver_name       VARCHAR(100) NOT NULL,
-  receiver_phone      VARCHAR(20),
-  confirmation_method VARCHAR(30)  NOT NULL,
-  evidence_object_key VARCHAR(255),
-  confirmed_at        TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  note                VARCHAR(500),
-  CONSTRAINT fk_conf_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_conf_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_conf_user FOREIGN KEY (confirmed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE delivery_exception (
-  exception_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id    BIGINT      NOT NULL,
-  exception_type VARCHAR(50) NOT NULL,
-  description    TEXT,
-  detected_at    TIMESTAMPTZ NOT NULL,
-  resolved_at    TIMESTAMPTZ,
-  resolved_by    BIGINT,
-  resolution     TEXT,
-  CONSTRAINT fk_exc_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_exc_resolver FOREIGN KEY (resolved_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
--- 7. Audit, Route, and AI Group
-
-CREATE TABLE audit_log (
-  log_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id     BIGINT,
-  entity_name VARCHAR(100) NOT NULL,
-  record_id   BIGINT,
-  action_type VARCHAR(50)  NOT NULL,
-  old_value   JSONB,
-  new_value   JSONB,
-  action_time TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  ip_address  INET,
-  CONSTRAINT fk_al_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE delivery_route (
-  route_id               BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id            BIGINT        NOT NULL UNIQUE,
-  total_distance_km      NUMERIC(12,3) CHECK (total_distance_km >= 0),
-  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
-  created_at             TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_route_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE route_point (
-  route_point_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  route_id        BIGINT       NOT NULL,
-  sequence_number INTEGER      NOT NULL,
-  latitude        NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude       NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  altitude_m      NUMERIC(10,2) CHECK (altitude_m >= 0),
-  CONSTRAINT fk_rp_route FOREIGN KEY (route_id)
-    REFERENCES delivery_route(route_id) ON DELETE CASCADE,
-  CONSTRAINT uq_rp_seq UNIQUE (route_id, sequence_number)
-);
-
-CREATE TABLE ai_recommendation (
-  recommendation_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id               BIGINT       NOT NULL,
-  activity_id            BIGINT,
-  recommendation_type    VARCHAR(50)  NOT NULL,
-  recommended_drone_id   BIGINT,
-  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
-  confidence_score       NUMERIC(5,4) CHECK (confidence_score BETWEEN 0 AND 1),
-  model_version          VARCHAR(50),
-  created_at             TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_ai_order    FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_ai_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
-  CONSTRAINT fk_ai_drone    FOREIGN KEY (recommended_drone_id)
-    REFERENCES drone(drone_id) ON DELETE SET NULL
+CREATE TABLE AuditLog (
+    LogID SERIAL PRIMARY KEY,
+    UserID INT REFERENCES User(UserID),
+    ActionType VARCHAR(50),
+    ActionTime TIMESTAMP,
+    AffectedRecord VARCHAR(100)
 );
 \end{verbatim}
 
-\subsection{Index Strategy}\label{s:indexes}
-
-Indexes are targeted at foreign keys and frequent query filters while avoiding redundant indexes on columns covered by unique constraints:
-
-\begin{verbatim}
--- Foreign key indexes for operational joins
-CREATE INDEX idx_order_customer    ON delivery_order(customer_id);
-CREATE INDEX idx_order_address     ON delivery_order(delivery_address_id);
-CREATE INDEX idx_osh_order         ON order_status_history(order_id);
-CREATE INDEX idx_pkg_order         ON package(order_id);
-CREATE INDEX idx_activity_order    ON delivery_activity(order_id);
-CREATE INDEX idx_activity_drone    ON delivery_activity(drone_id);
-CREATE INDEX idx_activity_prev     ON delivery_activity(previous_activity_id);
-CREATE INDEX idx_tracking_activity ON tracking_record(activity_id);
-CREATE INDEX idx_exception_activity ON delivery_exception(activity_id);
-CREATE INDEX idx_ssh_station       ON station_status_history(station_id);
-CREATE INDEX idx_soa_station       ON station_operator_assignment(station_id);
-CREATE INDEX idx_soa_user          ON station_operator_assignment(user_id);
-CREATE INDEX idx_pse_package       ON package_station_event(package_id);
-CREATE INDEX idx_pse_station       ON package_station_event(station_id);
-CREATE INDEX idx_audit_user        ON audit_log(user_id);
-CREATE INDEX idx_audit_time        ON audit_log(action_time);
-
--- Composite index for recent flight telemetry queries
-CREATE INDEX idx_tracking_activity_time
-  ON tracking_record(activity_id, recorded_at DESC);
-
--- Partial unique index ensuring at most one default address per customer (BR-05)
-CREATE UNIQUE INDEX uq_customer_default_address
-  ON customer_address(customer_id)
-  WHERE is_default = TRUE;
-\end{verbatim}
-
-\subsection{Representative Business Queries}
-
-The following queries confirm that the physical design directly answers operational needs:
-
-\paragraph{Retrieve orders for a customer with latest status.}
-\begin{verbatim}
-SELECT order_id, order_status, requested_delivery_time,
-       estimated_arrival_at, created_at
-FROM   delivery_order
-WHERE  customer_id = :customer_id
-ORDER  BY created_at DESC;
-\end{verbatim}
-
-\paragraph{Retrieve package pickup confirmation history at stations.}
-\begin{verbatim}
-SELECT pse.event_id, pse.package_id, ls.station_name,
-       pse.event_type, su.username AS operator_name, pse.occurred_at
-FROM   package_station_event pse
-JOIN   landing_station ls ON ls.station_id = pse.station_id
-LEFT   JOIN system_user su ON su.user_id = pse.performed_by
-WHERE  pse.package_id = :package_id
-ORDER  BY pse.occurred_at ASC;
-\end{verbatim}
-
-\paragraph{Trace rescheduling chain for a delivery order.}
-\begin{verbatim}
-SELECT activity_id, drone_id, activity_status,
-       previous_activity_id, started_at, ended_at
-FROM   delivery_activity
-WHERE  order_id = :order_id
-ORDER  BY created_at ASC;
-\end{verbatim}
-
-\paragraph{Retrieve flight telemetry for monitoring.}
-\begin{verbatim}
-SELECT recorded_at, latitude, longitude, altitude_m, speed_kmh, battery_level
-FROM   tracking_record
-WHERE  activity_id = :activity_id
-ORDER  BY recorded_at DESC
-LIMIT  50;
-\end{verbatim}
-
-\section{Chapter Summary}\label{s:ch3summary}
-
-\qquad This chapter detailed the conceptual, logical, and physical database design for the SmartDroneDelivery platform. The model comprises twenty-three normalized relations organized into seven functional groups.
-
-Key architectural enhancements include introducing \texttt{delivery\_activity} to decouple orders from drones, adding \texttt{station\_operator\_assignment} and \texttt{package\_station\_event} to formalize station staffing and package pickup workflows, incorporating \texttt{previous\_activity\_id} to track rescheduling chains, and referencing external digital proof keys in \texttt{delivery\_confirmation}.
-
-The logical schema satisfies 3NF and enforces six categories of integrity constraints. Finally, complete PostgreSQL DDL statements and an index strategy were presented, providing a rigorous, efficient, and fully traceable implementation ready for comprehensive validation in Chapter~\ref{c:test}.
+\section{Normalization and Constraints}
+\begin{itemize}
+    \item All tables satisfy 1NF, 2NF, and 3NF.
+    \item Integrity constraints:
+    \begin{itemize}
+        \item UNIQUE: customer phone number.
+        \item CHECK: order status, drone status, user role.
+        \item FOREIGN KEY: relationships between tables as defined in the ERD.
+    \end{itemize}
+    \item Indexes for query optimization:
+    \begin{verbatim}
+    CREATE INDEX idx_order_customer ON DeliveryOrder(CustomerID);
+    CREATE INDEX idx_tracking_order ON Tracking(OrderID);
+    CREATE INDEX idx_workflow_order ON DeliveryWorkflow(OrderID);
+    CREATE INDEX idx_audit_user ON AuditLog(UserID);
+    \end{verbatim}
+\end{itemize}
