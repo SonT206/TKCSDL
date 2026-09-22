@@ -11,6 +11,7 @@
 *.log
 *.out
 *.synctex.gz
+*.xdv
 *.toc
 *.lof
 *.lot

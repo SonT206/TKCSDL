@@ -1,286 +1,293 @@
-% ---- Select text fonts ----
+% ---- Chọn phông chữ cho văn bản ----
 \RequirePackage{iftex}
 
 \ifPDFTeX
-  % Make PDF searchable and copyable in pdfTeX
+  % Cho phép tìm kiếm và sao chép nội dung PDF khi dùng pdfTeX
   \input{glyphtounicode}
   \pdfgentounicode=1
-  % Select font encoding 
+  % Chọn bảng mã phông chữ
   \usepackage[T5,T1]{fontenc}
   \usepackage[utf8]{inputenc}
-  % Select text font
+  % Chọn phông chữ văn bản
   \usepackage{sourceserifpro}
-  % Select monospaced font
+  % Chọn phông chữ đơn cách
   \usepackage{sourcecodepro}
 \else
-  % XeTeX / LuaTeX handles Unicode natively via fontspec
+  % XeTeX/LuaTeX xử lý Unicode trực tiếp thông qua fontspec
 \fi
 
-% ---- Select math fonts ----
+% ---- Chọn phông chữ toán học ----
 
-% Select symbol font
-\usepackage{MnSymbol}
+% Dùng MnSymbol nếu hệ thống đã cài đặt; nếu không thì dùng bộ ký hiệu mặc định
+\IfFileExists{MnSymbol.sty}{\usepackage{MnSymbol}}{%
+  \PackageWarning{book}{Khong tim thay MnSymbol.sty; su dung ky hieu toan hoc mac dinh}%
+}
 
-% Select calligraphic and blackboard-bold fonts
+% Chọn phông chữ thư pháp và chữ đậm kiểu bảng đen
 \usepackage[cal=euler, bb=fourier]{mathalpha}
 
-% Enable bold math characters
-\newcommand{\hmmax}{0} % Avoid "Too many math alphabets" error
-\newcommand{\bmmax}{0} % Avoid "Too many math alphabets" error
+% Cho phép ký tự toán học in đậm
+\newcommand{\hmmax}{0} % Tránh lỗi "Too many math alphabets"
+\newcommand{\bmmax}{0} % Tránh lỗi "Too many math alphabets"
 \usepackage{bm}
 
-% Select font for Roman letters, Greek letters, digits, and punctuation
+% Chọn phông cho chữ La-tinh, chữ Hy Lạp, chữ số và dấu câu
 \usepackage[italic, eulergreek, nolessnomore, noparenthesis, noplusnominus, noequal, nohbar]{mathastext}
 
-% Correct spacing around certain Roman letters
+% Hiệu chỉnh khoảng cách quanh một số chữ cái La-tinh
 \MTsetmathskips{f}{3mu}{0mu}
 \MTsetmathskips{y}{2mu}{0mu}
 \MTsetmathskips{p}{2mu}{0mu}
 \MTsetmathskips{j}{2mu}{0mu}
 
-% ---- Adjust page layout ----
+% ---- Điều chỉnh bố cục trang ----
 
 \usepackage[top=1in, left=1.3in, right=1.3in, bottom=1.2in, footskip=0.7in]{geometry}
 
-% ---- Adjust spacing ----
+% ---- Điều chỉnh khoảng cách ----
 
-% Set spacing between lines
+% Đặt giãn cách dòng
 \usepackage[onehalfspacing]{setspace}
 
-% Adjust spacing on lines
+% Điều chỉnh khoảng cách trên dòng
 \usepackage{microtype}
 
-% Adjust spacing in text
+% Điều chỉnh khoảng cách trong văn bản
 \AtBeginDocument{\frenchspacing}
 
-% ---- Select color scheme ----
+% ---- Chọn bảng màu ----
 
 \usepackage[x11names]{xcolor}
 
-% ---- Format header and footer ----
+% ---- Định dạng đầu trang và chân trang ----
 
-% Customize headers and footers
+% Tùy chỉnh đầu trang và chân trang
 \usepackage{fancyhdr}
 
-% Activate custom header and footer
+% Kích hoạt đầu trang và chân trang tùy chỉnh
 \pagestyle{fancy}
 
-% Eliminate headers
+% Loại bỏ nội dung đầu trang
 \renewcommand{\headrulewidth}{0pt}
 \fancyhead{}
 
-% Remove headers/footers from blank pages
+% Loại bỏ đầu trang/chân trang khỏi trang trắng
 \usepackage{emptypage} 
 
-% ---- Format title page ----
+% ---- Định dạng trang bìa ----
 
-% Customize title, author, and date
+% Tùy chỉnh tiêu đề, tác giả và ngày tháng
 \usepackage{titling}
 
-% Format title
+% Định dạng tiêu đề
 \setlength{\droptitle}{-2cm}
 \pretitle{\begin{center}\bfseries\HUGE} 
 
-% Create subtitle
+% Tạo tiêu đề phụ
 \newcommand*{\subtitle}[1]{\posttitle{\vskip2cm\par\huge #1\end{center}}}
 
-% Format author
+% Định dạng tác giả
 \preauthor{\begin{center}\huge\vskip4cm\lineskip0.5em\begin{tabular}[t]{c}}
 
-% Format date
+% Định dạng ngày tháng
 \predate{\begin{center}\huge\vskip2cm}
 
-% --- Format table of contents ---
+% --- Định dạng mục lục ---
 
-% Customize table of contents
+% Tùy chỉnh mục lục
 \usepackage{tocloft}
 
-% Remove "Table of contents"
+% Loại bỏ dòng tiêu đề mặc định của mục lục
 \renewcommand{\contentsname}{}
 
-% Include only parts, chapters, and sections
+% Chỉ đưa phần, chương và mục vào mục lục
 \setcounter{tocdepth}{1}
 
-% Set entry fonts
+% Đặt phông chữ cho các mục
 \renewcommand{\cftpartfont}{\bfseries}
 \renewcommand{\cftchapfont}{\scshape}
 \renewcommand{\cftsecfont}{\normalfont}
 
-% Set page fonts
+% Đặt phông chữ cho số trang
 \renewcommand{\cftchappagefont}{\normalfont}
 \renewcommand{\cftsecpagefont}{\normalfont}
 
-% Remove dots for chapters
+% Loại bỏ dấu chấm dẫn ở cấp chương
 \renewcommand{\cftchapdotsep}{\cftnodots}
 
-% Set spacing for dots
+% Đặt khoảng cách giữa các dấu chấm dẫn
 \renewcommand{\cftdotsep}{10}
 
-% Set vertical spaces
+% Đặt khoảng cách theo chiều dọc
 \setlength{\cftbeforepartskip}{1em}
 \setlength{\cftbeforechapskip}{1em}
 \setlength{\cftbeforesecskip}{0em}
 
-% Align all numbers
+% Căn chỉnh các số thứ tự
 \setlength{\cftsecindent}{0em}
 
-% Set entry indentations
+% Đặt độ thụt lề cho các mục
 \setlength{\cftchapnumwidth}{3em}
 \setlength{\cftsecnumwidth}{4em}
 
-% ---- Format headings ----
+% ---- Định dạng tiêu đề ----
 
-% Customize section headings
+% Tùy chỉnh tiêu đề các cấp
 \usepackage{titlesec}
 
-% Format part headings
-\titleformat{\part}[display]{\Huge\bfseries\centering}{\textsc{part}~\thepart.}{2cm}{}[]
+% Định dạng tiêu đề phần
+\titleformat{\part}[display]{\Huge\bfseries\centering}{\textsc{Phần}~\thepart.}{2cm}{}[]
 
-% Format chapter headings
-\titleformat{\chapter}[display]{\huge\bfseries}{\textsc{chapter}~\thechapter.}{2cm}{}[\vskip2cm]
+% Định dạng tiêu đề chương
+\titleformat{\chapter}[display]{\huge\bfseries}{\textsc{Chương}~\thechapter.}{2cm}{}[\vskip2cm]
 
-% Format section headings
+% Định dạng tiêu đề mục
 \titleformat*{\section}{\large\bfseries}
 
-% Format subsection headings
+% Định dạng tiêu đề tiểu mục
 \titleformat*{\subsection}{\bfseries}
 
-% Format paragraph headings
+% Định dạng tiêu đề đoạn
 \titleformat{\paragraph}[runin]{\itshape}{}{}{}[\@addpunct{.}\hspace{1em}]
 
-% Add period after heading numbers
+% Thêm dấu chấm sau số thứ tự tiêu đề
 \titlelabel{\thetitle.\hspace{1em}}
 
-% ---- Format theorems and proofs ----
+% ---- Định dạng định lý và chứng minh ----
 
-% Enhance theorem environments
+% Bổ sung các môi trường định lý
 \usepackage{amsthm}
 
-% Define theorem style
+% Định nghĩa kiểu định lý
 \newtheoremstyle{paper}{0.5em}{0.5em}{\itshape}{}{\scshape}{.}{1em}{}
 
-% Apply theorem style
+% Áp dụng kiểu định lý
 \theoremstyle{paper}
 
-% Define theorems
-\newtheorem{theorem}{theorem}[chapter]
-\newtheorem{proposition}{proposition}[chapter]
-\newtheorem{lemma}{lemma}[chapter]
-\newtheorem{corollary}{corollary}[chapter]
-\newtheorem{definition}{definition}[chapter]
-\newtheorem{assumption}{assumption}[chapter]
-\newtheorem{remark}{remark}[chapter]
-\newtheorem{result}{result}[chapter]
+% Định nghĩa tên các môi trường định lý
+\newtheorem{theorem}{Định lý}[chapter]
+\newtheorem{proposition}{Mệnh đề}[chapter]
+\newtheorem{lemma}{Bổ đề}[chapter]
+\newtheorem{corollary}{Hệ quả}[chapter]
+\newtheorem{definition}{Định nghĩa}[chapter]
+\newtheorem{assumption}{Giả thiết}[chapter]
+\newtheorem{remark}{Nhận xét}[chapter]
+\newtheorem{result}{Kết quả}[chapter]
+\renewcommand{\proofname}{Chứng minh}
 
-% Enable patching and appending to commands
+% Cho phép bổ sung và điều chỉnh lệnh
 \usepackage{etoolbox}
 
-% Format proof environment
+% Định dạng môi trường chứng minh
 \renewenvironment{proof}[1][\proofname]{\par\parskip0pt\pushQED{\qed}\normalfont\topsep0.5em\relax\trivlist\item[\hskip\labelsep\upshape\scshape#1\@addpunct{.}\hspace{1em}]\ignorespaces}{\popQED\endtrivlist\@endpefalse}
 
-% ---- Format figures and tables ----
+% ---- Định dạng hình và bảng ----
 
-% Include graphics
+% Cho phép chèn hình ảnh
 \usepackage{graphicx}
 
-% Enhance table formatting
+% Cải thiện định dạng bảng
 \usepackage{booktabs}
 
-% Enable rotation of tables and figures
+% Cho phép xoay bảng và hình
 \usepackage{rotating}
 
-% Enable multiple rows in table
+% Cho phép ô trải trên nhiều hàng
 \usepackage{multirow}
 
-% Allow small figures and tables to be on their own page
+% Cho phép hình và bảng nhỏ nằm trên trang riêng
 \renewcommand{\floatpagefraction}{0}
 
-% Center figures and tables
+% Căn giữa hình và bảng
 \makeatletter\g@addto@macro\@floatboxreset\centering\makeatother 
 
-% Adjust spacing in tables
+% Điều chỉnh khoảng cách trong bảng
 \renewcommand{\arraystretch}{1.2}
 
-% Set font size in tables
+% Đặt cỡ chữ trong bảng
 \BeforeBeginEnvironment{tabular*}{\footnotesize}
 
-% Write "table" and "figure" in small caps 
-\renewcommand{\tablename}{\textsc{table}}
-\renewcommand{\figurename}{\textsc{figure}}
+% Hiển thị tên bảng và hình bằng chữ hoa nhỏ
+\renewcommand{\tablename}{\textsc{Bảng}}
+\renewcommand{\figurename}{\textsc{Hình}}
 
-% Customize captions
+% Tùy chỉnh chú thích
 \usepackage{caption, subcaption}
 
-% Format label separator
+% Định dạng dấu phân cách nhãn
 \DeclareCaptionLabelSeparator{periodem}{.\hspace{1em}}
 
-% Format captions
+% Định dạng chú thích
 \captionsetup{labelsep=periodem}
 
-% Place table captions above table
+% Đặt chú thích bảng phía trên bảng
 \captionsetup[table]{position=top}
 
-% Format subcaptions
+% Định dạng chú thích con
 \captionsetup[sub]{labelformat=simple, labelsep=periodem, size=footnotesize}
 
-% Use capitals for figure sublabels
+% Dùng chữ hoa cho nhãn hình con
 \renewcommand{\thesubfigure}{\Alph{subfigure}}
 
-% Create note for tables and figures
+% Tạo ghi chú cho bảng và hình
 \NewDocumentCommand{\note}{o m}{%
 \parbox{\linewidth}{\footnotesize\vspace*{10pt}%
 \IfValueT{#1}{\textit{#1}.\hspace{1em}}%
 #2}}
 
-% ---- Adjust tolerance for page breaks in equations ----
+% ---- Điều chỉnh việc ngắt trang giữa các công thức ----
 
+% Cung cấp \allowdisplaybreaks và các môi trường toán học chuẩn
+\usepackage{amsmath}
 \AtBeginDocument{\allowdisplaybreaks[1]}
 
-% ---- Format lists ----
+% ---- Định dạng danh sách ----
 
-% Customize lists
+% Tùy chỉnh danh sách
 \usepackage{enumitem}
 
-% Format itemized lists
+% Định dạng danh sách ký hiệu
 \setlist[itemize, 1]{leftmargin=\parindent, label=\color{gray}{\upshape\textbullet}, topsep=0.5em, itemsep=0.5em, parsep=0pt} % First level
 \setlist[itemize, 2]{leftmargin=2\parindent, label=\color{gray}{\upshape\textendash}, topsep=0.25em, itemsep=0.25em, parsep=0pt} % Second level
 
-% Format numbered lists
+% Định dạng danh sách đánh số
 \setlist[enumerate, 1]{leftmargin=\parindent, label=\color{gray}{\upshape\arabic*.}, topsep=0.5em, itemsep=0.5em, parsep=0pt} % First level
 \setlist[enumerate, 2]{leftmargin=2\parindent, label=\color{gray}{\upshape\Alph*.}, topsep=0.25em, itemsep=0.25em, parsep=0pt} % Second level
 
-% ---- Format appendix ----
+% ---- Định dạng phụ lục ----
 
 \apptocmd{\appendix}{%
-\titleformat{\chapter}[display]{\huge\bfseries}{\textsc{appendix}~\thechapter.}{2cm}{}[\vskip2cm]%
+\titleformat{\chapter}[display]{\huge\bfseries}{\textsc{Phụ lục}~\thechapter.}{2cm}{}[\vskip2cm]%
 }{}{}
 
-% ---- Format bibliography ----
+% ---- Định dạng tài liệu tham khảo ----
 
-% Enhance bibliography
+% Cải thiện phần tài liệu tham khảo
 \usepackage{natbib}
+\renewcommand{\bibname}{Tài liệu tham khảo}
 
-% Eliminate author-year separation in citations
+% Loại bỏ dấu phân cách giữa tác giả và năm trong trích dẫn
 \setcitestyle{aysep={}}
 
-% Set font size in bibliography
+% Đặt cỡ chữ cho tài liệu tham khảo
 \renewcommand{\bibfont}{\small}
 
-% Set spacing between references
+% Đặt khoảng cách giữa các tài liệu tham khảo
 \setlength{\bibsep}{0pt}
 
-% Set indentation of references
+% Đặt độ thụt lề cho tài liệu tham khảo
 \setlength{\bibhang}{\parindent}
 
-% Add bibliography to table of contents
+% Thêm tài liệu tham khảo vào mục lục
 \usepackage[nottoc]{tocbibind}
 
-% ---- Build index (comment if index is not required) ----
+% ---- Tạo chỉ mục (chú thích lệnh nếu không cần chỉ mục) ----
 
 \usepackage{imakeidx}
+\renewcommand{\indexname}{Chỉ mục}
 \makeindex[intoc]
 
-% ---- Enable hyperlinks ----
+% ---- Kích hoạt siêu liên kết ----
 
 \PassOptionsToPackage{hyphens}{url}
 \usepackage[hidelinks, hypertexnames=false, pdfpagemode=UseNone, pdfdisplaydoctitle=true]{hyperref}
