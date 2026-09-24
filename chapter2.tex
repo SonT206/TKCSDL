@@ -1,311 +1,311 @@
 % !TeX root = book.tex
-\section{System Overview}\label{s:overview}
+\section{Tổng quan hệ thống}\label{s:overview}
 
-\qquad The SmartDroneDelivery platform is an AI-powered Drone Delivery Management Platform designed to support the management of drone-based delivery operations. The system focuses on business and logistics management rather than direct drone control.
+\qquad SmartDroneDelivery là nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, được thiết kế để hỗ trợ quản lý các hoạt động giao hàng. Hệ thống tập trung vào quản lý nghiệp vụ và logistics thay vì trực tiếp điều khiển máy bay không người lái.
 
-The platform supports the complete delivery lifecycle, beginning with the creation of a delivery request and continuing through package management, delivery scheduling, delivery execution, delivery tracking, and delivery confirmation.
+Nền tảng hỗ trợ toàn bộ vòng đời giao hàng, bắt đầu từ khi tạo yêu cầu, sau đó là quản lý kiện hàng, lập lịch, thực hiện, theo dõi và xác nhận giao hàng.
 
-From a database perspective, the system requires a structured and reliable data management layer capable of storing and maintaining all information generated throughout these business processes. This chapter identifies the actors, functional requirements, business rules, and data requirements that form the foundation of the database design.
+Từ góc nhìn cơ sở dữ liệu, hệ thống cần một tầng quản lý dữ liệu có cấu trúc và đáng tin cậy, có khả năng lưu trữ và duy trì toàn bộ thông tin phát sinh trong các quy trình nghiệp vụ. Chương này xác định các tác nhân, yêu cầu chức năng, quy tắc nghiệp vụ và yêu cầu dữ liệu làm nền tảng cho quá trình thiết kế cơ sở dữ liệu.
 
-\section{System Actors and Data Responsibilities}\label{s:actors}
+\section{Tác nhân hệ thống và trách nhiệm dữ liệu}\label{s:actors}
 
-The SmartDroneDelivery platform supports five main human actors. Each actor interacts with different functions of the system and is associated with specific categories of data that the database must manage.
+Nền tảng SmartDroneDelivery hỗ trợ năm tác nhân chính là con người. Mỗi tác nhân tương tác với những chức năng khác nhau của hệ thống và gắn với các nhóm dữ liệu cụ thể mà cơ sở dữ liệu phải quản lý.
 
-\subsection{Customer}
+\subsection{Khách hàng}
 
-The Customer actor represents individuals who use the platform to request drone delivery services. The database must manage the following data on behalf of this actor:
+Tác nhân Khách hàng đại diện cho những cá nhân sử dụng nền tảng để yêu cầu dịch vụ giao hàng bằng máy bay không người lái. Cơ sở dữ liệu phải quản lý các dữ liệu sau cho tác nhân này:
 \begin{itemize}
-    \item Customer identification and profile information.
-    \item Customer account linked to the system user record.
-    \item One or more delivery addresses associated with the customer.
-    \item Delivery orders created by the customer.
-    \item Delivery confirmation records associated with completed orders.
+    \item Thông tin định danh và hồ sơ khách hàng.
+    \item Tài khoản khách hàng được liên kết với bản ghi người dùng hệ thống.
+    \item Một hoặc nhiều địa chỉ giao hàng của khách hàng.
+    \item Các đơn giao hàng do khách hàng tạo.
+    \item Các bản ghi xác nhận giao hàng của những đơn đã hoàn thành.
 \end{itemize}
 
-\subsection{Dispatcher}
+\subsection{Điều phối viên}
 
-The Dispatcher actor is a staff member responsible for reviewing and scheduling delivery orders. The database must provide this actor with access to:
+Điều phối viên là nhân viên chịu trách nhiệm xem xét và lập lịch các đơn giao hàng. Cơ sở dữ liệu phải cung cấp cho tác nhân này quyền truy cập vào:
 \begin{itemize}
-    \item Pending delivery orders awaiting review.
-    \item Current order status and status history.
-    \item Delivery activity records, including drone assignment.
-    \item Rescheduling information for failed or cancelled deliveries.
+    \item Các đơn giao hàng đang chờ xem xét.
+    \item Trạng thái hiện tại và lịch sử trạng thái của đơn hàng.
+    \item Các bản ghi hoạt động giao hàng, bao gồm việc phân công máy bay không người lái.
+    \item Thông tin lập lịch lại đối với những lần giao hàng thất bại hoặc bị hủy.
 \end{itemize}
 
-\subsection{Station Operator}
+\subsection{Nhân viên vận hành trạm}
 
-The Station Operator actor manages the physical landing stations used in delivery operations. The relevant data includes:
+Nhân viên vận hành trạm quản lý các trạm hạ cánh vật lý được sử dụng trong hoạt động giao hàng. Dữ liệu liên quan bao gồm:
 \begin{itemize}
-    \item Landing station identification and location information.
-    \item Current station status and capacity.
-    \item Station status history records.
-    \item Station operator assignments linking operators to designated stations.
-    \item Package station events, including arrival, pickup confirmation, loading, and unloading.
-    \item Delivery activities originating from or terminating at a given station.
+    \item Thông tin định danh và vị trí trạm hạ cánh.
+    \item Trạng thái hiện tại và sức chứa của trạm.
+    \item Các bản ghi lịch sử trạng thái trạm.
+    \item Việc phân công nhân viên vận hành với các trạm được chỉ định.
+    \item Các sự kiện của kiện hàng tại trạm, bao gồm tiếp nhận, xác nhận lấy hàng, chất hàng và dỡ hàng.
+    \item Các hoạt động giao hàng khởi hành từ hoặc kết thúc tại một trạm nhất định.
 \end{itemize}
 
-\subsection{Logistics Manager}
+\subsection{Quản lý logistics}
 
-The Logistics Manager actor monitors overall operations and uses data for reporting and analytics. The relevant data includes:
+Quản lý logistics giám sát hoạt động tổng thể và sử dụng dữ liệu cho báo cáo, phân tích. Dữ liệu liên quan bao gồm:
 \begin{itemize}
-    \item Aggregated delivery order and activity data.
-    \item Tracking records for monitoring delivery progress and flight trajectories.
-    \item Delivery exception, incident, and failure records.
-    \item Station operational metrics and operator assignments.
-    \item Data required for operational reports and AI-assisted analytics.
+    \item Dữ liệu tổng hợp về đơn hàng và hoạt động giao hàng.
+    \item Các bản ghi theo dõi tiến độ giao hàng và quỹ đạo bay.
+    \item Các bản ghi ngoại lệ, sự cố và thất bại trong giao hàng.
+    \item Các chỉ số vận hành trạm và việc phân công nhân viên.
+    \item Dữ liệu cần thiết cho báo cáo hoạt động và phân tích có hỗ trợ của trí tuệ nhân tạo.
 \end{itemize}
 
-\subsection{System Administrator}
+\subsection{Quản trị viên hệ thống}
 
-The System Administrator actor manages the technical aspects of the system. The relevant data includes:
+Quản trị viên hệ thống quản lý các khía cạnh kỹ thuật của hệ thống. Dữ liệu liên quan bao gồm:
 \begin{itemize}
-    \item System user accounts and account status.
-    \item Role and permission assignments.
-    \item Audit log records for all important system actions.
+    \item Tài khoản người dùng hệ thống và trạng thái tài khoản.
+    \item Việc gán vai trò và quyền hạn.
+    \item Các bản ghi nhật ký kiểm toán đối với mọi thao tác quan trọng trong hệ thống.
 \end{itemize}
 
-\section{Functional Requirements}\label{s:functional}
+\section{Yêu cầu chức năng}\label{s:functional}
 
-This section describes the main functions that the SmartDroneDelivery platform must support from a database perspective. The functional requirements are grouped according to the core modules of the system.
+Phần này mô tả những chức năng chính mà nền tảng SmartDroneDelivery phải hỗ trợ từ góc nhìn cơ sở dữ liệu. Các yêu cầu chức năng được phân nhóm theo những phân hệ cốt lõi của hệ thống.
 
-\subsection{User Management}
+\subsection{Quản lý người dùng}
 
-The user management module handles account registration, authentication, and role-based access control for all system actors.
+Phân hệ quản lý người dùng xử lý việc đăng ký tài khoản, xác thực và kiểm soát truy cập theo vai trò cho tất cả tác nhân hệ thống.
 \begin{enumerate}
-    \item The system shall allow customers to register and manage their own accounts.
-    \item The system shall allow administrators to create, update, and deactivate accounts for staff members, including dispatchers, station operators, and logistics managers.
-    \item The system shall authenticate users through a secure login mechanism using password hashing.
-    \item The system shall assign roles and permissions to each account and restrict access to functions according to that role.
-    \item The system shall allow users to view and update their personal profile information.
+    \item Hệ thống phải cho phép khách hàng đăng ký và quản lý tài khoản của mình.
+    \item Hệ thống phải cho phép quản trị viên tạo, cập nhật và vô hiệu hóa tài khoản nhân viên, bao gồm điều phối viên, nhân viên vận hành trạm và quản lý logistics.
+    \item Hệ thống phải xác thực người dùng thông qua cơ chế đăng nhập an toàn sử dụng mật khẩu đã được băm.
+    \item Hệ thống phải gán vai trò và quyền hạn cho từng tài khoản, đồng thời giới hạn quyền truy cập chức năng theo vai trò đó.
+    \item Hệ thống phải cho phép người dùng xem và cập nhật thông tin hồ sơ cá nhân.
 \end{enumerate}
-This module requires the database to store account credentials (\texttt{system\_user}), roles (\texttt{role}), permissions (\texttt{permission}), and their bridge assignments (\texttt{user\_role}, \texttt{role\_permission}).
+Phân hệ này yêu cầu cơ sở dữ liệu lưu thông tin xác thực tài khoản (\texttt{system\_user}), vai trò (\texttt{role}), quyền hạn (\texttt{permission}) và các bảng liên kết tương ứng (\texttt{user\_role}, \texttt{role\_permission}).
 
-\subsection{Customer and Delivery Order Management}
+\subsection{Quản lý khách hàng và đơn giao hàng}
 
-This module supports the management of customer information and delivery orders.
+Phân hệ này hỗ trợ quản lý thông tin khách hàng và các đơn giao hàng.
 \begin{enumerate}
-    \item The system shall allow customers to manage one or more delivery addresses, including setting a default address and geographic coordinates.
-    \item The system shall allow customers to create a delivery request by specifying the delivery address, requested delivery time, and package physical details.
-    \item The system shall allow dispatchers to review, approve, or reject submitted delivery requests.
-    \item The system shall allow customers and staff to view the current status and full history of their delivery orders.
-    \item The system shall allow a delivery order to be modified or cancelled before it is scheduled.
+    \item Hệ thống phải cho phép khách hàng quản lý một hoặc nhiều địa chỉ giao hàng, bao gồm đặt địa chỉ mặc định và lưu tọa độ địa lý.
+    \item Hệ thống phải cho phép khách hàng tạo yêu cầu giao hàng bằng cách cung cấp địa chỉ, thời gian mong muốn và thông tin vật lý của kiện hàng.
+    \item Hệ thống phải cho phép điều phối viên xem xét, phê duyệt hoặc từ chối các yêu cầu đã gửi.
+    \item Hệ thống phải cho phép khách hàng và nhân viên xem trạng thái hiện tại cùng toàn bộ lịch sử của đơn giao hàng.
+    \item Hệ thống phải cho phép sửa đổi hoặc hủy đơn giao hàng trước khi đơn được lập lịch.
 \end{enumerate}
-This module requires the database to store customer profiles (\texttt{customer}), delivery addresses (\texttt{customer\_address}), delivery orders (\texttt{delivery\_order}), package details (\texttt{package}), and order status history (\texttt{order\_status\_history}).
+Phân hệ này yêu cầu cơ sở dữ liệu lưu hồ sơ khách hàng (\texttt{customer}), địa chỉ giao hàng (\texttt{customer\_address}), đơn giao hàng (\texttt{delivery\_order}), thông tin kiện hàng (\texttt{package}) và lịch sử trạng thái đơn (\texttt{order\_status\_history}).
 
-\subsection{Delivery Workflow and Execution}
+\subsection{Quy trình và thực hiện giao hàng}
 
-This module supports the scheduling, execution, and confirmation of delivery activities.
+Phân hệ này hỗ trợ lập lịch, thực hiện và xác nhận các hoạt động giao hàng.
 \begin{enumerate}
-    \item The system shall allow dispatchers to schedule an approved delivery order by creating a delivery activity, selecting pickup and destination stations, and assigning an available operational drone.
-    \item The system shall verify that the total package weight does not exceed the assigned drone's payload capacity.
-    \item The system shall record package station events, ensuring package pickup and loading are confirmed by an assigned station operator prior to drone departure.
-    \item The system shall record real-time flight telemetry and tracking information generated during delivery execution.
-    \item The system shall allow confirmation of delivery upon successful handover, capturing receiver details, confirmation method, and a digital evidence key.
-    \item The system shall record failed delivery attempts with comprehensive exception reasons and support rescheduling by creating a new linked delivery activity.
+    \item Hệ thống phải cho phép điều phối viên lập lịch cho một đơn đã được phê duyệt bằng cách tạo hoạt động giao hàng, chọn trạm lấy hàng và trạm đích, đồng thời phân công một máy bay không người lái đang sẵn sàng hoạt động.
+    \item Hệ thống phải kiểm tra để bảo đảm tổng khối lượng kiện hàng không vượt quá tải trọng của máy bay được phân công.
+    \item Hệ thống phải ghi nhận các sự kiện kiện hàng tại trạm, bảo đảm việc lấy và chất hàng đã được một nhân viên được phân công tại trạm xác nhận trước khi máy bay khởi hành.
+    \item Hệ thống phải ghi nhận dữ liệu đo từ xa và thông tin theo dõi thời gian thực phát sinh trong quá trình giao hàng.
+    \item Hệ thống phải cho phép xác nhận khi bàn giao thành công, bao gồm thông tin người nhận, phương thức xác nhận và khóa tham chiếu bằng chứng số.
+    \item Hệ thống phải ghi nhận các lần giao hàng thất bại cùng nguyên nhân ngoại lệ đầy đủ và hỗ trợ lập lịch lại bằng cách tạo một hoạt động giao hàng mới có liên kết.
 \end{enumerate}
-This module requires the database to store delivery activities (\texttt{delivery\_activity}), package station events (\texttt{package\_station\_event}), tracking records (\texttt{tracking\_record}), delivery confirmations (\texttt{delivery\_confirmation}), and delivery exceptions (\texttt{delivery\_exception}).
+Phân hệ này yêu cầu cơ sở dữ liệu lưu hoạt động giao hàng (\texttt{delivery\_activity}), sự kiện kiện hàng tại trạm (\texttt{package\_station\_event}), bản ghi theo dõi (\texttt{tracking\_record}), xác nhận giao hàng (\texttt{delivery\_confirmation}) và ngoại lệ giao hàng (\texttt{delivery\_exception}).
 
-\subsection{Landing Station and Operator Management}
+\subsection{Quản lý trạm hạ cánh và nhân viên vận hành}
 
-This module supports the management of landing stations and station staffing used during delivery operations.
+Phân hệ này hỗ trợ quản lý các trạm hạ cánh và nhân sự vận hành trạm được sử dụng trong quá trình giao hàng.
 \begin{enumerate}
-    \item The system shall allow station operators to register and update landing station information, including geographic coordinates and capacity.
-    \item The system shall record operator assignments to stations, ensuring only assigned operators perform station operations.
-    \item The system shall monitor station availability and record all station status changes, such as maintenance or capacity limits, in an immutable history.
+    \item Hệ thống phải cho phép nhân viên vận hành đăng ký và cập nhật thông tin trạm hạ cánh, bao gồm tọa độ địa lý và sức chứa.
+    \item Hệ thống phải ghi nhận việc phân công nhân viên vào trạm, bảo đảm chỉ nhân viên được phân công mới được thực hiện thao tác tại trạm.
+    \item Hệ thống phải giám sát khả năng hoạt động của trạm và ghi lại mọi thay đổi trạng thái, chẳng hạn bảo trì hoặc giới hạn sức chứa, trong một lịch sử không thể sửa đổi.
 \end{enumerate}
-This module requires the database to store landing stations (\texttt{landing\_station}), station status history (\texttt{station\_status\_history}), and station operator assignments (\texttt{station\_operator\_assignment}).
+Phân hệ này yêu cầu cơ sở dữ liệu lưu trạm hạ cánh (\texttt{landing\_station}), lịch sử trạng thái trạm (\texttt{station\_status\_history}) và việc phân công nhân viên vận hành trạm (\texttt{station\_operator\_assignment}).
 
-\subsection{Dashboard and AI-assisted Services}
+\subsection{Bảng điều khiển và dịch vụ hỗ trợ bởi trí tuệ nhân tạo}
 
-This module provides operational monitoring and AI-assisted functions to support logistics managers and dispatchers.
+Phân hệ này cung cấp chức năng giám sát hoạt động và hỗ trợ bằng trí tuệ nhân tạo cho quản lý logistics và điều phối viên.
 \begin{enumerate}
-    \item The system shall provide a dashboard displaying the status of delivery orders, drones, and landing stations.
-    \item The system shall store AI-generated recommendations for drone selection, route planning, and estimated time of arrival (ETA).
-    \item The system shall provide operational analytics based on historical delivery and tracking data.
+    \item Hệ thống phải cung cấp bảng điều khiển hiển thị trạng thái của đơn giao hàng, máy bay không người lái và trạm hạ cánh.
+    \item Hệ thống phải lưu các đề xuất do trí tuệ nhân tạo tạo ra cho việc lựa chọn máy bay, lập kế hoạch tuyến đường và dự kiến thời gian đến (ETA).
+    \item Hệ thống phải cung cấp các phân tích hoạt động dựa trên dữ liệu lịch sử giao hàng và theo dõi.
 \end{enumerate}
-This module requires the database to store historical operational data, planned routes (\texttt{delivery\_route}, \texttt{route\_point}), and AI recommendation results (\texttt{ai\_recommendation}). The database does not store AI model weights or code.
+Phân hệ này yêu cầu cơ sở dữ liệu lưu dữ liệu hoạt động lịch sử, các tuyến đường dự kiến (\texttt{delivery\_route}, \texttt{route\_point}) và kết quả đề xuất của trí tuệ nhân tạo (\texttt{ai\_recommendation}). Cơ sở dữ liệu không lưu trọng số mô hình hoặc mã nguồn trí tuệ nhân tạo.
 
-\section{Non-functional Requirements}\label{s:nonfunctional}
+\section{Yêu cầu phi chức năng}\label{s:nonfunctional}
 
-In addition to functional requirements, the system must satisfy several non-functional requirements that directly affect database design decisions.
+Bên cạnh các yêu cầu chức năng, hệ thống phải đáp ứng một số yêu cầu phi chức năng có ảnh hưởng trực tiếp đến các quyết định thiết kế cơ sở dữ liệu.
 
-\subsection{Security}
-The system shall provide secure authentication and role-based authorization. Sensitive credentials must be stored as cryptographic hashes (\texttt{password\_hash}). The database design must enforce access control through relational permissions and prevent unauthorized access to customer and operational records.
+\subsection{Bảo mật}
+Hệ thống phải cung cấp cơ chế xác thực an toàn và phân quyền theo vai trò. Thông tin xác thực nhạy cảm phải được lưu dưới dạng giá trị băm mật mã (\texttt{password\_hash}). Thiết kế cơ sở dữ liệu phải thực thi kiểm soát truy cập thông qua các quyền hạn quan hệ và ngăn chặn truy cập trái phép vào dữ liệu khách hàng cũng như dữ liệu vận hành.
 
-\subsection{Performance}
-The system is expected to provide a response time of less than three seconds for common operational queries. Selective indexing, optimal data types, and non-redundant schemas must be implemented to support high-throughput telemetry writes and rapid lookup.
+\subsection{Hiệu năng}
+Hệ thống được kỳ vọng cung cấp thời gian phản hồi dưới ba giây đối với các truy vấn vận hành thông thường. Cần triển khai chỉ mục có chọn lọc, kiểu dữ liệu phù hợp và lược đồ không dư thừa để hỗ trợ ghi dữ liệu đo từ xa với thông lượng cao và tra cứu nhanh.
 
-\subsection{Concurrency}
-The system shall support concurrent users, dispatchers, and automated telemetry ingestion while maintaining strict data consistency. Transactions and constraints must prevent race conditions, such as double-booking a drone for overlapping flights.
+\subsection{Tính đồng thời}
+Hệ thống phải hỗ trợ đồng thời nhiều người dùng, điều phối viên và tiến trình tự động tiếp nhận dữ liệu đo từ xa mà vẫn duy trì tính nhất quán nghiêm ngặt. Giao dịch và ràng buộc phải ngăn ngừa các điều kiện tranh chấp, chẳng hạn phân công cùng một máy bay cho hai chuyến bay có thời gian chồng lấn.
 
-\subsection{Integration}
-The database serves as the persistent foundation for RESTful APIs and event-driven services. Object storage keys (\texttt{evidence\_object\_key}) are stored to link external object storage (MinIO/S3) without bloating PostgreSQL with binary files.
+\subsection{Tích hợp}
+Cơ sở dữ liệu đóng vai trò nền tảng lưu trữ bền vững cho các API RESTful và dịch vụ hướng sự kiện. Các khóa lưu trữ đối tượng (\texttt{evidence\_object\_key}) được lưu để liên kết với hệ thống lưu trữ đối tượng bên ngoài (MinIO/S3), tránh làm PostgreSQL phình to bởi các tệp nhị phân.
 
-\subsection{Scalability and Maintainability}
-The database design must be modular, adhering to Third Normal Form (3NF), allowing future functional extensions (e.g., maintenance schedules, multi-hop routes) without breaking existing relational schemas.
+\subsection{Khả năng mở rộng và bảo trì}
+Thiết kế cơ sở dữ liệu phải có tính mô-đun và tuân thủ Dạng chuẩn thứ ba (3NF), cho phép mở rộng chức năng trong tương lai, chẳng hạn lịch bảo trì hoặc tuyến đường nhiều chặng, mà không phá vỡ các lược đồ quan hệ hiện có.
 
-\subsection{Audit and Traceability}
-The system shall maintain comprehensive auditability. An append-only audit log table must capture the actor, action type, entity, changed values, and timestamp for all critical data modifications.
+\subsection{Kiểm toán và khả năng truy vết}
+Hệ thống phải duy trì khả năng kiểm toán đầy đủ. Một bảng nhật ký kiểm toán chỉ cho phép ghi nối tiếp phải lưu tác nhân, loại thao tác, thực thể, giá trị thay đổi và thời điểm của tất cả thay đổi dữ liệu quan trọng.
 
-\section{Business Process}\label{s:process}
+\section{Quy trình nghiệp vụ}\label{s:process}
 
-The complete delivery lifecycle is managed through the following systematic workflow:
+Toàn bộ vòng đời giao hàng được quản lý theo quy trình có hệ thống sau:
 
 \begin{enumerate}
-    \item \textbf{Order Placement}: A customer creates a delivery order specifying the target delivery address, requested delivery time, and package specifications. The order is stored with an initial status of \texttt{PENDING}.
-    \item \textbf{AI Recommendation}: The AI engine processes the order requirements and records recommendations for drone selection and ETA prediction in \texttt{ai\_recommendation}.
-    \item \textbf{Review and Approval}: The dispatcher reviews the order and AI recommendations, updating the order status to \texttt{APPROVED} or \texttt{REJECTED}.
-    \item \textbf{Scheduling and Drone Assignment}: The dispatcher schedules the delivery, creating a \texttt{delivery\_activity} that links the order to a specific drone, departure station, and destination station. The order status transitions to \texttt{ASSIGNED}.
-    \item \textbf{Station Processing and Package Pickup}: The package arrives at the departure station. An assigned station operator inspects the package, recording a \texttt{package\_station\_event} with status \texttt{PICKUP\_CONFIRMED} and \texttt{LOADED}.
-    \item \textbf{Flight Execution and Tracking}: The drone takes off. The activity transitions to \texttt{IN\_TRANSIT}. High-frequency telemetry records (coordinates, altitude, speed, battery) are continuously inserted into \texttt{tracking\_record}.
-    \item \textbf{Successful Delivery Confirmation}: Upon safe arrival and recipient handover, the recipient signs or provides verification. A \texttt{delivery\_confirmation} record is created with a reference to the proof object in storage. The order and activity statuses are updated to \texttt{DELIVERED}.
-    \item \textbf{Exception and Rescheduling}: If flight anomalies or weather issues occur, a \texttt{delivery\_exception} is recorded, and the activity status is updated to \texttt{FAILED}. The dispatcher can reschedule the delivery, which creates a new \texttt{delivery\_activity} linked to the original failed activity via \texttt{previous\_activity\_id}, preserving complete historical traceability.
+    \item \textbf{Tạo đơn hàng}: Khách hàng tạo đơn giao hàng, cung cấp địa chỉ đích, thời gian mong muốn và thông số kiện hàng. Đơn được lưu với trạng thái ban đầu là \texttt{PENDING}.
+    \item \textbf{Đề xuất bằng trí tuệ nhân tạo}: Bộ máy trí tuệ nhân tạo xử lý yêu cầu của đơn và ghi các đề xuất lựa chọn máy bay, dự đoán ETA vào \texttt{ai\_recommendation}.
+    \item \textbf{Xem xét và phê duyệt}: Điều phối viên xem xét đơn hàng cùng các đề xuất, sau đó cập nhật trạng thái đơn thành \texttt{APPROVED} hoặc \texttt{REJECTED}.
+    \item \textbf{Lập lịch và phân công máy bay}: Điều phối viên lập lịch giao hàng bằng cách tạo một \texttt{delivery\_activity} liên kết đơn hàng với một máy bay, trạm khởi hành và trạm đích cụ thể. Trạng thái đơn chuyển thành \texttt{ASSIGNED}.
+    \item \textbf{Xử lý tại trạm và lấy kiện hàng}: Kiện hàng đến trạm khởi hành. Nhân viên được phân công kiểm tra kiện hàng và ghi một \texttt{package\_station\_event} với trạng thái \texttt{PICKUP\_CONFIRMED} và \texttt{LOADED}.
+    \item \textbf{Thực hiện chuyến bay và theo dõi}: Máy bay cất cánh. Hoạt động chuyển sang trạng thái \texttt{IN\_TRANSIT}. Các bản ghi đo từ xa tần suất cao gồm tọa độ, độ cao, tốc độ và pin được liên tục thêm vào \texttt{tracking\_record}.
+    \item \textbf{Xác nhận giao hàng thành công}: Sau khi đến nơi an toàn và bàn giao cho người nhận, người nhận ký hoặc cung cấp thông tin xác minh. Một bản ghi \texttt{delivery\_confirmation} được tạo kèm tham chiếu tới đối tượng bằng chứng trong hệ thống lưu trữ. Trạng thái đơn và hoạt động được cập nhật thành \texttt{DELIVERED}.
+    \item \textbf{Ngoại lệ và lập lịch lại}: Nếu xảy ra bất thường trong chuyến bay hoặc vấn đề thời tiết, hệ thống ghi một \texttt{delivery\_exception} và cập nhật trạng thái hoạt động thành \texttt{FAILED}. Điều phối viên có thể lập lịch lại bằng cách tạo một \texttt{delivery\_activity} mới liên kết với hoạt động thất bại ban đầu thông qua \texttt{previous\_activity\_id}, qua đó duy trì khả năng truy vết lịch sử đầy đủ.
 \end{enumerate}
 
-\section{Business Rules}\label{s:rules}
+\section{Quy tắc nghiệp vụ}\label{s:rules}
 
-To ensure complete structural rigor, thirty-nine formal business rules (BR-01 through BR-39) are established. These rules directly govern entity identification, relationship cardinalities, and database integrity constraints.
+Để bảo đảm tính chặt chẽ đầy đủ về cấu trúc, ba mươi chín quy tắc nghiệp vụ chính thức (từ BR-01 đến BR-39) được thiết lập. Những quy tắc này chi phối trực tiếp việc xác định thực thể, bản số của mối quan hệ và các ràng buộc toàn vẹn cơ sở dữ liệu.
 
-\paragraph{Customer and Address Rules.}
+\paragraph{Quy tắc về khách hàng và địa chỉ.}
 \begin{itemize}
-    \item \textbf{BR-01}: A customer can have multiple delivery addresses.
-    \item \textbf{BR-02}: Each delivery order belongs to exactly one customer.
-    \item \textbf{BR-03}: Each delivery order uses exactly one delivery address.
-    \item \textbf{BR-04}: The selected delivery address must belong to the customer who owns the order.
-    \item \textbf{BR-05}: A customer can have at most one default delivery address.
+    \item \textbf{BR-01}: Một khách hàng có thể có nhiều địa chỉ giao hàng.
+    \item \textbf{BR-02}: Mỗi đơn giao hàng thuộc về chính xác một khách hàng.
+    \item \textbf{BR-03}: Mỗi đơn giao hàng sử dụng chính xác một địa chỉ giao hàng.
+    \item \textbf{BR-04}: Địa chỉ giao hàng được chọn phải thuộc về khách hàng sở hữu đơn hàng.
+    \item \textbf{BR-05}: Mỗi khách hàng có tối đa một địa chỉ giao hàng mặc định.
 \end{itemize}
 
-\paragraph{Order and Package Rules.}
+\paragraph{Quy tắc về đơn hàng và kiện hàng.}
 \begin{itemize}
-    \item \textbf{BR-06}: A delivery order must contain at least one package.
-    \item \textbf{BR-07}: A delivery order can contain multiple packages.
-    \item \textbf{BR-08}: Package weight and physical dimensions (length, width, height) must be strictly positive numeric values.
-    \item \textbf{BR-09}: Package status must follow the defined lifecycle (\texttt{CREATED}, \texttt{AT\_STATION}, \texttt{PICKED\_UP}, \texttt{IN\_TRANSIT}, \texttt{DELIVERED}, \texttt{FAILED}, \texttt{RETURNED}, \texttt{DAMAGED}).
+    \item \textbf{BR-06}: Một đơn giao hàng phải chứa ít nhất một kiện hàng.
+    \item \textbf{BR-07}: Một đơn giao hàng có thể chứa nhiều kiện hàng.
+    \item \textbf{BR-08}: Khối lượng và các kích thước vật lý của kiện hàng (dài, rộng, cao) phải là các giá trị số dương.
+    \item \textbf{BR-09}: Trạng thái kiện hàng phải tuân theo vòng đời đã xác định (\texttt{CREATED}, \texttt{AT\_STATION}, \texttt{PICKED\_UP}, \texttt{IN\_TRANSIT}, \texttt{DELIVERED}, \texttt{FAILED}, \texttt{RETURNED}, \texttt{DAMAGED}).
 \end{itemize}
 
-\paragraph{Order Status and Lifecycle Rules.}
+\paragraph{Quy tắc về trạng thái và vòng đời đơn hàng.}
 \begin{itemize}
-    \item \textbf{BR-10}: Every delivery order has exactly one current status at any given moment.
-    \item \textbf{BR-11}: Every order status change must be preserved in an append-only \texttt{order\_status\_history} table.
-    \item \textbf{BR-12}: Only valid status transitions are permitted in the order lifecycle.
-    \item \textbf{BR-13}: A cancelled order cannot return to an active state.
-    \item \textbf{BR-14}: A delivered order cannot be rescheduled.
+    \item \textbf{BR-10}: Tại mỗi thời điểm, mỗi đơn giao hàng có chính xác một trạng thái hiện tại.
+    \item \textbf{BR-11}: Mọi thay đổi trạng thái đơn phải được lưu trong bảng chỉ cho phép ghi nối tiếp \texttt{order\_status\_history}.
+    \item \textbf{BR-12}: Chỉ những phép chuyển trạng thái hợp lệ mới được phép thực hiện trong vòng đời đơn hàng.
+    \item \textbf{BR-13}: Đơn hàng đã hủy không thể quay lại trạng thái hoạt động.
+    \item \textbf{BR-14}: Đơn hàng đã giao không thể được lập lịch lại.
 \end{itemize}
 
-\paragraph{Drone and Operational Rules.}
+\paragraph{Quy tắc về máy bay và vận hành.}
 \begin{itemize}
-    \item \textbf{BR-15}: A drone can execute many delivery activities over time.
-    \item \textbf{BR-16}: A drone cannot be assigned to two active delivery activities simultaneously.
-    \item \textbf{BR-17}: A drone assigned to an active delivery must be in an operational status (\texttt{AVAILABLE}).
-    \item \textbf{BR-18}: The total weight of packages assigned to an activity must not exceed the drone's payload capacity (\texttt{max\_payload\_kg}).
+    \item \textbf{BR-15}: Một máy bay không người lái có thể thực hiện nhiều hoạt động giao hàng theo thời gian.
+    \item \textbf{BR-16}: Một máy bay không thể đồng thời được phân công cho hai hoạt động giao hàng đang diễn ra.
+    \item \textbf{BR-17}: Máy bay được phân công cho một hoạt động giao hàng phải ở trạng thái sẵn sàng vận hành (\texttt{AVAILABLE}).
+    \item \textbf{BR-18}: Tổng khối lượng kiện hàng của một hoạt động không được vượt quá tải trọng của máy bay (\texttt{max\_payload\_kg}).
 \end{itemize}
 
-\paragraph{Delivery Activity and Rescheduling Rules.}
+\paragraph{Quy tắc về hoạt động giao hàng và lập lịch lại.}
 \begin{itemize}
-    \item \textbf{BR-19}: One delivery order may be associated with multiple delivery activities over time.
-    \item \textbf{BR-20}: Each delivery activity represents one discrete delivery execution attempt.
-    \item \textbf{BR-21}: Failed delivery attempt records, exceptions, and tracking data must be preserved.
-    \item \textbf{BR-22}: Rescheduling an order creates a new delivery activity that references the failed activity via \texttt{previous\_activity\_id}.
-    \item \textbf{BR-23}: Each delivery activity is associated with exactly one drone.
-    \item \textbf{BR-24}: Each delivery activity has its own independent status and operational timestamps.
+    \item \textbf{BR-19}: Một đơn giao hàng có thể gắn với nhiều hoạt động giao hàng theo thời gian.
+    \item \textbf{BR-20}: Mỗi hoạt động giao hàng đại diện cho một lần thực hiện giao hàng riêng biệt.
+    \item \textbf{BR-21}: Các bản ghi về lần giao hàng thất bại, ngoại lệ và dữ liệu theo dõi phải được bảo toàn.
+    \item \textbf{BR-22}: Việc lập lịch lại tạo một hoạt động giao hàng mới tham chiếu tới hoạt động thất bại thông qua \texttt{previous\_activity\_id}.
+    \item \textbf{BR-23}: Mỗi hoạt động giao hàng gắn với chính xác một máy bay không người lái.
+    \item \textbf{BR-24}: Mỗi hoạt động giao hàng có trạng thái và các mốc thời gian vận hành độc lập.
 \end{itemize}
 
-\paragraph{Landing Station and Staffing Rules.}
+\paragraph{Quy tắc về trạm hạ cánh và nhân sự.}
 \begin{itemize}
-    \item \textbf{BR-25}: A landing station has a defined non-negative capacity.
-    \item \textbf{BR-26}: Station status transitions (e.g., maintenance, offline) must be preserved in \texttt{station\_status\_history}.
-    \item \textbf{BR-27}: A station operator can be assigned to one or more landing stations over specified time intervals.
-    \item \textbf{BR-28}: Only actively assigned station operators may record station operations and verify package pickups.
+    \item \textbf{BR-25}: Một trạm hạ cánh có sức chứa xác định và không âm.
+    \item \textbf{BR-26}: Các lần chuyển trạng thái trạm, chẳng hạn bảo trì hoặc ngừng hoạt động, phải được lưu trong \texttt{station\_status\_history}.
+    \item \textbf{BR-27}: Một nhân viên vận hành có thể được phân công cho một hoặc nhiều trạm trong những khoảng thời gian xác định.
+    \item \textbf{BR-28}: Chỉ nhân viên đang được phân công mới có thể ghi thao tác tại trạm và xác minh việc lấy kiện hàng.
 \end{itemize}
 
-\paragraph{Package Pickup Rules.}
+\paragraph{Quy tắc về lấy kiện hàng.}
 \begin{itemize}
-    \item \textbf{BR-29}: A package can be processed at a departure or destination landing station.
-    \item \textbf{BR-30}: Package pickup and handover must be explicitly recorded as station events.
-    \item \textbf{BR-31}: Package station event records must record the station, performing operator, event type, and timestamp.
-    \item \textbf{BR-32}: A package cannot transition to \texttt{IN\_TRANSIT} without a verified pickup event.
+    \item \textbf{BR-29}: Một kiện hàng có thể được xử lý tại trạm hạ cánh khởi hành hoặc trạm đích.
+    \item \textbf{BR-30}: Việc lấy và bàn giao kiện hàng phải được ghi nhận rõ ràng dưới dạng sự kiện tại trạm.
+    \item \textbf{BR-31}: Bản ghi sự kiện kiện hàng tại trạm phải lưu trạm, nhân viên thực hiện, loại sự kiện và thời điểm.
+    \item \textbf{BR-32}: Một kiện hàng không thể chuyển sang \texttt{IN\_TRANSIT} nếu chưa có sự kiện lấy hàng đã được xác minh.
 \end{itemize}
 
-\paragraph{Delivery Confirmation Rules.}
+\paragraph{Quy tắc về xác nhận giao hàng.}
 \begin{itemize}
-    \item \textbf{BR-33}: A delivery order has at most one successful delivery confirmation.
-    \item \textbf{BR-34}: A delivery confirmation can only be generated for a successfully delivered order.
-    \item \textbf{BR-35}: A confirmation is linked directly to the specific successful delivery activity.
-    \item \textbf{BR-36}: Recipient identification, confirmation method, and digital proof reference must be preserved.
+    \item \textbf{BR-33}: Một đơn giao hàng có tối đa một xác nhận giao hàng thành công.
+    \item \textbf{BR-34}: Xác nhận giao hàng chỉ có thể được tạo cho một đơn đã giao thành công.
+    \item \textbf{BR-35}: Xác nhận được liên kết trực tiếp với hoạt động giao hàng thành công tương ứng.
+    \item \textbf{BR-36}: Thông tin định danh người nhận, phương thức xác nhận và tham chiếu bằng chứng số phải được bảo toàn.
 \end{itemize}
 
-\paragraph{Audit and Traceability Rules.}
+\paragraph{Quy tắc về kiểm toán và truy vết.}
 \begin{itemize}
-    \item \textbf{BR-37}: All critical system actions must be traceable to the responsible user and timestamp.
-    \item \textbf{BR-38}: Audit records must capture actor identity, action type, affected table, record ID, and before/after state.
-    \item \textbf{BR-39}: Business state history (\texttt{order\_status\_history}, \texttt{station\_status\_history}) and audit logs (\texttt{audit\_log}) represent separate concerns and must be stored in distinct tables.
+    \item \textbf{BR-37}: Mọi thao tác quan trọng trong hệ thống phải truy vết được tới người dùng chịu trách nhiệm và thời điểm thực hiện.
+    \item \textbf{BR-38}: Bản ghi kiểm toán phải lưu danh tính tác nhân, loại thao tác, bảng bị tác động, mã bản ghi và trạng thái trước/sau.
+    \item \textbf{BR-39}: Lịch sử trạng thái nghiệp vụ (\texttt{order\_status\_history}, \texttt{station\_status\_history}) và nhật ký kiểm toán (\texttt{audit\_log}) phục vụ các mục đích khác nhau nên phải được lưu trong những bảng riêng biệt.
 \end{itemize}
 
-\section{Data Requirements}\label{s:datareq}
+\section{Yêu cầu dữ liệu}\label{s:datareq}
 
-Based on the system requirements and thirty-nine business rules, the database must manage the following major categories of data.
+Dựa trên các yêu cầu hệ thống và ba mươi chín quy tắc nghiệp vụ, cơ sở dữ liệu phải quản lý những nhóm dữ liệu chính sau.
 
-\subsection{User and Authorization Data}
-Stores authentication credentials, account statuses, roles, permissions, and many-to-many role/permission assignments (\texttt{system\_user}, \texttt{role}, \texttt{permission}, \texttt{user\_role}, \texttt{role\_permission}).
+\subsection{Dữ liệu người dùng và phân quyền}
+Lưu thông tin xác thực, trạng thái tài khoản, vai trò, quyền hạn và các phép gán vai trò/quyền hạn nhiều--nhiều (\texttt{system\_user}, \texttt{role}, \texttt{permission}, \texttt{user\_role}, \texttt{role\_permission}).
 
-\subsection{Customer and Address Data}
-Stores customer profiles and one or more delivery addresses per customer, including street details, administrative divisions, and geographic coordinates for navigation (\texttt{customer}, \texttt{customer\_address}).
+\subsection{Dữ liệu khách hàng và địa chỉ}
+Lưu hồ sơ khách hàng và một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm địa chỉ đường phố, đơn vị hành chính và tọa độ địa lý phục vụ định vị (\texttt{customer}, \texttt{customer\_address}).
 
-\subsection{Delivery Order and Package Data}
-Stores customer delivery orders, requested delivery times, estimated arrivals, completion timestamps, and detailed package dimensions and weights (\texttt{delivery\_order}, \texttt{package}, \texttt{order\_status\_history}).
+\subsection{Dữ liệu đơn giao hàng và kiện hàng}
+Lưu đơn giao hàng của khách hàng, thời gian giao mong muốn, thời gian đến dự kiến, thời điểm hoàn thành, cùng kích thước và khối lượng chi tiết của kiện hàng (\texttt{delivery\_order}, \texttt{package}, \texttt{order\_status\_history}).
 
-\subsection{Drone and Station Data}
-Stores drone physical specifications, operational statuses, battery levels, landing station coordinates, station capacity, status transition history, and operator assignments (\texttt{drone}, \texttt{landing\_station}, \texttt{station\_status\_history}, \texttt{station\_operator\_assignment}).
+\subsection{Dữ liệu máy bay và trạm}
+Lưu thông số vật lý, trạng thái vận hành, mức pin của máy bay; tọa độ, sức chứa, lịch sử chuyển trạng thái của trạm; và việc phân công nhân viên vận hành (\texttt{drone}, \texttt{landing\_station}, \texttt{station\_status\_history}, \texttt{station\_operator\_assignment}).
 
-\subsection{Delivery Activity and Event Data}
-Stores discrete execution attempts, drone assignments, departure/destination stations, previous activity links for rescheduling, and station package handling events (\texttt{delivery\_activity}, \texttt{package\_station\_event}).
+\subsection{Dữ liệu hoạt động giao hàng và sự kiện}
+Lưu từng lần thực hiện giao hàng riêng biệt, việc phân công máy bay, trạm khởi hành/đích, liên kết tới hoạt động trước khi lập lịch lại và các sự kiện xử lý kiện hàng tại trạm (\texttt{delivery\_activity}, \texttt{package\_station\_event}).
 
-\subsection{Tracking and Exception Data}
-Stores high-frequency flight telemetry (coordinates, altitude, speed, battery) and records flight incidents, failure categories, and resolutions (\texttt{tracking\_record}, \texttt{delivery\_exception}).
+\subsection{Dữ liệu theo dõi và ngoại lệ}
+Lưu dữ liệu đo từ xa tần suất cao trong chuyến bay gồm tọa độ, độ cao, tốc độ và pin; đồng thời lưu các sự cố, nhóm lỗi và phương án xử lý (\texttt{tracking\_record}, \texttt{delivery\_exception}).
 
-\subsection{Confirmation Data}
-Stores formal proof of delivery, recipient name, contact number, confirmation method, and object storage key for digital signatures or photos (\texttt{delivery\_confirmation}).
+\subsection{Dữ liệu xác nhận}
+Lưu bằng chứng giao hàng chính thức, tên và số liên hệ của người nhận, phương thức xác nhận cùng khóa lưu trữ đối tượng cho chữ ký số hoặc hình ảnh (\texttt{delivery\_confirmation}).
 
-\subsection{Route and AI Recommendation Data}
-Stores planned waypoint paths and AI recommendation outputs including drone selection, duration predictions, and confidence scores (\texttt{delivery\_route}, \texttt{route\_point}, \texttt{ai\_recommendation}).
+\subsection{Dữ liệu tuyến đường và đề xuất của trí tuệ nhân tạo}
+Lưu các điểm hành trình dự kiến và đầu ra đề xuất của trí tuệ nhân tạo, bao gồm lựa chọn máy bay, dự đoán thời lượng và điểm tin cậy (\texttt{delivery\_route}, \texttt{route\_point}, \texttt{ai\_recommendation}).
 
-\subsection{Audit Data}
-Preserves an immutable audit trail capturing actor IDs, action types, table names, affected record IDs, JSON before/after snapshots, and IP addresses (\texttt{audit\_log}).
+\subsection{Dữ liệu kiểm toán}
+Bảo toàn dấu vết kiểm toán không thể sửa đổi, gồm mã tác nhân, loại thao tác, tên bảng, mã bản ghi bị tác động, ảnh chụp JSON trước/sau và địa chỉ IP (\texttt{audit\_log}).
 
-\section{Requirement-to-Entity Traceability}\label{s:traceability}
+\section{Truy vết từ yêu cầu đến thực thể}\label{s:traceability}
 
-\textsc{Table}~\ref{tab:traceability} maps each identified requirement and business rule to the database entity or relation that satisfies it. This matrix verifies that the database design completely covers all specifications without omissions.
+\textsc{Bảng}~\ref{tab:traceability} ánh xạ từng yêu cầu và quy tắc nghiệp vụ đã xác định tới thực thể hoặc quan hệ cơ sở dữ liệu đáp ứng yêu cầu đó. Ma trận này xác minh thiết kế cơ sở dữ liệu bao phủ đầy đủ các đặc tả mà không bỏ sót.
 
 \begin{table}[h]
-\caption{Requirement-to-entity traceability matrix}
+\caption{Ma trận truy vết từ yêu cầu đến thực thể}
 \label{tab:traceability}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{6.5cm} p{5.5cm} p{2cm}}
 \toprule
-\textbf{Requirement / Business Rule} & \textbf{Entity / Table} & \textbf{Status} \\
+\textbf{Yêu cầu / Quy tắc nghiệp vụ} & \textbf{Thực thể / Bảng} & \textbf{Trạng thái} \\
 \midrule
-Customer multiple delivery addresses (BR-01, 05) & \texttt{customer\_address} & Satisfied \\
-Customer order placement (BR-02, 03, 04) & \texttt{delivery\_order} & Satisfied \\
-Package physical specifications (BR-06, 07, 08, 09) & \texttt{package} & Satisfied \\
-Order status transition tracking (BR-10, 11, 12, 13) & \texttt{order\_status\_history} & Satisfied \\
-Drone operational capacity (BR-15, 17, 18) & \texttt{drone} & Satisfied \\
-Landing station capacity and status (BR-25, 26) & \texttt{landing\_station}, \texttt{station\_status\_history} & Satisfied \\
-Station operator staffing (BR-27, 28) & \texttt{station\_operator\_assignment} & Satisfied \\
-Delivery execution attempt (BR-16, 19, 20, 23, 24) & \texttt{delivery\_activity} & Satisfied \\
-Rescheduling attempt linkage (BR-21, 22) & \texttt{delivery\_activity.previous\_activity\_id} & Satisfied \\
-Station package handling / pickup (BR-29, 30, 31, 32) & \texttt{package\_station\_event} & Satisfied \\
-In-flight telemetry tracking (BR-12) & \texttt{tracking\_record} & Satisfied \\
-Delivery failure / incident capture (BR-13, 21) & \texttt{delivery\_exception} & Satisfied \\
-At-most-one confirmation with proof (BR-33, 34, 35, 36) & \texttt{delivery\_confirmation} & Satisfied \\
-Role-based access control & \texttt{system\_user}, \texttt{role}, \texttt{permission}, bridge tables & Satisfied \\
-Audit logging and traceability (BR-37, 38, 39) & \texttt{audit\_log} & Satisfied \\
-Planned route and waypoints & \texttt{delivery\_route}, \texttt{route\_point} & Satisfied \\
-AI-assisted recommendations & \texttt{ai\_recommendation} & Satisfied \\
+Một khách hàng có nhiều địa chỉ giao hàng (BR-01, 05) & \texttt{customer\_address} & Đáp ứng \\
+Khách hàng tạo đơn giao hàng (BR-02, 03, 04) & \texttt{delivery\_order} & Đáp ứng \\
+Thông số vật lý kiện hàng (BR-06, 07, 08, 09) & \texttt{package} & Đáp ứng \\
+Theo dõi chuyển trạng thái đơn (BR-10, 11, 12, 13) & \texttt{order\_status\_history} & Đáp ứng \\
+Năng lực vận hành của máy bay (BR-15, 17, 18) & \texttt{drone} & Đáp ứng \\
+Sức chứa và trạng thái trạm hạ cánh (BR-25, 26) & \texttt{landing\_station}, \texttt{station\_status\_history} & Đáp ứng \\
+Phân công nhân viên vận hành trạm (BR-27, 28) & \texttt{station\_operator\_assignment} & Đáp ứng \\
+Lần thực hiện giao hàng (BR-16, 19, 20, 23, 24) & \texttt{delivery\_activity} & Đáp ứng \\
+Liên kết lần lập lịch lại (BR-21, 22) & \texttt{delivery\_activity.previous\_activity\_id} & Đáp ứng \\
+Xử lý/lấy kiện hàng tại trạm (BR-29, 30, 31, 32) & \texttt{package\_station\_event} & Đáp ứng \\
+Theo dõi dữ liệu đo từ xa trong chuyến bay (BR-12) & \texttt{tracking\_record} & Đáp ứng \\
+Ghi nhận sự cố/thất bại giao hàng (BR-13, 21) & \texttt{delivery\_exception} & Đáp ứng \\
+Tối đa một xác nhận có bằng chứng (BR-33, 34, 35, 36) & \texttt{delivery\_confirmation} & Đáp ứng \\
+Kiểm soát truy cập theo vai trò & \texttt{system\_user}, \texttt{role}, \texttt{permission}, các bảng liên kết & Đáp ứng \\
+Ghi nhật ký kiểm toán và truy vết (BR-37, 38, 39) & \texttt{audit\_log} & Đáp ứng \\
+Tuyến đường và các điểm hành trình dự kiến & \texttt{delivery\_route}, \texttt{route\_point} & Đáp ứng \\
+Đề xuất có hỗ trợ của trí tuệ nhân tạo & \texttt{ai\_recommendation} & Đáp ứng \\
 \bottomrule
 \end{tabular*}
 \end{table}
 
-\section{Chapter Summary}\label{s:ch2summary}
+\section{Tóm tắt chương}\label{s:ch2summary}
 
-\qquad This chapter established the comprehensive database requirements analysis for the SmartDroneDelivery platform. The five system actors and their specific data responsibilities were defined. Functional requirements across five core operational modules and non-functional constraints were specified.
+\qquad Chương này đã thiết lập bản phân tích yêu cầu cơ sở dữ liệu toàn diện cho nền tảng SmartDroneDelivery. Năm tác nhân hệ thống và trách nhiệm dữ liệu cụ thể của họ đã được xác định. Các yêu cầu chức năng thuộc năm phân hệ vận hành cốt lõi và những ràng buộc phi chức năng cũng đã được mô tả.
 
-The complete delivery lifecycle was articulated from order placement through package station pickup, drone flight tracking, exception handling, rescheduling, and final confirmation. Thirty-nine formal business rules (BR-01 through BR-39) were defined to eliminate ambiguity. Finally, the traceability matrix demonstrated how all requirements map directly to twenty-three relational entities, establishing a robust foundation for the conceptual, logical, and physical database design in Chapter~\ref{c:design}.
+Toàn bộ vòng đời giao hàng được trình bày từ khi tạo đơn, tiếp nhận kiện hàng tại trạm, theo dõi chuyến bay, xử lý ngoại lệ, lập lịch lại cho đến xác nhận cuối cùng. Ba mươi chín quy tắc nghiệp vụ chính thức (từ BR-01 đến BR-39) được xác định để loại bỏ sự mơ hồ. Cuối cùng, ma trận truy vết cho thấy cách toàn bộ yêu cầu ánh xạ trực tiếp tới hai mươi ba thực thể quan hệ, tạo nền tảng vững chắc cho thiết kế cơ sở dữ liệu mức khái niệm, mức logic và mức vật lý ở Chương~\ref{c:design}.
