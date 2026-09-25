@@ -272,35 +272,5 @@ Lưu các điểm hành trình dự kiến và đầu ra đề xuất của trí
 \subsection{Dữ liệu kiểm toán}
 Bảo toàn dấu vết kiểm toán không thể sửa đổi, gồm mã tác nhân, loại thao tác, tên bảng, mã bản ghi bị tác động, ảnh chụp JSON trước/sau và địa chỉ IP (\texttt{audit\_log}).
 
-\section{Truy vết từ yêu cầu đến thực thể}\label{s:traceability}
-
-\textsc{Bảng}~\ref{tab:traceability} ánh xạ từng yêu cầu và quy tắc nghiệp vụ đã xác định tới thực thể hoặc quan hệ cơ sở dữ liệu đáp ứng yêu cầu đó. Ma trận này xác minh thiết kế cơ sở dữ liệu bao phủ đầy đủ các đặc tả mà không bỏ sót.
-
-\begin{table}[h]
-\caption{Ma trận truy vết từ yêu cầu đến thực thể}
-\label{tab:traceability}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{6.5cm} p{5.5cm} p{2cm}}
-\toprule
-\textbf{Yêu cầu / Quy tắc nghiệp vụ} & \textbf{Thực thể / Bảng} & \textbf{Trạng thái} \\
-\midrule
-Một khách hàng có nhiều địa chỉ giao hàng (BR-01, 05) & \texttt{customer\_address} & Đáp ứng \\
-Khách hàng tạo đơn giao hàng (BR-02, 03, 04) & \texttt{delivery\_order} & Đáp ứng \\
-Thông số vật lý kiện hàng (BR-06, 07, 08, 09) & \texttt{package} & Đáp ứng \\
-Theo dõi chuyển trạng thái đơn (BR-10, 11, 12, 13) & \texttt{order\_status\_history} & Đáp ứng \\
-Năng lực vận hành của máy bay (BR-15, 17, 18) & \texttt{drone} & Đáp ứng \\
-Sức chứa và trạng thái trạm hạ cánh (BR-25, 26) & \texttt{landing\_station}, \texttt{station\_status\_history} & Đáp ứng \\
-Phân công nhân viên vận hành trạm (BR-27, 28) & \texttt{station\_operator\_assignment} & Đáp ứng \\
-Lần thực hiện giao hàng (BR-16, 19, 20, 23, 24) & \texttt{delivery\_activity} & Đáp ứng \\
-Liên kết lần lập lịch lại (BR-21, 22) & \texttt{delivery\_activity.previous\_activity\_id} & Đáp ứng \\
-Xử lý/lấy kiện hàng tại trạm (BR-29, 30, 31, 32) & \texttt{package\_station\_event} & Đáp ứng \\
-Theo dõi dữ liệu đo từ xa trong chuyến bay (BR-12) & \texttt{tracking\_record} & Đáp ứng \\
-Ghi nhận sự cố/thất bại giao hàng (BR-13, 21) & \texttt{delivery\_exception} & Đáp ứng \\
-Tối đa một xác nhận có bằng chứng (BR-33, 34, 35, 36) & \texttt{delivery\_confirmation} & Đáp ứng \\
-Kiểm soát truy cập theo vai trò & \texttt{system\_user}, \texttt{role}, \texttt{permission}, các bảng liên kết & Đáp ứng \\
-Ghi nhật ký kiểm toán và truy vết (BR-37, 38, 39) & \texttt{audit\_log} & Đáp ứng \\
-Tuyến đường và các điểm hành trình dự kiến & \texttt{delivery\_route}, \texttt{route\_point} & Đáp ứng \\
-Đề xuất có hỗ trợ của trí tuệ nhân tạo & \texttt{ai\_recommendation} & Đáp ứng \\
-\bottomrule
-\end{tabular*}
 \end{table}
 
