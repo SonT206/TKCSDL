@@ -162,6 +162,43 @@ Toàn bộ vòng đời giao hàng được quản lý theo quy trình có hệ 
     \item \textbf{Ngoại lệ và lập lịch lại}: Nếu xảy ra bất thường trong chuyến bay hoặc vấn đề thời tiết, hệ thống ghi một \texttt{delivery\_exception} và cập nhật trạng thái hoạt động thành \texttt{FAILED}. Điều phối viên có thể lập lịch lại bằng cách tạo một \texttt{delivery\_activity} mới liên kết với hoạt động thất bại ban đầu thông qua \texttt{previous\_activity\_id}, qua đó duy trì khả năng truy vết lịch sử đầy đủ.
 \end{enumerate}
 
+<<<<<<< HEAD
+\section{Quy tắc nghiệp vụ}\label{s:rules} Để bảo đảm tính chặt chẽ và đầy đủ về cấu trúc, các quy tắc nghiệp vụ sau được thiết lập. Những quy tắc này chi phối trực tiếp việc xác định thực thể, bản số quan hệ và các ràng buộc toàn vẹn của cơ sở dữ liệu. \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{1.8cm}|p{3.8cm}|p{9cm}|} \hline \textbf{Mã} & \textbf{Nhóm quy tắc} & \textbf{Nội dung} \\ \hline \endfirsthead \hline \textbf{Mã} & \textbf{Nhóm quy tắc} & \textbf{Nội dung} \\ \hline \endhead BR-01 & Khách hàng và địa chỉ & Một khách hàng có thể có nhiều địa chỉ giao hàng. \\ \hline BR-02 & Khách hàng và địa chỉ & Mỗi đơn giao hàng thuộc về chính xác một khách hàng. \\ \hline BR-03 & Khách hàng và địa chỉ & Mỗi đơn giao hàng sử dụng chính xác một địa chỉ giao hàng. \\ \hline BR-04 & Khách hàng và địa chỉ & Địa chỉ giao hàng được chọn phải thuộc về khách hàng sở hữu đơn hàng. \\ \hline BR-05 & Khách hàng và địa chỉ & Mỗi khách hàng có tối đa một địa chỉ giao hàng mặc định. \\ \hline BR-06 & Đơn hàng và kiện hàng & Một đơn giao hàng phải chứa ít nhất một kiện hàng. \\ \hline BR-07 & Đơn hàng và kiện hàng & Một đơn giao hàng có thể chứa nhiều kiện hàng. \\ \hline BR-08 & Đơn hàng và kiện hàng & Khối lượng và kích thước vật lý của kiện hàng phải là các giá trị số dương. \\ \hline BR-09 & Đơn hàng và kiện hàng & Trạng thái kiện hàng phải tuân theo vòng đời đã xác định. \\ \hline BR-10 & Trạng thái đơn hàng & Tại mỗi thời điểm, mỗi đơn giao hàng có chính xác một trạng thái hiện tại. \\ \hline BR-11 & Trạng thái đơn hàng & Mọi thay đổi trạng thái đơn phải được lưu trong bảng \texttt{order\_status\_history}. \\ \hline BR-12 & Trạng thái đơn hàng & Chỉ các phép chuyển trạng thái hợp lệ mới được phép thực hiện. \\ \hline BR-13 & Trạng thái đơn hàng & Đơn hàng đã hủy không thể quay lại trạng thái hoạt động. \\ \hline BR-14 & Trạng thái đơn hàng & Đơn hàng đã giao không thể được lập lịch lại. \\ \hline BR-15 & Máy bay và vận hành & Một máy bay không người lái có thể thực hiện nhiều hoạt động giao hàng theo thời gian. \\ \hline BR-16 & Máy bay và vận hành & Một máy bay không thể đồng thời được phân công cho hai hoạt động đang diễn ra. \\ \hline BR-17 & Máy bay và vận hành & Máy bay được phân công phải ở trạng thái \texttt{AVAILABLE}. \\ \hline BR-18 & Máy bay và vận hành & Tổng khối lượng hàng hóa không được vượt quá \texttt{max\_payload\_kg}. \\ \hline BR-19 & Hoạt động giao hàng & Một đơn giao hàng có thể gắn với nhiều hoạt động giao hàng. \\ \hline BR-20 & Hoạt động giao hàng & Mỗi hoạt động giao hàng đại diện cho một lần thực hiện riêng biệt. \\ \hline BR-21 & Hoạt động giao hàng & Các lần giao thất bại, ngoại lệ và dữ liệu theo dõi phải được bảo toàn. \\ \hline BR-22 & Hoạt động giao hàng & Việc lập lịch lại tạo một hoạt động mới tham chiếu qua \texttt{previous\_activity\_id}. \\ \hline BR-23 & Hoạt động giao hàng & Mỗi hoạt động giao hàng gắn với chính xác một máy bay không người lái. \\ \hline BR-24 & Hoạt động giao hàng & Mỗi hoạt động giao hàng có trạng thái và mốc thời gian độc lập. \\ \hline BR-25 & Trạm hạ cánh và nhân sự & Một trạm hạ cánh có sức chứa xác định và không âm. \\ \hline BR-26 & Trạm hạ cánh và nhân sự & Mọi lần thay đổi trạng thái trạm phải được lưu trong \texttt{station\_status\_history}. \\ \hline BR-27 & Trạm hạ cánh và nhân sự & Một nhân viên có thể được phân công cho nhiều trạm trong các khoảng thời gian xác định. \\ \hline BR-28 & Trạm hạ cánh và nhân sự & Chỉ nhân viên được phân công mới được ghi nhận thao tác tại trạm. \\ \hline BR-29 & Lấy kiện hàng & Một kiện hàng có thể được xử lý tại trạm khởi hành hoặc trạm đích. \\ \hline BR-30 & Lấy kiện hàng & Việc lấy và bàn giao kiện hàng phải được ghi nhận dưới dạng sự kiện. \\ \hline BR-31 & Lấy kiện hàng & Sự kiện tại trạm phải lưu trạm, nhân viên, loại sự kiện và thời điểm. \\ \hline BR-32 & Lấy kiện hàng & Một kiện hàng không thể chuyển sang \texttt{IN\_TRANSIT} nếu chưa được xác minh lấy hàng. \\ \hline BR-33 & Xác nhận giao hàng & Một đơn giao hàng có tối đa một xác nhận giao hàng thành công. \\ \hline BR-34 & Xác nhận giao hàng & Xác nhận giao hàng chỉ được tạo cho đơn đã giao thành công. \\ \hline BR-35 & Xác nhận giao hàng & Xác nhận phải liên kết với hoạt động giao hàng thành công tương ứng. \\ \hline BR-36 & Xác nhận giao hàng & Thông tin người nhận, phương thức xác nhận và bằng chứng số phải được bảo toàn. \\ \hline BR-37 & Kiểm toán và truy vết & Mọi thao tác quan trọng phải truy vết được tới người dùng và thời điểm thực hiện. \\ \hline BR-38 & Kiểm toán và truy vết & Bản ghi kiểm toán phải lưu tác nhân, thao tác, bảng dữ liệu, mã bản ghi và trạng thái trước/sau. \\ \hline BR-39 & Kiểm toán và truy vết & Lịch sử trạng thái nghiệp vụ và nhật ký kiểm toán phải được lưu trong các bảng riêng biệt. \\ \hline \end{longtable}
+
+\section{Yêu cầu dữ liệu}\label{s:datareq}
+
+Dựa trên các yêu cầu hệ thống và ba mươi chín quy tắc nghiệp vụ, cơ sở dữ liệu phải quản lý những nhóm dữ liệu chính sau.
+
+\subsection{Dữ liệu người dùng và phân quyền}
+Lưu thông tin xác thực, trạng thái tài khoản, vai trò, quyền hạn và các phép gán vai trò/quyền hạn nhiều--nhiều (\texttt{system\_user}, \texttt{role}, \texttt{permission}, \texttt{user\_role}, \texttt{role\_permission}).
+
+\subsection{Dữ liệu khách hàng và địa chỉ}
+Lưu hồ sơ khách hàng và một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm địa chỉ đường phố, đơn vị hành chính và tọa độ địa lý phục vụ định vị (\texttt{customer}, \texttt{customer\_address}).
+
+\subsection{Dữ liệu đơn giao hàng và kiện hàng}
+Lưu đơn giao hàng của khách hàng, thời gian giao mong muốn, thời gian đến dự kiến, thời điểm hoàn thành, cùng kích thước và khối lượng chi tiết của kiện hàng (\texttt{delivery\_order}, \texttt{package}, \texttt{order\_status\_history}).
+
+\subsection{Dữ liệu máy bay và trạm}
+Lưu thông số vật lý, trạng thái vận hành, mức pin của máy bay; tọa độ, sức chứa, lịch sử chuyển trạng thái của trạm; và việc phân công nhân viên vận hành (\texttt{drone}, \texttt{landing\_station}, \texttt{station\_status\_history}, \texttt{station\_operator\_assignment}).
+
+\subsection{Dữ liệu hoạt động giao hàng và sự kiện}
+Lưu từng lần thực hiện giao hàng riêng biệt, việc phân công máy bay, trạm khởi hành/đích, liên kết tới hoạt động trước khi lập lịch lại và các sự kiện xử lý kiện hàng tại trạm (\texttt{delivery\_activity}, \texttt{package\_station\_event}).
+
+\subsection{Dữ liệu theo dõi và ngoại lệ}
+Lưu dữ liệu đo từ xa tần suất cao trong chuyến bay gồm tọa độ, độ cao, tốc độ và pin; đồng thời lưu các sự cố, nhóm lỗi và phương án xử lý (\texttt{tracking\_record}, \texttt{delivery\_exception}).
+
+\subsection{Dữ liệu xác nhận}
+Lưu bằng chứng giao hàng chính thức, tên và số liên hệ của người nhận, phương thức xác nhận cùng khóa lưu trữ đối tượng cho chữ ký số hoặc hình ảnh (\texttt{delivery\_confirmation}).
+
+\subsection{Dữ liệu tuyến đường và đề xuất của trí tuệ nhân tạo}
+Lưu các điểm hành trình dự kiến và đầu ra đề xuất của trí tuệ nhân tạo, bao gồm lựa chọn máy bay, dự đoán thời lượng và điểm tin cậy (\texttt{delivery\_route}, \texttt{route\_point}, \texttt{ai\_recommendation}).
+
+\subsection{Dữ liệu kiểm toán}
+Bảo toàn dấu vết kiểm toán không thể sửa đổi, gồm mã tác nhân, loại thao tác, tên bảng, mã bản ghi bị tác động, ảnh chụp JSON trước/sau và địa chỉ IP (\texttt{audit\_log}).
+
+\end{table}
+
+=======
 \section{Quy tắc nghiệp vụ}\label{s:rules}
 
 Để bảo đảm tính chặt chẽ đầy đủ về cấu trúc, ba mươi chín quy tắc nghiệp vụ chính thức (từ BR-01 đến BR-39) được thiết lập. Những quy tắc này chi phối trực tiếp việc xác định thực thể, bản số của mối quan hệ và các ràng buộc toàn vẹn cơ sở dữ liệu.
@@ -309,3 +346,4 @@ Tuyến đường và các điểm hành trình dự kiến & \texttt{delivery\_
 \qquad Chương này đã thiết lập bản phân tích yêu cầu cơ sở dữ liệu toàn diện cho nền tảng SmartDroneDelivery. Năm tác nhân hệ thống và trách nhiệm dữ liệu cụ thể của họ đã được xác định. Các yêu cầu chức năng thuộc năm phân hệ vận hành cốt lõi và những ràng buộc phi chức năng cũng đã được mô tả.
 
 Toàn bộ vòng đời giao hàng được trình bày từ khi tạo đơn, tiếp nhận kiện hàng tại trạm, theo dõi chuyến bay, xử lý ngoại lệ, lập lịch lại cho đến xác nhận cuối cùng. Ba mươi chín quy tắc nghiệp vụ chính thức (từ BR-01 đến BR-39) được xác định để loại bỏ sự mơ hồ. Cuối cùng, ma trận truy vết cho thấy cách toàn bộ yêu cầu ánh xạ trực tiếp tới hai mươi ba thực thể quan hệ, tạo nền tảng vững chắc cho thiết kế cơ sở dữ liệu mức khái niệm, mức logic và mức vật lý ở Chương~\ref{c:design}.
+>>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6
