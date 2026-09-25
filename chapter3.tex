@@ -1,356 +1,356 @@
 % !TeX root = book.tex
-\section{Conceptual Database Design}\label{s:conceptual}
+\section{Thiết kế cơ sở dữ liệu mức khái niệm}\label{s:conceptual}
 
-This section presents the conceptual database model for the SmartDroneDelivery platform. The conceptual model identifies the main entities, their attributes, the relationships between entities, and the cardinalities of those relationships. The conceptual model serves as the basis for the logical relational schema developed in Section~\ref{s:logical}.
+Phần này trình bày mô hình cơ sở dữ liệu mức khái niệm cho nền tảng SmartDroneDelivery. Mô hình xác định các thực thể chính, thuộc tính của chúng, mối quan hệ giữa các thực thể và bản số của những mối quan hệ đó. Đây là cơ sở để xây dựng lược đồ quan hệ mức logic trong Phần~\ref{s:logical}.
 
-\subsection{Entity Identification}\label{s:entities}
+\subsection{Xác định thực thể}\label{s:entities}
 
-Based on the requirements and business rules documented in Chapter~\ref{c:analysis}, the following twenty-three entities are identified. They are organized into seven functional groups to ensure comprehensive coverage without operational redundancy.
+Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể sau được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành.
 
-\paragraph{1. User and Authorization Group.}
+\paragraph{1. Nhóm người dùng và phân quyền.}
 \begin{itemize}
-    \item \textbf{system\_user} — Stores authentication credentials and account statuses for all actors. Avoids reserved SQL keywords.
-    \item \textbf{role} — Defines standard operational roles (\texttt{CUSTOMER}, \texttt{DISPATCHER}, \texttt{STATION\_OPERATOR}, \texttt{LOGISTICS\_MANAGER}, \texttt{SYSTEM\_ADMIN}).
-    \item \textbf{permission} — Defines granular permissions (e.g., \texttt{CREATE\_ORDER}, \texttt{ASSIGN\_DRONE}, \texttt{CONFIRM\_PICKUP}).
-    \item \textbf{user\_role} — Bridge table implementing the many-to-many relationship between users and roles.
-    \item \textbf{role\_permission} — Bridge table implementing the many-to-many relationship between roles and permissions.
+    \item \textbf{system\_user} — Lưu thông tin xác thực và trạng thái tài khoản của mọi tác nhân; tên bảng tránh sử dụng từ khóa dành riêng của SQL.
+    \item \textbf{role} — Xác định các vai trò vận hành tiêu chuẩn (\texttt{CUSTOMER}, \texttt{DISPATCHER}, \texttt{STATION\_OPERATOR}, \texttt{LOGISTICS\_MANAGER}, \texttt{SYSTEM\_ADMIN}).
+    \item \textbf{permission} — Xác định các quyền hạn chi tiết, chẳng hạn \texttt{CREATE\_ORDER}, \texttt{ASSIGN\_DRONE}, \texttt{CONFIRM\_PICKUP}.
+    \item \textbf{user\_role} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa người dùng và vai trò.
+    \item \textbf{role\_permission} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa vai trò và quyền hạn.
 \end{itemize}
 
-\paragraph{2. Customer and Address Group.}
+\paragraph{2. Nhóm khách hàng và địa chỉ.}
 \begin{itemize}
-    \item \textbf{customer} — Stores customer profile information, optionally linked to a system user account.
-    \item \textbf{customer\_address} — Stores one or more delivery addresses per customer, including precise geographic coordinates for drone navigation.
+    \item \textbf{customer} — Lưu thông tin hồ sơ khách hàng và có thể liên kết với một tài khoản người dùng hệ thống.
+    \item \textbf{customer\_address} — Lưu một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm tọa độ địa lý chính xác phục vụ định vị cho máy bay không người lái.
 \end{itemize}
 
-\paragraph{3. Delivery Order and Package Group.}
+\paragraph{3. Nhóm đơn giao hàng và kiện hàng.}
 \begin{itemize}
-    \item \textbf{delivery\_order} — Represents customer delivery requests, tracking customer requested time, estimated arrival, and lifecycle state.
-    \item \textbf{package} — Stores physical package specifications (weight and dimensions in centimeters) associated with an order.
-    \item \textbf{order\_status\_history} — Append-only record capturing every status transition of a delivery order.
+    \item \textbf{delivery\_order} — Đại diện cho yêu cầu giao hàng của khách hàng, lưu thời gian khách hàng mong muốn, thời gian đến dự kiến và trạng thái vòng đời.
+    \item \textbf{package} — Lưu thông số vật lý của kiện hàng (khối lượng và kích thước tính bằng centimét) thuộc một đơn hàng.
+    \item \textbf{order\_status\_history} — Bản ghi chỉ cho phép ghi nối tiếp, lưu mọi lần chuyển trạng thái của đơn giao hàng.
 \end{itemize}
 
-\paragraph{4. Landing Station and Drone Management Group.}
+\paragraph{4. Nhóm quản lý trạm hạ cánh và máy bay.}
 \begin{itemize}
-    \item \textbf{landing\_station} — Stores physical takeoff/landing stations, coordinates, and drone capacity.
-    \item \textbf{station\_status\_history} — Records the history of station status transitions (maintenance, availability).
-    \item \textbf{station\_operator\_assignment} — Records staffing assignments of station operators to landing stations over defined time periods.
-    \item \textbf{drone} — Stores drone serial numbers, models, operational statuses, battery levels, and payload capacities.
+    \item \textbf{landing\_station} — Lưu các trạm cất/hạ cánh vật lý, tọa độ và sức chứa máy bay.
+    \item \textbf{station\_status\_history} — Lưu lịch sử chuyển trạng thái trạm, chẳng hạn trạng thái bảo trì hoặc sẵn sàng.
+    \item \textbf{station\_operator\_assignment} — Lưu việc phân công nhân viên vận hành vào trạm trong những khoảng thời gian xác định.
+    \item \textbf{drone} — Lưu số sê-ri, mẫu, trạng thái vận hành, mức pin và tải trọng của máy bay không người lái.
 \end{itemize}
 
-\paragraph{5. Delivery Execution and Telemetry Group.}
+\paragraph{5. Nhóm thực hiện giao hàng và dữ liệu đo từ xa.}
 \begin{itemize}
-    \item \textbf{delivery\_activity} — Central operational entity representing each discrete execution attempt for an order, linking the drone, departure station, and destination station.
-    \item \textbf{package\_station\_event} — Records package physical handling events at landing stations (arrival, pickup confirmation, loading, unloading).
-    \item \textbf{tracking\_record} — Stores high-frequency GPS and telemetry data captured during drone flight.
-    \item \textbf{delivery\_exception} — Records flight failures, anomalies, or disruptions during a delivery activity.
+    \item \textbf{delivery\_activity} — Thực thể vận hành trung tâm đại diện cho từng lần thực hiện một đơn hàng, liên kết máy bay, trạm khởi hành và trạm đích.
+    \item \textbf{package\_station\_event} — Lưu các sự kiện xử lý vật lý của kiện hàng tại trạm hạ cánh như tiếp nhận, xác nhận lấy hàng, chất hàng và dỡ hàng.
+    \item \textbf{tracking\_record} — Lưu dữ liệu GPS và dữ liệu đo từ xa tần suất cao được thu thập trong chuyến bay.
+    \item \textbf{delivery\_exception} — Lưu các thất bại, bất thường hoặc gián đoạn của chuyến bay trong một hoạt động giao hàng.
 \end{itemize}
 
-\paragraph{6. Delivery Confirmation Group.}
+\paragraph{6. Nhóm xác nhận giao hàng.}
 \begin{itemize}
-    \item \textbf{delivery\_confirmation} — Records formal handover proof upon successful delivery, linked 1:0..1 with the order and referencing digital proof in object storage.
+    \item \textbf{delivery\_confirmation} — Lưu bằng chứng bàn giao chính thức sau khi giao hàng thành công, liên kết 1:0..1 với đơn hàng và tham chiếu tới bằng chứng số trong kho lưu trữ đối tượng.
 \end{itemize}
 
-\paragraph{7. Audit, Route, and AI Assistance Group.}
+\paragraph{7. Nhóm kiểm toán, tuyến đường và hỗ trợ trí tuệ nhân tạo.}
 \begin{itemize}
-    \item \textbf{audit\_log} — Immutable system audit trail capturing user actions, before/after JSON snapshots, and IP addresses.
-    \item \textbf{delivery\_route} — Stores planned flight path metadata for a delivery activity.
-    \item \textbf{route\_point} — Stores ordered waypoints along a planned delivery route.
-    \item \textbf{ai\_recommendation} — Stores persistent outputs of AI recommendation models (drone recommendations and ETA predictions).
+    \item \textbf{audit\_log} — Dấu vết kiểm toán hệ thống không thể sửa đổi, lưu thao tác người dùng, ảnh chụp JSON trước/sau và địa chỉ IP.
+    \item \textbf{delivery\_route} — Lưu siêu dữ liệu về đường bay dự kiến của một hoạt động giao hàng.
+    \item \textbf{route\_point} — Lưu các điểm hành trình có thứ tự trên một tuyến giao hàng dự kiến.
+    \item \textbf{ai\_recommendation} — Lưu bền vững đầu ra của các mô hình đề xuất bằng trí tuệ nhân tạo, gồm đề xuất máy bay và dự đoán ETA.
 \end{itemize}
 
-\subsection{Entity Attributes}\label{s:attributes}
+\subsection{Thuộc tính của thực thể}\label{s:attributes}
 
-This section specifies the attributes and data types of each identified entity.
+Phần này xác định các thuộc tính và kiểu dữ liệu của từng thực thể.
 
 \paragraph{system\_user.}
-Stores user account credentials and authentication state.
+Lưu thông tin xác thực tài khoản và trạng thái xác thực người dùng.
 \begin{itemize}
-    \item \texttt{user\_id} — Primary key (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}).
-    \item \texttt{username} — Unique username (\texttt{VARCHAR(100)}).
-    \item \texttt{password\_hash} — Cryptographic password hash (\texttt{VARCHAR(255)}).
-    \item \texttt{email} — Unique email address (\texttt{VARCHAR(255)}).
-    \item \texttt{phone\_number} — Unique phone number (\texttt{VARCHAR(20)}).
-    \item \texttt{is\_active} — Account active flag (\texttt{BOOLEAN}).
-    \item \texttt{created\_at}, \texttt{updated\_at} — Account audit timestamps (\texttt{TIMESTAMPTZ}).
+    \item \texttt{user\_id} — Khóa chính (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}).
+    \item \texttt{username} — Tên đăng nhập duy nhất (\texttt{VARCHAR(100)}).
+    \item \texttt{password\_hash} — Giá trị băm mật mã của mật khẩu (\texttt{VARCHAR(255)}).
+    \item \texttt{email} — Địa chỉ thư điện tử duy nhất (\texttt{VARCHAR(255)}).
+    \item \texttt{phone\_number} — Số điện thoại duy nhất (\texttt{VARCHAR(20)}).
+    \item \texttt{is\_active} — Cờ cho biết tài khoản đang hoạt động (\texttt{BOOLEAN}).
+    \item \texttt{created\_at}, \texttt{updated\_at} — Các mốc thời gian kiểm toán tài khoản (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{role.}
-Defines system roles.
+Xác định các vai trò trong hệ thống.
 \begin{itemize}
-    \item \texttt{role\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{role\_name} — Unique role identifier (\texttt{VARCHAR(50)}).
-    \item \texttt{description} — Description of role responsibilities (\texttt{VARCHAR(255)}).
+    \item \texttt{role\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{role\_name} — Mã vai trò duy nhất (\texttt{VARCHAR(50)}).
+    \item \texttt{description} — Mô tả trách nhiệm của vai trò (\texttt{VARCHAR(255)}).
 \end{itemize}
 
 \paragraph{permission.}
-Defines functional permissions.
+Xác định các quyền chức năng.
 \begin{itemize}
-    \item \texttt{permission\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{permission\_name} — Unique permission code (\texttt{VARCHAR(100)}).
-    \item \texttt{description} — Permission explanation (\texttt{VARCHAR(255)}).
+    \item \texttt{permission\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{permission\_name} — Mã quyền hạn duy nhất (\texttt{VARCHAR(100)}).
+    \item \texttt{description} — Nội dung giải thích quyền hạn (\texttt{VARCHAR(255)}).
 \end{itemize}
 
 \paragraph{user\_role.}
-Associates users with roles.
+Liên kết người dùng với các vai trò.
 \begin{itemize}
-    \item \texttt{user\_id}, \texttt{role\_id} — Composite primary key and foreign keys.
-    \item \texttt{assigned\_at} — Timestamp of role assignment (\texttt{TIMESTAMPTZ}).
+    \item \texttt{user\_id}, \texttt{role\_id} — Khóa chính ghép và đồng thời là các khóa ngoại.
+    \item \texttt{assigned\_at} — Thời điểm gán vai trò (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{role\_permission.}
-Associates roles with permissions.
+Liên kết vai trò với các quyền hạn.
 \begin{itemize}
-    \item \texttt{role\_id}, \texttt{permission\_id} — Composite primary key and foreign keys.
+    \item \texttt{role\_id}, \texttt{permission\_id} — Khóa chính ghép và đồng thời là các khóa ngoại.
 \end{itemize}
 
 \paragraph{customer.}
-Stores customer profiles.
+Lưu hồ sơ khách hàng.
 \begin{itemize}
-    \item \texttt{customer\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Foreign key to \texttt{system\_user} (\texttt{BIGINT UNIQUE NULL}).
-    \item \texttt{customer\_name} — Full name (\texttt{VARCHAR(100)}).
-    \item \texttt{phone\_number} — Primary contact number (\texttt{VARCHAR(20) UNIQUE}).
-    \item \texttt{email} — Contact email (\texttt{VARCHAR(255) UNIQUE}).
-    \item \texttt{created\_at} — Registration timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{customer\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{user\_id} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT UNIQUE NULL}).
+    \item \texttt{customer\_name} — Họ và tên (\texttt{VARCHAR(100)}).
+    \item \texttt{phone\_number} — Số điện thoại liên hệ chính (\texttt{VARCHAR(20) UNIQUE}).
+    \item \texttt{email} — Thư điện tử liên hệ (\texttt{VARCHAR(255) UNIQUE}).
+    \item \texttt{created\_at} — Thời điểm đăng ký (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{customer\_address.}
-Stores customer delivery locations.
+Lưu các địa điểm giao hàng của khách hàng.
 \begin{itemize}
-    \item \texttt{address\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Foreign key to \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{address\_label} — Label such as ``Home'' or ``Office'' (\texttt{VARCHAR(50)}).
-    \item \texttt{address\_line} — Street address (\texttt{VARCHAR(255) NOT NULL}).
-    \item \texttt{ward}, \texttt{district}, \texttt{city} — Administrative divisions (\texttt{VARCHAR(100)}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{is\_default} — Default address flag (\texttt{BOOLEAN NOT NULL DEFAULT FALSE}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{address\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{customer\_id} — Khóa ngoại tham chiếu \texttt{customer} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{address\_label} — Nhãn như ``Nhà'' hoặc ``Văn phòng'' (\texttt{VARCHAR(50)}).
+    \item \texttt{address\_line} — Địa chỉ đường phố (\texttt{VARCHAR(255) NOT NULL}).
+    \item \texttt{ward}, \texttt{district}, \texttt{city} — Các đơn vị hành chính (\texttt{VARCHAR(100)}).
+    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
+    \item \texttt{is\_default} — Cờ địa chỉ mặc định (\texttt{BOOLEAN NOT NULL DEFAULT FALSE}).
+    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{delivery\_order.}
-Represents delivery requests.
+Đại diện cho các yêu cầu giao hàng.
 \begin{itemize}
-    \item \texttt{order\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Foreign key to \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{delivery\_address\_id} — Foreign key to \texttt{customer\_address} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{order\_status} — Current lifecycle state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{requested\_delivery\_time} — Customer desired delivery time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{estimated\_arrival\_at} — System estimated arrival time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{created\_at} — Order placement timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{completed\_at}, \texttt{cancelled\_at} — Finalization timestamps (\texttt{TIMESTAMPTZ}).
-    \item \texttt{cancellation\_reason} — Explanation if cancelled (\texttt{VARCHAR(255)}).
+    \item \texttt{order\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{customer\_id} — Khóa ngoại tham chiếu \texttt{customer} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{delivery\_address\_id} — Khóa ngoại tham chiếu \texttt{customer\_address} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{order\_status} — Trạng thái vòng đời hiện tại (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{requested\_delivery\_time} — Thời gian giao hàng khách hàng mong muốn (\texttt{TIMESTAMPTZ}).
+    \item \texttt{estimated\_arrival\_at} — Thời gian đến do hệ thống dự kiến (\texttt{TIMESTAMPTZ}).
+    \item \texttt{created\_at} — Thời điểm tạo đơn (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{completed\_at}, \texttt{cancelled\_at} — Các thời điểm kết thúc (\texttt{TIMESTAMPTZ}).
+    \item \texttt{cancellation\_reason} — Nội dung giải thích nếu đơn bị hủy (\texttt{VARCHAR(255)}).
 \end{itemize}
 
 \paragraph{package.}
-Stores package specifications.
+Lưu thông số kiện hàng.
 \begin{itemize}
-    \item \texttt{package\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{description} — Content description (\texttt{VARCHAR(500)}).
-    \item \texttt{weight\_kg} — Weight in kilograms (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm} — Dimensions in centimeters (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{package\_status} — Status code (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{package\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{description} — Mô tả nội dung kiện hàng (\texttt{VARCHAR(500)}).
+    \item \texttt{weight\_kg} — Khối lượng tính bằng kilôgam (\texttt{NUMERIC(10,2) > 0}).
+    \item \texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm} — Kích thước tính bằng centimét (\texttt{NUMERIC(10,2) > 0}).
+    \item \texttt{package\_status} — Mã trạng thái (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{order\_status\_history.}
-Maintains immutable order lifecycle audit.
+Duy trì lịch sử vòng đời đơn hàng không thể sửa đổi.
 \begin{itemize}
-    \item \texttt{status\_history\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Recorded status value (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Foreign key to \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Transition reason (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Transition timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{status\_history\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{status} — Giá trị trạng thái được ghi nhận (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{changed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT}).
+    \item \texttt{reason} — Lý do chuyển trạng thái (\texttt{VARCHAR(255)}).
+    \item \texttt{changed\_at} — Thời điểm chuyển trạng thái (\texttt{TIMESTAMPTZ NOT NULL}).
 \end{itemize}
 
 \paragraph{landing\_station.}
-Stores physical landing stations.
+Lưu các trạm hạ cánh vật lý.
 \begin{itemize}
-    \item \texttt{station\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_code} — Unique station code (\texttt{VARCHAR(50) UNIQUE NOT NULL}).
-    \item \texttt{station\_name} — Human-readable name (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{address} — Physical address (\texttt{VARCHAR(255)}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{capacity} — Maximum drone capacity (\texttt{INTEGER >= 0}).
-    \item \texttt{status} — Operational state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{station\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{station\_code} — Mã trạm duy nhất (\texttt{VARCHAR(50) UNIQUE NOT NULL}).
+    \item \texttt{station\_name} — Tên trạm dễ đọc (\texttt{VARCHAR(100) NOT NULL}).
+    \item \texttt{address} — Địa chỉ vật lý (\texttt{VARCHAR(255)}).
+    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
+    \item \texttt{capacity} — Sức chứa máy bay tối đa (\texttt{INTEGER >= 0}).
+    \item \texttt{status} — Trạng thái vận hành (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{station\_status\_history.}
-Maintains station operational history.
+Duy trì lịch sử vận hành của trạm.
 \begin{itemize}
-    \item \texttt{history\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Recorded station state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Foreign key to \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Transition reason (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Transition timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{history\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{status} — Trạng thái trạm được ghi nhận (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{changed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT}).
+    \item \texttt{reason} — Lý do chuyển trạng thái (\texttt{VARCHAR(255)}).
+    \item \texttt{changed\_at} — Thời điểm chuyển trạng thái (\texttt{TIMESTAMPTZ NOT NULL}).
 \end{itemize}
 
 \paragraph{station\_operator\_assignment.}
-Records operator staffing at stations.
+Lưu việc bố trí nhân viên vận hành tại các trạm.
 \begin{itemize}
-    \item \texttt{assignment\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{user\_id} — Foreign key to \texttt{system\_user} representing the operator (\texttt{BIGINT NOT NULL}).
-    \item \texttt{assigned\_from}, \texttt{assigned\_to} — Assignment validity window (\texttt{TIMESTAMPTZ}).
-    \item \texttt{is\_active} — Flag indicating active assignment (\texttt{BOOLEAN NOT NULL DEFAULT TRUE}).
-    \item \texttt{created\_at} — Assignment timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{assignment\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{user\_id} — Khóa ngoại tham chiếu \texttt{system\_user}, đại diện cho nhân viên vận hành (\texttt{BIGINT NOT NULL}).
+    \item \texttt{assigned\_from}, \texttt{assigned\_to} — Khoảng thời gian phân công có hiệu lực (\texttt{TIMESTAMPTZ}).
+    \item \texttt{is\_active} — Cờ cho biết phân công đang có hiệu lực (\texttt{BOOLEAN NOT NULL DEFAULT TRUE}).
+    \item \texttt{created\_at} — Thời điểm tạo phân công (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{drone.}
-Stores drone specifications and status.
+Lưu thông số và trạng thái của máy bay không người lái.
 \begin{itemize}
-    \item \texttt{drone\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{serial\_number} — Physical identifier (\texttt{VARCHAR(100) UNIQUE NOT NULL}).
-    \item \texttt{model} — Model designation (\texttt{VARCHAR(100)}).
-    \item \texttt{status} — Operational status (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{max\_payload\_kg} — Maximum payload capacity (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{battery\_level} — Current battery level (\texttt{NUMERIC(5,2)} between 0 and 100).
-    \item \texttt{station\_id} — Foreign key to current \texttt{landing\_station} (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Registration timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{drone\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{serial\_number} — Mã định danh vật lý (\texttt{VARCHAR(100) UNIQUE NOT NULL}).
+    \item \texttt{model} — Tên mẫu máy bay (\texttt{VARCHAR(100)}).
+    \item \texttt{status} — Trạng thái vận hành (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{max\_payload\_kg} — Tải trọng tối đa (\texttt{NUMERIC(10,2) > 0}).
+    \item \texttt{battery\_level} — Mức pin hiện tại (\texttt{NUMERIC(5,2)}, từ 0 đến 100).
+    \item \texttt{station\_id} — Khóa ngoại tham chiếu trạm \texttt{landing\_station} hiện tại (\texttt{BIGINT NULL}).
+    \item \texttt{created\_at} — Thời điểm đăng ký (\texttt{TIMESTAMPTZ}).
 \end{itemize}
-Note: Drones do not store an \texttt{order\_id}; drone assignment is mediated via \texttt{delivery\_activity}.
+Lưu ý: Máy bay không lưu trực tiếp \texttt{order\_id}; việc phân công máy bay được thực hiện thông qua \texttt{delivery\_activity}.
 
 \paragraph{delivery\_activity.}
-The operational mediator representing delivery execution attempts.
+Thực thể trung gian vận hành đại diện cho các lần thực hiện giao hàng.
 \begin{itemize}
-    \item \texttt{activity\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{drone\_id} — Foreign key to \texttt{drone} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{pickup\_station\_id} — Foreign key to origin \texttt{landing\_station} (\texttt{BIGINT}).
-    \item \texttt{destination\_station\_id} — Foreign key to destination \texttt{landing\_station} (\texttt{BIGINT}).
-    \item \texttt{assigned\_by} — Foreign key to dispatching \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{scheduled\_at} — Planned execution time (\texttt{TIMESTAMPTZ}).
-    \item \texttt{activity\_status} — Execution state (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{started\_at}, \texttt{ended\_at} — Execution timestamps (\texttt{TIMESTAMPTZ}).
-    \item \texttt{previous\_activity\_id} — Self-referencing foreign key linking preceding failed attempt (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Creation timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{activity\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{drone\_id} — Khóa ngoại tham chiếu \texttt{drone} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{pickup\_station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} khởi hành (\texttt{BIGINT}).
+    \item \texttt{destination\_station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} đích (\texttt{BIGINT}).
+    \item \texttt{assigned\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện phân công (\texttt{BIGINT}).
+    \item \texttt{scheduled\_at} — Thời gian dự kiến thực hiện (\texttt{TIMESTAMPTZ}).
+    \item \texttt{activity\_status} — Trạng thái thực hiện (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{started\_at}, \texttt{ended\_at} — Các mốc thời gian thực hiện (\texttt{TIMESTAMPTZ}).
+    \item \texttt{previous\_activity\_id} — Khóa ngoại tự tham chiếu, liên kết với lần thực hiện thất bại trước đó (\texttt{BIGINT NULL}).
+    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
 \paragraph{package\_station\_event.}
-Records package handling at stations.
+Lưu quá trình xử lý kiện hàng tại các trạm.
 \begin{itemize}
-    \item \texttt{event\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{package\_id} — Foreign key to \texttt{package} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{station\_id} — Foreign key to \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{event\_type} — Handling event type (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{performed\_by} — Foreign key to station operator \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{occurred\_at} — Event timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Operational remarks (\texttt{VARCHAR(255)}).
+    \item \texttt{event\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{package\_id} — Khóa ngoại tham chiếu \texttt{package} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{event\_type} — Loại sự kiện xử lý (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{performed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} là nhân viên vận hành trạm (\texttt{BIGINT}).
+    \item \texttt{occurred\_at} — Thời điểm xảy ra sự kiện (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{note} — Ghi chú vận hành (\texttt{VARCHAR(255)}).
 \end{itemize}
 
 \paragraph{tracking\_record.}
-Stores high-frequency in-flight telemetry.
+Lưu dữ liệu đo từ xa tần suất cao trong chuyến bay.
 \begin{itemize}
-    \item \texttt{tracking\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{latitude}, \texttt{longitude} — Coordinates (\texttt{NUMERIC(9,6)}).
-    \item \texttt{altitude\_m} — Altitude in meters (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{speed\_kmh} — Ground speed in km/h (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{battery\_level} — Battery percentage (\texttt{NUMERIC(5,2)}).
-    \item \texttt{recorded\_at} — Telemetry capture timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{tracking\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
+    \item \texttt{altitude\_m} — Độ cao tính bằng mét (\texttt{NUMERIC(10,2) >= 0}).
+    \item \texttt{speed\_kmh} — Tốc độ so với mặt đất tính bằng km/h (\texttt{NUMERIC(10,2) >= 0}).
+    \item \texttt{battery\_level} — Phần trăm pin (\texttt{NUMERIC(5,2)}).
+    \item \texttt{recorded\_at} — Thời điểm thu thập dữ liệu đo từ xa (\texttt{TIMESTAMPTZ NOT NULL}).
 \end{itemize}
 
 \paragraph{delivery\_confirmation.}
-Formal delivery proof.
+Bằng chứng giao hàng chính thức.
 \begin{itemize}
-    \item \texttt{confirmation\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{activity\_id} — Foreign key to successful \texttt{delivery\_activity} (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{confirmed\_by} — Foreign key to verifying \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{receiver\_name} — Name of package recipient (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{receiver\_phone} — Recipient contact phone (\texttt{VARCHAR(20)}).
-    \item \texttt{confirmation\_method} — Method code (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{evidence\_object\_key} — Object storage key for digital signature/photo proof (\texttt{VARCHAR(255)}).
-    \item \texttt{confirmed\_at} — Handover timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Delivery remarks (\texttt{VARCHAR(500)}).
+    \item \texttt{confirmation\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT UNIQUE NOT NULL}).
+    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} thành công (\texttt{BIGINT UNIQUE NOT NULL}).
+    \item \texttt{confirmed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện xác minh (\texttt{BIGINT}).
+    \item \texttt{receiver\_name} — Tên người nhận kiện hàng (\texttt{VARCHAR(100) NOT NULL}).
+    \item \texttt{receiver\_phone} — Số điện thoại liên hệ của người nhận (\texttt{VARCHAR(20)}).
+    \item \texttt{confirmation\_method} — Mã phương thức xác nhận (\texttt{VARCHAR(30) NOT NULL}).
+    \item \texttt{evidence\_object\_key} — Khóa lưu trữ đối tượng của bằng chứng chữ ký số/hình ảnh (\texttt{VARCHAR(255)}).
+    \item \texttt{confirmed\_at} — Thời điểm bàn giao (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{note} — Ghi chú giao hàng (\texttt{VARCHAR(500)}).
 \end{itemize}
 
 \paragraph{delivery\_exception.}
-Records flight failures and incidents.
+Lưu các thất bại và sự cố chuyến bay.
 \begin{itemize}
-    \item \texttt{exception\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{exception\_type} — Incident category (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{description} — Detailed incident narrative (\texttt{TEXT}).
-    \item \texttt{detected\_at} — Incident detection timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{resolved\_at} — Resolution timestamp (\texttt{TIMESTAMPTZ}).
-    \item \texttt{resolved\_by} — Foreign key to resolving \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{resolution} — Corrective action explanation (\texttt{TEXT}).
+    \item \texttt{exception\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{exception\_type} — Nhóm sự cố (\texttt{VARCHAR(50) NOT NULL}).
+    \item \texttt{description} — Mô tả chi tiết sự cố (\texttt{TEXT}).
+    \item \texttt{detected\_at} — Thời điểm phát hiện sự cố (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{resolved\_at} — Thời điểm xử lý xong (\texttt{TIMESTAMPTZ}).
+    \item \texttt{resolved\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện xử lý (\texttt{BIGINT}).
+    \item \texttt{resolution} — Mô tả biện pháp khắc phục (\texttt{TEXT}).
 \end{itemize}
 
 \paragraph{audit\_log.}
-System-wide security and modification audit log.
+Nhật ký kiểm toán bảo mật và thay đổi trên toàn hệ thống.
 \begin{itemize}
-    \item \texttt{log\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Foreign key to actor \texttt{system\_user} (\texttt{BIGINT NULL}).
-    \item \texttt{entity\_name} — Target table name (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{record\_id} — Target record primary key (\texttt{BIGINT}).
-    \item \texttt{action\_type} — Operation type (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{old\_value}, \texttt{new\_value} — Before/after JSON snapshots (\texttt{JSONB}).
-    \item \texttt{action\_time} — Audit timestamp (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{ip\_address} — Client network address (\texttt{INET}).
+    \item \texttt{log\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{user\_id} — Khóa ngoại tham chiếu tác nhân \texttt{system\_user} (\texttt{BIGINT NULL}).
+    \item \texttt{entity\_name} — Tên bảng đích (\texttt{VARCHAR(100) NOT NULL}).
+    \item \texttt{record\_id} — Khóa chính của bản ghi đích (\texttt{BIGINT}).
+    \item \texttt{action\_type} — Loại thao tác (\texttt{VARCHAR(50) NOT NULL}).
+    \item \texttt{old\_value}, \texttt{new\_value} — Ảnh chụp JSON trước/sau (\texttt{JSONB}).
+    \item \texttt{action\_time} — Thời điểm kiểm toán (\texttt{TIMESTAMPTZ NOT NULL}).
+    \item \texttt{ip\_address} — Địa chỉ mạng của máy khách (\texttt{INET}).
 \end{itemize}
 
-\paragraph{delivery\_route and route\_point.}
-Planned flight trajectories and waypoints.
+\paragraph{delivery\_route và route\_point.}
+Các quỹ đạo bay và điểm hành trình dự kiến.
 \begin{itemize}
     \item \texttt{delivery\_route}: \texttt{route\_id} (PK), \texttt{activity\_id} (FK UNIQUE), \texttt{total\_distance\_km}, \texttt{estimated\_duration\_min}, \texttt{created\_at}.
     \item \texttt{route\_point}: \texttt{route\_point\_id} (PK), \texttt{route\_id} (FK), \texttt{sequence\_number}, \texttt{latitude}, \texttt{longitude}, \texttt{altitude\_m}.
 \end{itemize}
 
 \paragraph{ai\_recommendation.}
-Persistent outputs from AI analytics services.
+Đầu ra được lưu bền vững từ các dịch vụ phân tích bằng trí tuệ nhân tạo.
 \begin{itemize}
-    \item \texttt{recommendation\_id} — Primary key (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Foreign key to \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{activity\_id} — Foreign key to \texttt{delivery\_activity} (\texttt{BIGINT NULL}).
-    \item \texttt{recommendation\_type} — Recommendation category (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{recommended\_drone\_id} — Foreign key to suggested \texttt{drone} (\texttt{BIGINT NULL}).
-    \item \texttt{estimated\_duration\_min} — Model estimated flight minutes (\texttt{NUMERIC(10,2)}).
-    \item \texttt{confidence\_score} — Confidence level (\texttt{NUMERIC(5,4)} between 0 and 1).
-    \item \texttt{model\_version} — Version identifier of the AI service (\texttt{VARCHAR(50)}).
-    \item \texttt{created\_at} — Recommendation generation timestamp (\texttt{TIMESTAMPTZ}).
+    \item \texttt{recommendation\_id} — Khóa chính (\texttt{BIGINT}).
+    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
+    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NULL}).
+    \item \texttt{recommendation\_type} — Nhóm đề xuất (\texttt{VARCHAR(50) NOT NULL}).
+    \item \texttt{recommended\_drone\_id} — Khóa ngoại tham chiếu \texttt{drone} được đề xuất (\texttt{BIGINT NULL}).
+    \item \texttt{estimated\_duration\_min} — Số phút bay do mô hình dự kiến (\texttt{NUMERIC(10,2)}).
+    \item \texttt{confidence\_score} — Mức độ tin cậy (\texttt{NUMERIC(5,4)}, từ 0 đến 1).
+    \item \texttt{model\_version} — Mã phiên bản của dịch vụ trí tuệ nhân tạo (\texttt{VARCHAR(50)}).
+    \item \texttt{created\_at} — Thời điểm tạo đề xuất (\texttt{TIMESTAMPTZ}).
 \end{itemize}
 
-\subsection{Relationships and Cardinalities}\label{s:relationships}
+\subsection{Mối quan hệ và bản số}\label{s:relationships}
 
-The relationships and cardinalities between the twenty-three entities are defined as follows, strictly conforming to the business rules:
+Mối quan hệ và bản số giữa hai mươi ba thực thể được xác định như sau, tuân thủ nghiêm ngặt các quy tắc nghiệp vụ:
 
 \begin{itemize}
-    \item \textbf{customer} 1 : N \textbf{customer\_address} — One customer owns many addresses; each address belongs to exactly one customer (BR-01).
-    \item \textbf{customer} 1 : N \textbf{delivery\_order} — One customer creates many delivery orders; each order belongs to one customer (BR-02).
-    \item \textbf{customer\_address} 1 : N \textbf{delivery\_order} — One address can be the destination for many orders; each order specifies one destination address (BR-03, BR-04).
-    \item \textbf{delivery\_order} 1 : N \textbf{package} — One order contains one or more packages; each package belongs to one order (BR-06, BR-07).
-    \item \textbf{delivery\_order} 1 : N \textbf{order\_status\_history} — One order accumulates multiple historical status records (BR-10, BR-11).
-    \item \textbf{delivery\_order} 1 : N \textbf{delivery\_activity} — One order can have multiple execution attempts (initial and rescheduled) (BR-19, BR-20).
-    \item \textbf{delivery\_order} 1 : 0..1 \textbf{delivery\_confirmation} — One order has at most one successful delivery confirmation (BR-33).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_confirmation} — A confirmation is tied to exactly one successful delivery activity attempt (BR-35).
-    \item \textbf{delivery\_activity} 0..1 : 1 \textbf{delivery\_activity} — Rescheduled activities link to their preceding attempt via \texttt{previous\_activity\_id} (BR-22).
-    \item \textbf{drone} 1 : N \textbf{delivery\_activity} — A drone serves many delivery activities over time, but only one active flight at any instant (BR-15, BR-16).
-    \item \textbf{landing\_station} 1 : N \textbf{drone} — A station accommodates multiple parked drones (BR-25).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_status\_history} — A station preserves its operational status changes (BR-26).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_operator\_assignment} — A station has multiple operator staffing assignments over time (BR-27).
-    \item \textbf{system\_user} 1 : N \textbf{station\_operator\_assignment} — A station operator user can be assigned to multiple stations over time (BR-27).
-    \item \textbf{package} 1 : N \textbf{package\_station\_event} — A package undergoes multiple station handling events (arrival, pickup, loading) (BR-29, BR-30).
-    \item \textbf{landing\_station} 1 : N \textbf{package\_station\_event} — A station processes events for many packages (BR-31).
-    \item \textbf{delivery\_activity} 1 : N \textbf{tracking\_record} — Each activity generates an immutable series of flight telemetry points (BR-12).
-    \item \textbf{delivery\_activity} 1 : N \textbf{delivery\_exception} — An activity may encounter zero, one, or multiple exception incidents (BR-13, BR-21).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_route} — An activity has at most one planned route.
-    \item \textbf{delivery\_route} 1 : N \textbf{route\_point} — A route is composed of an ordered sequence of waypoints.
-    \item \textbf{delivery\_order} 1 : N \textbf{ai\_recommendation} — An order may receive recommendations from multiple AI models over time.
-    \item \textbf{system\_user} N : N \textbf{role} — Mediated by \textbf{user\_role}.
-    \item \textbf{role} N : N \textbf{permission} — Mediated by \textbf{role\_permission}.
-    \item \textbf{system\_user} 1 : N \textbf{audit\_log} — Users generate audit log entries across the system (BR-37, BR-38).
+    \item \textbf{customer} 1 : N \textbf{customer\_address} — Một khách hàng sở hữu nhiều địa chỉ; mỗi địa chỉ thuộc về chính xác một khách hàng (BR-01).
+    \item \textbf{customer} 1 : N \textbf{delivery\_order} — Một khách hàng tạo nhiều đơn giao hàng; mỗi đơn thuộc về một khách hàng (BR-02).
+    \item \textbf{customer\_address} 1 : N \textbf{delivery\_order} — Một địa chỉ có thể là điểm đến của nhiều đơn; mỗi đơn chỉ định một địa chỉ đích (BR-03, BR-04).
+    \item \textbf{delivery\_order} 1 : N \textbf{package} — Một đơn chứa một hoặc nhiều kiện hàng; mỗi kiện hàng thuộc về một đơn (BR-06, BR-07).
+    \item \textbf{delivery\_order} 1 : N \textbf{order\_status\_history} — Một đơn tích lũy nhiều bản ghi lịch sử trạng thái (BR-10, BR-11).
+    \item \textbf{delivery\_order} 1 : N \textbf{delivery\_activity} — Một đơn có thể có nhiều lần thực hiện, gồm lần đầu và các lần được lập lịch lại (BR-19, BR-20).
+    \item \textbf{delivery\_order} 1 : 0..1 \textbf{delivery\_confirmation} — Một đơn có tối đa một xác nhận giao hàng thành công (BR-33).
+    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_confirmation} — Một xác nhận gắn với chính xác một lần thực hiện giao hàng thành công (BR-35).
+    \item \textbf{delivery\_activity} 0..1 : 1 \textbf{delivery\_activity} — Hoạt động được lập lịch lại liên kết với lần thực hiện trước đó thông qua \texttt{previous\_activity\_id} (BR-22).
+    \item \textbf{drone} 1 : N \textbf{delivery\_activity} — Một máy bay phục vụ nhiều hoạt động giao hàng theo thời gian, nhưng tại mỗi thời điểm chỉ có một chuyến bay đang hoạt động (BR-15, BR-16).
+    \item \textbf{landing\_station} 1 : N \textbf{drone} — Một trạm có thể chứa nhiều máy bay đang đỗ (BR-25).
+    \item \textbf{landing\_station} 1 : N \textbf{station\_status\_history} — Một trạm bảo toàn các thay đổi trạng thái vận hành (BR-26).
+    \item \textbf{landing\_station} 1 : N \textbf{station\_operator\_assignment} — Một trạm có nhiều lượt phân công nhân viên theo thời gian (BR-27).
+    \item \textbf{system\_user} 1 : N \textbf{station\_operator\_assignment} — Một người dùng là nhân viên vận hành có thể được phân công tới nhiều trạm theo thời gian (BR-27).
+    \item \textbf{package} 1 : N \textbf{package\_station\_event} — Một kiện hàng trải qua nhiều sự kiện xử lý tại trạm như tiếp nhận, lấy hàng và chất hàng (BR-29, BR-30).
+    \item \textbf{landing\_station} 1 : N \textbf{package\_station\_event} — Một trạm xử lý sự kiện của nhiều kiện hàng (BR-31).
+    \item \textbf{delivery\_activity} 1 : N \textbf{tracking\_record} — Mỗi hoạt động tạo ra một chuỗi điểm dữ liệu đo từ xa không thể sửa đổi (BR-12).
+    \item \textbf{delivery\_activity} 1 : N \textbf{delivery\_exception} — Một hoạt động có thể gặp không, một hoặc nhiều sự cố ngoại lệ (BR-13, BR-21).
+    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_route} — Một hoạt động có tối đa một tuyến đường dự kiến.
+    \item \textbf{delivery\_route} 1 : N \textbf{route\_point} — Một tuyến đường gồm một chuỗi điểm hành trình có thứ tự.
+    \item \textbf{delivery\_order} 1 : N \textbf{ai\_recommendation} — Theo thời gian, một đơn có thể nhận đề xuất từ nhiều mô hình trí tuệ nhân tạo.
+    \item \textbf{system\_user} N : N \textbf{role} — Được liên kết thông qua \textbf{user\_role}.
+    \item \textbf{role} N : N \textbf{permission} — Được liên kết thông qua \textbf{role\_permission}.
+    \item \textbf{system\_user} 1 : N \textbf{audit\_log} — Người dùng tạo các bản ghi nhật ký kiểm toán trong toàn hệ thống (BR-37, BR-38).
 \end{itemize}
 
-\section{Logical Database Design}\label{s:logical}
+\section{Thiết kế cơ sở dữ liệu mức logic}\label{s:logical}
 
-This section derives the logical relational schema from the conceptual model. The relational schema is presented in standard notation, with primary keys denoted by (PK), foreign keys by (FK), and unique constraints by UNIQUE.
+Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức khái niệm. Lược đồ quan hệ được trình bày theo ký hiệu chuẩn, trong đó khóa chính được ký hiệu là (PK), khóa ngoại là (FK) và ràng buộc duy nhất là UNIQUE.
 
-\subsection{Relational Schema}
+\subsection{Lược đồ quan hệ}
 
 \begin{verbatim}
 SYSTEM_USER(user_id PK, username UNIQUE, password_hash,
@@ -443,88 +443,88 @@ AI_RECOMMENDATION(recommendation_id PK, order_id FK,
   confidence_score, model_version, created_at)
 \end{verbatim}
 
-\subsection{Primary Keys, Foreign Keys, and Candidate Keys}
+\subsection{Khóa chính, khóa ngoại và khóa ứng viên}
 
-Every base table possesses a single-column surrogate primary key (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}). Bridge tables (\texttt{user\_role}, \texttt{role\_permission}) employ composite primary keys. Candidate natural keys are protected with \texttt{UNIQUE} constraints:
+Mỗi bảng cơ sở có một khóa chính thay thế gồm một cột (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}). Các bảng liên kết (\texttt{user\_role}, \texttt{role\_permission}) sử dụng khóa chính ghép. Các khóa tự nhiên ứng viên được bảo vệ bằng ràng buộc \texttt{UNIQUE}:
 \begin{itemize}
     \item \texttt{system\_user.username}, \texttt{system\_user.email}, \texttt{system\_user.phone\_number}
     \item \texttt{customer.phone\_number}, \texttt{customer.email}
     \item \texttt{drone.serial\_number}
     \item \texttt{landing\_station.station\_code}
-    \item \texttt{delivery\_confirmation.order\_id} and \texttt{delivery\_confirmation.activity\_id}
+    \item \texttt{delivery\_confirmation.order\_id} và \texttt{delivery\_confirmation.activity\_id}
     \item \texttt{delivery\_route.activity\_id}
     \item \texttt{route\_point(route\_id, sequence\_number)}
 \end{itemize}
 
-\subsection{Functional Dependencies and Normalization}
+\subsection{Phụ thuộc hàm và chuẩn hóa}
 
-All twenty-three relations satisfy Third Normal Form (3NF):
+Cả hai mươi ba quan hệ đều thỏa mãn Dạng chuẩn thứ ba (3NF):
 
-\paragraph{First Normal Form (1NF).}
-All column values are atomic. Address components are separated into discrete attributes; dimensions are stored as individual numeric values (\texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm}); and multiple addresses or packages are represented as separate relational rows rather than composite strings.
+\paragraph{Dạng chuẩn thứ nhất (1NF).}
+Mọi giá trị cột đều có tính nguyên tử. Các thành phần địa chỉ được tách thành những thuộc tính riêng; kích thước được lưu dưới dạng các giá trị số độc lập (\texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm}); nhiều địa chỉ hoặc kiện hàng được biểu diễn bằng các dòng quan hệ riêng thay vì chuỗi phức hợp.
 
-\paragraph{Second Normal Form (2NF).}
-Every non-key attribute is fully functionally dependent on the entire primary key. In composite-key tables (\texttt{user\_role}, \texttt{role\_permission}), non-key attributes depend on both component keys.
+\paragraph{Dạng chuẩn thứ hai (2NF).}
+Mỗi thuộc tính không khóa phụ thuộc hàm đầy đủ vào toàn bộ khóa chính. Trong các bảng có khóa ghép (\texttt{user\_role}, \texttt{role\_permission}), thuộc tính không khóa phụ thuộc vào cả hai thành phần của khóa.
 
-\paragraph{Third Normal Form (3NF).}
-No transitive dependencies exist between non-key attributes. For example, \texttt{delivery\_order} references \texttt{customer\_id} and does not store customer contact details; \texttt{delivery\_confirmation} does not store customer or drone data; and \texttt{tracking\_record} references \texttt{activity\_id} without redundantly storing drone attributes.
+\paragraph{Dạng chuẩn thứ ba (3NF).}
+Không tồn tại phụ thuộc bắc cầu giữa các thuộc tính không khóa. Ví dụ, \texttt{delivery\_order} tham chiếu \texttt{customer\_id} và không lưu lại thông tin liên hệ của khách hàng; \texttt{delivery\_confirmation} không lưu dữ liệu khách hàng hoặc máy bay; còn \texttt{tracking\_record} tham chiếu \texttt{activity\_id} mà không lưu dư thừa thuộc tính của máy bay.
 
-\subsection{Integrity Constraints}
+\subsection{Các ràng buộc toàn vẹn}
 
-The relational schema enforces six categories of integrity constraints:
+Lược đồ quan hệ thực thi sáu nhóm ràng buộc toàn vẹn:
 
 \begin{enumerate}
-    \item \textbf{Entity Integrity}: Guaranteed by surrogate primary keys that are automatically generated, non-null, and unique across all tables.
-    \item \textbf{Referential Integrity}: Enforced via foreign key constraints. Operational master data (\texttt{customer}, \texttt{drone}, \texttt{landing\_station}) use \texttt{ON DELETE RESTRICT} to prevent accidental deletion of operational history. Security bridge tables use \texttt{ON DELETE CASCADE}. User audit references use \texttt{ON DELETE SET NULL} to preserve audit trails if user accounts are archived.
-    \item \textbf{Domain Integrity}: Column data types and explicit \texttt{CHECK} constraints ensure valid domain values (coordinates within $[-90, 90]$ and $[-180, 180]$, positive dimensions and payload capacities, battery percentages between $0$ and $100$).
-    \item \textbf{Uniqueness Constraints}: Natural identifiers and 1:0..1 cardinalities are strictly enforced by database-level \texttt{UNIQUE} indexes.
-    \item \textbf{Business Integrity}: Total package weight must not exceed assigned drone capacity (BR-18); address must belong to the ordering customer (BR-04).
-    \item \textbf{Temporal Integrity}: In \texttt{delivery\_activity}, \texttt{started\_at < ended\_at}; in \texttt{station\_operator\_assignment}, \texttt{assigned\_from < assigned\_to}.
+    \item \textbf{Toàn vẹn thực thể}: Được bảo đảm bởi các khóa chính thay thế tự động sinh, không rỗng và duy nhất trong từng bảng.
+    \item \textbf{Toàn vẹn tham chiếu}: Được thực thi bằng các ràng buộc khóa ngoại. Dữ liệu chủ phục vụ vận hành (\texttt{customer}, \texttt{drone}, \texttt{landing\_station}) sử dụng \texttt{ON DELETE RESTRICT} để ngăn vô tình xóa lịch sử vận hành. Các bảng liên kết bảo mật sử dụng \texttt{ON DELETE CASCADE}. Tham chiếu người dùng trong nhật ký kiểm toán sử dụng \texttt{ON DELETE SET NULL} để bảo toàn dấu vết khi tài khoản được lưu trữ.
+    \item \textbf{Toàn vẹn miền}: Kiểu dữ liệu cột và các ràng buộc \texttt{CHECK} tường minh bảo đảm giá trị thuộc miền hợp lệ: tọa độ nằm trong $[-90, 90]$ và $[-180, 180]$, kích thước và tải trọng dương, phần trăm pin từ $0$ đến $100$.
+    \item \textbf{Ràng buộc duy nhất}: Các mã định danh tự nhiên và bản số 1:0..1 được thực thi nghiêm ngặt bằng chỉ mục \texttt{UNIQUE} ở cấp cơ sở dữ liệu.
+    \item \textbf{Toàn vẹn nghiệp vụ}: Tổng khối lượng kiện hàng không được vượt quá tải trọng máy bay được phân công (BR-18); địa chỉ phải thuộc về khách hàng đặt đơn (BR-04).
+    \item \textbf{Toàn vẹn thời gian}: Trong \texttt{delivery\_activity}, \texttt{started\_at < ended\_at}; trong \texttt{station\_operator\_assignment}, \texttt{assigned\_from < assigned\_to}.
 \end{enumerate}
 
-\subsection{State Transition Lifecycle Models}\label{s:lifecycle}
+\subsection{Mô hình vòng đời chuyển trạng thái}\label{s:lifecycle}
 
-The system defines formal lifecycles for its three central stateful entities:
+Hệ thống xác định vòng đời chính thức cho ba thực thể trung tâm có trạng thái:
 
-\paragraph{Delivery Order Lifecycle.}
+\paragraph{Vòng đời đơn giao hàng.}
 \begin{verbatim}
 PENDING
    |
    +---> APPROVED ---> ASSIGNED ---> IN_TRANSIT
    |                                     |
-   |                                     +---> DELIVERED (Terminal)
+   |                                     +---> DELIVERED (Kết thúc)
    |                                     |
    |                                     +---> FAILED
    |                                              |
-   |                                              +---> ASSIGNED (Rescheduled)
+   |                                              +---> ASSIGNED (Được lập lịch lại)
    |                                              |
-   |                                              +---> CANCELLED (Terminal)
+   |                                              +---> CANCELLED (Kết thúc)
    |
-   +---> REJECTED (Terminal)
+   +---> REJECTED (Kết thúc)
    |
-   +---> CANCELLED (Terminal)
+   +---> CANCELLED (Kết thúc)
 \end{verbatim}
 
-\paragraph{Package Lifecycle.}
+\paragraph{Vòng đời kiện hàng.}
 \begin{verbatim}
 CREATED -> AT_STATION -> PICKED_UP -> IN_TRANSIT -> DELIVERED
                                          |
                                          +-> FAILED -> RETURNED / DAMAGED
 \end{verbatim}
 
-\paragraph{Delivery Activity Lifecycle.}
+\paragraph{Vòng đời hoạt động giao hàng.}
 \begin{verbatim}
 ASSIGNED -> PREPARING -> IN_TRANSIT -> DELIVERED / FAILED / CANCELLED
 \end{verbatim}
 
-\section{Physical Database Design}\label{s:physical}
+\section{Thiết kế cơ sở dữ liệu mức vật lý}\label{s:physical}
 
-This section details the physical PostgreSQL implementation. All tables employ \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} for primary keys, \texttt{TIMESTAMPTZ} for time fields, and appropriate numeric and geometric domains.
+Phần này trình bày chi tiết việc triển khai vật lý bằng PostgreSQL. Tất cả các bảng sử dụng \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} cho khóa chính, \texttt{TIMESTAMPTZ} cho trường thời gian và các miền số, hình học phù hợp.
 
-\subsection{CREATE TABLE Statements}
+\subsection{Các câu lệnh CREATE TABLE}
 
 \begin{verbatim}
--- 1. User and Authorization Group
+-- 1. Nhóm người dùng và phân quyền
 
 CREATE TABLE system_user (
   user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -570,7 +570,7 @@ CREATE TABLE role_permission (
     REFERENCES permission(permission_id) ON DELETE CASCADE
 );
 
--- 2. Customer and Address Group
+-- 2. Nhóm khách hàng và địa chỉ
 
 CREATE TABLE customer (
   customer_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -600,7 +600,7 @@ CREATE TABLE customer_address (
   CONSTRAINT uq_customer_address UNIQUE (address_id, customer_id)
 );
 
--- 3. Landing Station and Operator Group
+-- 3. Nhóm trạm hạ cánh và nhân viên vận hành
 
 CREATE TABLE landing_station (
   station_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -643,7 +643,7 @@ CREATE TABLE station_operator_assignment (
   CONSTRAINT chk_soa_interval CHECK (assigned_to IS NULL OR assigned_from < assigned_to)
 );
 
--- 4. Drone Group
+-- 4. Nhóm máy bay không người lái
 
 CREATE TABLE drone (
   drone_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -659,7 +659,7 @@ CREATE TABLE drone (
     REFERENCES landing_station(station_id) ON DELETE SET NULL
 );
 
--- 5. Delivery Order and Package Group
+-- 5. Nhóm đơn giao hàng và kiện hàng
 
 CREATE TABLE delivery_order (
   order_id                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -711,7 +711,7 @@ CREATE TABLE order_status_history (
     REFERENCES system_user(user_id) ON DELETE SET NULL
 );
 
--- 6. Delivery Execution and Event Group
+-- 6. Nhóm thực hiện giao hàng và sự kiện
 
 CREATE TABLE delivery_activity (
   activity_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -808,7 +808,7 @@ CREATE TABLE delivery_exception (
     REFERENCES system_user(user_id) ON DELETE SET NULL
 );
 
--- 7. Audit, Route, and AI Group
+-- 7. Nhóm kiểm toán, tuyến đường và trí tuệ nhân tạo
 
 CREATE TABLE audit_log (
   log_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -865,12 +865,12 @@ CREATE TABLE ai_recommendation (
 );
 \end{verbatim}
 
-\subsection{Index Strategy}\label{s:indexes}
+\subsection{Chiến lược chỉ mục}\label{s:indexes}
 
-Indexes are targeted at foreign keys and frequent query filters while avoiding redundant indexes on columns covered by unique constraints:
+Chỉ mục được ưu tiên cho khóa ngoại và các điều kiện lọc truy vấn thường xuyên, đồng thời tránh tạo chỉ mục dư thừa trên những cột đã được bao phủ bởi ràng buộc duy nhất:
 
 \begin{verbatim}
--- Foreign key indexes for operational joins
+-- Chỉ mục khóa ngoại phục vụ các phép nối dữ liệu vận hành
 CREATE INDEX idx_order_customer    ON delivery_order(customer_id);
 CREATE INDEX idx_order_address     ON delivery_order(delivery_address_id);
 CREATE INDEX idx_osh_order         ON order_status_history(order_id);
@@ -888,21 +888,21 @@ CREATE INDEX idx_pse_station       ON package_station_event(station_id);
 CREATE INDEX idx_audit_user        ON audit_log(user_id);
 CREATE INDEX idx_audit_time        ON audit_log(action_time);
 
--- Composite index for recent flight telemetry queries
+-- Chỉ mục ghép phục vụ truy vấn dữ liệu đo từ xa gần nhất
 CREATE INDEX idx_tracking_activity_time
   ON tracking_record(activity_id, recorded_at DESC);
 
--- Partial unique index ensuring at most one default address per customer (BR-05)
+-- Chỉ mục duy nhất từng phần bảo đảm mỗi khách hàng có tối đa một địa chỉ mặc định (BR-05)
 CREATE UNIQUE INDEX uq_customer_default_address
   ON customer_address(customer_id)
   WHERE is_default = TRUE;
 \end{verbatim}
 
-\subsection{Representative Business Queries}
+\subsection{Các truy vấn nghiệp vụ tiêu biểu}
 
-The following queries confirm that the physical design directly answers operational needs:
+Các truy vấn sau xác nhận thiết kế vật lý đáp ứng trực tiếp nhu cầu vận hành:
 
-\paragraph{Retrieve orders for a customer with latest status.}
+\paragraph{Truy xuất các đơn hàng của khách hàng với trạng thái mới nhất.}
 \begin{verbatim}
 SELECT order_id, order_status, requested_delivery_time,
        estimated_arrival_at, created_at
@@ -911,7 +911,7 @@ WHERE  customer_id = :customer_id
 ORDER  BY created_at DESC;
 \end{verbatim}
 
-\paragraph{Retrieve package pickup confirmation history at stations.}
+\paragraph{Truy xuất lịch sử xác nhận lấy kiện hàng tại các trạm.}
 \begin{verbatim}
 SELECT pse.event_id, pse.package_id, ls.station_name,
        pse.event_type, su.username AS operator_name, pse.occurred_at
@@ -922,7 +922,7 @@ WHERE  pse.package_id = :package_id
 ORDER  BY pse.occurred_at ASC;
 \end{verbatim}
 
-\paragraph{Trace rescheduling chain for a delivery order.}
+\paragraph{Truy vết chuỗi lập lịch lại của một đơn giao hàng.}
 \begin{verbatim}
 SELECT activity_id, drone_id, activity_status,
        previous_activity_id, started_at, ended_at
@@ -931,7 +931,7 @@ WHERE  order_id = :order_id
 ORDER  BY created_at ASC;
 \end{verbatim}
 
-\paragraph{Retrieve flight telemetry for monitoring.}
+\paragraph{Truy xuất dữ liệu đo từ xa của chuyến bay để giám sát.}
 \begin{verbatim}
 SELECT recorded_at, latitude, longitude, altitude_m, speed_kmh, battery_level
 FROM   tracking_record
@@ -940,10 +940,10 @@ ORDER  BY recorded_at DESC
 LIMIT  50;
 \end{verbatim}
 
-\section{Chapter Summary}\label{s:ch3summary}
+\section{Tóm tắt chương}\label{s:ch3summary}
 
-\qquad This chapter detailed the conceptual, logical, and physical database design for the SmartDroneDelivery platform. The model comprises twenty-three normalized relations organized into seven functional groups.
+\qquad Chương này đã trình bày chi tiết thiết kế cơ sở dữ liệu mức khái niệm, mức logic và mức vật lý cho nền tảng SmartDroneDelivery. Mô hình gồm hai mươi ba quan hệ đã chuẩn hóa, được tổ chức thành bảy nhóm chức năng.
 
-Key architectural enhancements include introducing \texttt{delivery\_activity} to decouple orders from drones, adding \texttt{station\_operator\_assignment} and \texttt{package\_station\_event} to formalize station staffing and package pickup workflows, incorporating \texttt{previous\_activity\_id} to track rescheduling chains, and referencing external digital proof keys in \texttt{delivery\_confirmation}.
+Các cải tiến kiến trúc chính gồm đưa vào \texttt{delivery\_activity} để tách đơn hàng khỏi máy bay; bổ sung \texttt{station\_operator\_assignment} và \texttt{package\_station\_event} để chính thức hóa quy trình bố trí nhân sự tại trạm và lấy kiện hàng; sử dụng \texttt{previous\_activity\_id} để theo dõi chuỗi lập lịch lại; và tham chiếu khóa bằng chứng số bên ngoài trong \texttt{delivery\_confirmation}.
 
-The logical schema satisfies 3NF and enforces six categories of integrity constraints. Finally, complete PostgreSQL DDL statements and an index strategy were presented, providing a rigorous, efficient, and fully traceable implementation ready for comprehensive validation in Chapter~\ref{c:test}.
+Lược đồ logic thỏa mãn 3NF và thực thi sáu nhóm ràng buộc toàn vẹn. Cuối cùng, chương đã trình bày đầy đủ các câu lệnh DDL PostgreSQL và chiến lược chỉ mục, cung cấp một triển khai chặt chẽ, hiệu quả, có khả năng truy vết đầy đủ và sẵn sàng được kiểm chứng toàn diện trong Chương~\ref{c:test}.
