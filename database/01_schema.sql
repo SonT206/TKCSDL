@@ -14,7 +14,7 @@ SET search_path TO smart_drone_delivery, public;
 -- 1. NGUOI DUNG VA PHAN QUYEN
 -- --------------------------------------------------------------------------
 
-CREATE TABLE system_user (
+CREATE TABLE app_user (
     user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username      VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE user_role (
     assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, role_id),
     CONSTRAINT fk_ur_user FOREIGN KEY (user_id)
-        REFERENCES system_user(user_id) ON DELETE CASCADE,
+        REFERENCES app_user(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_ur_role FOREIGN KEY (role_id)
         REFERENCES role(role_id) ON DELETE CASCADE
 );
@@ -70,7 +70,7 @@ CREATE TABLE customer (
     email         VARCHAR(255) UNIQUE,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_customer_user FOREIGN KEY (user_id)
-        REFERENCES system_user(user_id) ON DELETE RESTRICT
+        REFERENCES app_user(user_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE customer_address (
@@ -127,7 +127,7 @@ CREATE TABLE station_status_history (
     CONSTRAINT fk_station_history_station FOREIGN KEY (station_id)
         REFERENCES landing_station(station_id) ON DELETE RESTRICT,
     CONSTRAINT fk_station_history_user FOREIGN KEY (changed_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE station_operator_assignment (
@@ -141,7 +141,7 @@ CREATE TABLE station_operator_assignment (
     CONSTRAINT fk_assignment_station FOREIGN KEY (station_id)
         REFERENCES landing_station(station_id) ON DELETE RESTRICT,
     CONSTRAINT fk_assignment_user FOREIGN KEY (user_id)
-        REFERENCES system_user(user_id) ON DELETE RESTRICT,
+        REFERENCES app_user(user_id) ON DELETE RESTRICT,
     CONSTRAINT chk_assignment_interval CHECK (
         assigned_to IS NULL OR assigned_from < assigned_to
     )
@@ -242,7 +242,7 @@ CREATE TABLE order_status_history (
     CONSTRAINT fk_order_history_order FOREIGN KEY (order_id)
         REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
     CONSTRAINT fk_order_history_user FOREIGN KEY (changed_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 -- --------------------------------------------------------------------------
@@ -283,7 +283,7 @@ CREATE TABLE delivery_activity (
     CONSTRAINT fk_activity_destination_station FOREIGN KEY (destination_station_id)
         REFERENCES landing_station(station_id) ON DELETE SET NULL,
     CONSTRAINT fk_activity_user FOREIGN KEY (assigned_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL,
+        REFERENCES app_user(user_id) ON DELETE SET NULL,
     CONSTRAINT fk_activity_previous FOREIGN KEY (previous_activity_id)
         REFERENCES delivery_activity(activity_id) ON DELETE SET NULL
 );
@@ -304,7 +304,7 @@ CREATE TABLE package_station_event (
     CONSTRAINT fk_station_event_station FOREIGN KEY (station_id)
         REFERENCES landing_station(station_id) ON DELETE RESTRICT,
     CONSTRAINT fk_station_event_user FOREIGN KEY (performed_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE tracking_record (
@@ -344,7 +344,7 @@ CREATE TABLE delivery_confirmation (
     CONSTRAINT fk_confirmation_activity FOREIGN KEY (activity_id)
         REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
     CONSTRAINT fk_confirmation_user FOREIGN KEY (confirmed_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE delivery_exception (
@@ -362,7 +362,7 @@ CREATE TABLE delivery_exception (
     CONSTRAINT fk_exception_activity FOREIGN KEY (activity_id)
         REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
     CONSTRAINT fk_exception_resolver FOREIGN KEY (resolved_by)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 -- --------------------------------------------------------------------------
@@ -380,7 +380,7 @@ CREATE TABLE audit_log (
     action_time TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ip_address  INET,
     CONSTRAINT fk_audit_user FOREIGN KEY (user_id)
-        REFERENCES system_user(user_id) ON DELETE SET NULL
+        REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE delivery_route (
@@ -492,8 +492,8 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER trg_system_user_updated_at
-BEFORE UPDATE ON system_user
+CREATE TRIGGER trg_app_user_updated_at
+BEFORE UPDATE ON app_user
 FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
 
 -- BR-12, BR-13, BR-14: Kiem tra chuyen trang thai don hang.

@@ -42,14 +42,14 @@ JOIN permission p ON p.permission_name = 'CREATE_ORDER'
 WHERE r.role_name = 'CUSTOMER';
 
 -- 2. Nguoi dung
-INSERT INTO system_user(username, password_hash, email, phone_number) VALUES
+INSERT INTO app_user(username, password_hash, email, phone_number) VALUES
     ('admin', '$2a$12$demo.admin.hash', 'admin@smartdrone.local', '0901000001'),
     ('operator01', '$2a$12$demo.operator.hash', 'operator01@smartdrone.local', '0901000002'),
     ('customer01', '$2a$12$demo.customer.hash', 'customer01@example.com', '0901000003');
 
 INSERT INTO user_role(user_id, role_id)
 SELECT u.user_id, r.role_id
-FROM system_user u
+FROM app_user u
 JOIN role r ON (
     (u.username = 'admin' AND r.role_name = 'SYSTEM_ADMIN') OR
     (u.username = 'operator01' AND r.role_name = 'STATION_OPERATOR') OR
@@ -59,14 +59,14 @@ JOIN role r ON (
 -- Dat nguoi dung hien tai cho cac trigger ghi lich su.
 SELECT set_config(
     'app.current_user_id',
-    (SELECT user_id::TEXT FROM system_user WHERE username = 'admin'),
+    (SELECT user_id::TEXT FROM app_user WHERE username = 'admin'),
     TRUE
 );
 
 -- 3. Khach hang va dia chi
 INSERT INTO customer(user_id, customer_name, phone_number, email)
 SELECT user_id, 'Nguyen Van An', '0902000001', 'nguyenvanan@example.com'
-FROM system_user
+FROM app_user
 WHERE username = 'customer01';
 
 INSERT INTO customer_address(
@@ -99,7 +99,7 @@ INSERT INTO landing_station(
 INSERT INTO station_operator_assignment(station_id, user_id)
 SELECT s.station_id, u.user_id
 FROM landing_station s
-CROSS JOIN system_user u
+CROSS JOIN app_user u
 WHERE s.station_code IN ('ST-THUDUC-01', 'ST-THUDUC-02')
   AND u.username = 'operator01';
 
@@ -159,7 +159,7 @@ FROM delivery_order dord
 CROSS JOIN drone d
 CROSS JOIN landing_station pickup
 CROSS JOIN landing_station destination
-CROSS JOIN system_user operator
+CROSS JOIN app_user operator
 WHERE dord.order_id = (SELECT MAX(order_id) FROM delivery_order)
   AND d.serial_number = 'DRONE-SDD-001'
   AND pickup.station_code = 'ST-THUDUC-01'
@@ -175,7 +175,7 @@ SELECT p.package_id, s.station_id, 'PICKUP_CONFIRMED', u.user_id,
 FROM package p
 JOIN delivery_order dord ON dord.order_id = p.order_id
 CROSS JOIN landing_station s
-CROSS JOIN system_user u
+CROSS JOIN app_user u
 WHERE dord.order_id = (SELECT MAX(order_id) FROM delivery_order)
   AND s.station_code = 'ST-THUDUC-01'
   AND u.username = 'operator01';
@@ -259,7 +259,7 @@ SELECT dord.order_id, da.activity_id, u.user_id, 'Nguyen Van An', '0902000001',
        'Giao hang thanh cong; du lieu minh hoa'
 FROM delivery_order dord
 JOIN delivery_activity da ON da.order_id = dord.order_id
-CROSS JOIN system_user u
+CROSS JOIN app_user u
 WHERE dord.order_id = (SELECT MAX(order_id) FROM delivery_order)
   AND u.username = 'operator01';
 
@@ -268,7 +268,7 @@ INSERT INTO audit_log(
 )
 SELECT u.user_id, 'delivery_order', dord.order_id, 'DELIVERY_COMPLETED',
        jsonb_build_object('order_status', dord.order_status), '127.0.0.1'
-FROM system_user u
+FROM app_user u
 CROSS JOIN delivery_order dord
 WHERE u.username = 'operator01'
   AND dord.order_id = (SELECT MAX(order_id) FROM delivery_order);

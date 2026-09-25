@@ -353,7 +353,7 @@ Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức
 \subsection{Lược đồ quan hệ}
 
 \begin{verbatim}
-SYSTEM_USER(user_id PK, username UNIQUE, password_hash,
+app_user(user_id PK, username UNIQUE, password_hash,
   email UNIQUE, phone_number UNIQUE, is_active,
   created_at, updated_at)
 
@@ -526,7 +526,7 @@ Phần này trình bày chi tiết việc triển khai vật lý bằng PostgreS
 \begin{verbatim}
 -- 1. Nhóm người dùng và phân quyền
 
-CREATE TABLE system_user (
+CREATE TABLE app_user (
   user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   username      VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
@@ -555,7 +555,7 @@ CREATE TABLE user_role (
   assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, role_id),
   CONSTRAINT fk_ur_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE CASCADE,
+    REFERENCES app_user(user_id) ON DELETE CASCADE,
   CONSTRAINT fk_ur_role FOREIGN KEY (role_id)
     REFERENCES role(role_id) ON DELETE CASCADE
 );
@@ -580,7 +580,7 @@ CREATE TABLE customer (
   email         VARCHAR(255) UNIQUE,
   created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_customer_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT
+    REFERENCES app_user(user_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE customer_address (
@@ -625,7 +625,7 @@ CREATE TABLE station_status_history (
   CONSTRAINT fk_ssh_station FOREIGN KEY (station_id)
     REFERENCES landing_station(station_id) ON DELETE RESTRICT,
   CONSTRAINT fk_ssh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE station_operator_assignment (
@@ -639,7 +639,7 @@ CREATE TABLE station_operator_assignment (
   CONSTRAINT fk_soa_station FOREIGN KEY (station_id)
     REFERENCES landing_station(station_id) ON DELETE RESTRICT,
   CONSTRAINT fk_soa_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT,
+    REFERENCES app_user(user_id) ON DELETE RESTRICT,
   CONSTRAINT chk_soa_interval CHECK (assigned_to IS NULL OR assigned_from < assigned_to)
 );
 
@@ -708,7 +708,7 @@ CREATE TABLE order_status_history (
   CONSTRAINT fk_osh_order FOREIGN KEY (order_id)
     REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
   CONSTRAINT fk_osh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 -- 6. Nhóm thực hiện giao hàng và sự kiện
@@ -738,7 +738,7 @@ CREATE TABLE delivery_activity (
   CONSTRAINT fk_act_dest FOREIGN KEY (destination_station_id)
     REFERENCES landing_station(station_id) ON DELETE SET NULL,
   CONSTRAINT fk_act_user FOREIGN KEY (assigned_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL,
+    REFERENCES app_user(user_id) ON DELETE SET NULL,
   CONSTRAINT fk_act_prev FOREIGN KEY (previous_activity_id)
     REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
   CONSTRAINT chk_act_time CHECK (ended_at IS NULL OR started_at <= ended_at)
@@ -758,7 +758,7 @@ CREATE TABLE package_station_event (
   CONSTRAINT fk_pse_station FOREIGN KEY (station_id)
     REFERENCES landing_station(station_id) ON DELETE RESTRICT,
   CONSTRAINT fk_pse_user FOREIGN KEY (performed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE tracking_record (
@@ -790,7 +790,7 @@ CREATE TABLE delivery_confirmation (
   CONSTRAINT fk_conf_activity FOREIGN KEY (activity_id)
     REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
   CONSTRAINT fk_conf_user FOREIGN KEY (confirmed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE delivery_exception (
@@ -805,7 +805,7 @@ CREATE TABLE delivery_exception (
   CONSTRAINT fk_exc_activity FOREIGN KEY (activity_id)
     REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
   CONSTRAINT fk_exc_resolver FOREIGN KEY (resolved_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 -- 7. Nhóm kiểm toán, tuyến đường và trí tuệ nhân tạo
@@ -821,7 +821,7 @@ CREATE TABLE audit_log (
   action_time TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   ip_address  INET,
   CONSTRAINT fk_al_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
+    REFERENCES app_user(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE delivery_route (
@@ -917,7 +917,7 @@ SELECT pse.event_id, pse.package_id, ls.station_name,
        pse.event_type, su.username AS operator_name, pse.occurred_at
 FROM   package_station_event pse
 JOIN   landing_station ls ON ls.station_id = pse.station_id
-LEFT   JOIN system_user su ON su.user_id = pse.performed_by
+LEFT   JOIN app_user su ON su.user_id = pse.performed_by
 WHERE  pse.package_id = :package_id
 ORDER  BY pse.occurred_at ASC;
 \end{verbatim}
