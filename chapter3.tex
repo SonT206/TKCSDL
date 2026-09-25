@@ -43,89 +43,11 @@ Một kịch bản nghiệp vụ dùng để kiểm tra mức khái niệm có t
     \item Khi giao thành công, xác nhận giao hàng ghi nhận kết quả và tham chiếu bằng chứng.
 \end{itemize}
 
-\subsection{Các tác nhân và trách nhiệm nghiệp vụ}
+\subsection{Ý nghĩa nghiệp vụ của các thực thể} Một thực thể chỉ nên được đưa vào mô hình khi nó đại diện cho một đối tượng nghiệp vụ độc lập, một vòng đời riêng hoặc một loại sự kiện cần được quản lý riêng. \renewcommand{\arraystretch}{1.2} \small \begin{longtable}{|p{5cm}|p{9cm}|} \hline \textbf{Thực thể} & \textbf{Giải thích} \\ \hline \endfirsthead \hline \textbf{Thực thể} & \textbf{Giải thích} \\ \hline \endhead Customer\\ và\\ Customer Address & Customer đại diện cho chủ thể sử dụng dịch vụ. Customer Address không chỉ là một thuộc tính văn bản của khách hàng vì một khách hàng có thể có nhiều địa chỉ và mỗi địa chỉ có tọa độ phục vụ giao hàng. Do đó địa chỉ là một thực thể độc lập có vòng đời riêng. \\ \hline Delivery Order & Đại diện cho yêu cầu nghiệp vụ giao hàng. Thực thể này lưu thông tin khách hàng, địa chỉ giao, trạng thái đơn hàng, thời gian yêu cầu, ETA và kết quả hoàn thành hoặc hủy. Không chứa dữ liệu theo dõi hay lịch sử thực hiện. \\ \hline Package & Đại diện cho đơn vị logistics vật lý thuộc một đơn hàng. Một đơn hàng có thể chứa nhiều kiện hàng và mỗi kiện hàng có các thuộc tính riêng như khối lượng, kích thước và trạng thái xử lý. \\ \hline Landing Station\\ và\\ Drone & Landing Station là hạ tầng vận hành, còn Drone là nguồn lực giao hàng. Hai thực thể này tồn tại độc lập với đơn hàng, có vòng đời riêng và được tái sử dụng cho nhiều lần giao hàng khác nhau. \\ \hline Delivery Activity & Mô tả một lần thực hiện giao hàng cụ thể. Đây là thực thể trung tâm liên kết drone, trạm lấy/trả, lịch thực hiện, dữ liệu theo dõi, lộ trình, sự cố và các khuyến nghị AI. \\ \hline Các thực thể lịch sử\\ và sự kiện & Các bảng lịch sử và sự kiện được tách riêng khi thông tin thay đổi theo thời gian hoặc phát sinh nhiều lần. Ví dụ: lịch sử trạng thái đơn hàng, lịch sử trạng thái trạm, sự kiện xử lý kiện hàng, dữ liệu theo dõi và các sự cố phát sinh. \\ \hline Delivery Confirmation & Lưu kết quả xác nhận giao hàng thành công. Các bằng chứng xác nhận được tham chiếu thông qua khóa hoặc đường dẫn lưu trữ thay vì nhúng trực tiếp dữ liệu tệp vào cơ sở dữ liệu. \\ \hline Phân quyền\\ và kiểm toán & Người dùng, vai trò và quyền được mô hình hóa thành các thực thể riêng biệt với quan hệ nhiều-nhiều. Nhật ký kiểm toán được lưu độc lập nhằm phục vụ quản trị, bảo mật và truy vết hoạt động hệ thống. \\ \hline \end{longtable} \normalsize
+\subsection{Xác định thực thể: mỗi khái niệm có ý nghĩa gì} Một thực thể chỉ nên được đưa vào mô hình khi nó đại diện cho một đối tượng nghiệp vụ độc lập, một vòng đời riêng, một loại sự kiện lặp lại hoặc một mối quan hệ cần được quản lý riêng. \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{3.5cm}|p{4.5cm}|p{7cm}|} \hline \textbf{Nhóm khái niệm} & \textbf{Thực thể / Quan hệ} & \textbf{Ý nghĩa nghiệp vụ} \\ \hline \endfirsthead \hline \textbf{Nhóm khái niệm} & \textbf{Thực thể / Quan hệ} & \textbf{Ý nghĩa nghiệp vụ} \\ \hline \endhead Định danh và khách hàng & \texttt{SYSTEM\_USER}, \texttt{CUSTOMER}, \texttt{CUSTOMER\_ADDRESS} & Quản lý tài khoản, hồ sơ khách hàng và các địa chỉ có thể được sử dụng làm điểm giao hàng. \\ \hline Đơn giao hàng và kiện hàng & \texttt{DELIVERY\_ORDER}, \texttt{PACKAGE} & Mô tả yêu cầu giao hàng và các đơn vị logistics thuộc đơn hàng. \\ \hline Trạm hạ cánh và drone & \texttt{LANDING\_STATION}, \texttt{DRONE} & Đại diện cho hạ tầng và phương tiện thực hiện hoạt động giao hàng. \\ \hline Thực hiện giao hàng & \texttt{DELIVERY\_ACTIVITY} & Đại diện cho một lần thực hiện (attempt) cụ thể của đơn giao hàng; là thực thể trung tâm của mô hình nghiệp vụ. \\ \hline Lịch sử và sự kiện & \texttt{ORDER\_STATUS\_HISTORY}, \texttt{STATION\_STATUS\_HISTORY}, \texttt{PACKAGE\_STATION\_EVENT}, \texttt{TRACKING\_RECORD}, \texttt{DELIVERY\_EXCEPTION} & Lưu các sự kiện phát sinh theo thời gian; tránh lưu danh sách lặp hoặc dữ liệu lịch sử trực tiếp trong thực thể cha. \\ \hline Xác nhận giao hàng & \texttt{DELIVERY\_CONFIRMATION} & Lưu kết quả giao hàng thành công và tham chiếu tới bằng chứng xác nhận. \\ \hline Lộ trình và trí tuệ nhân tạo & \texttt{DELIVERY\_ROUTE}, \texttt{ROUTE\_POINT}, \texttt{AI\_RECOMMENDATION} & Quản lý lộ trình dự kiến, các điểm hành trình và các khuyến nghị từ mô hình AI. \\ \hline Phân quyền và kiểm toán & \texttt{ROLE}, \texttt{PERMISSION}, \texttt{USER\_ROLE}, \texttt{ROLE\_PERMISSION}, \texttt{AUDIT\_LOG} & Hỗ trợ kiểm soát truy cập, quản lý quyền hạn và truy vết các thao tác trong hệ thống. \\ \hline \end{longtable} \normalsize
 
-\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}}
-\toprule
-\textbf{Tác nhân} & \textbf{Trách nhiệm nghiệp vụ} & \textbf{Khái niệm chính} & \textbf{Ý nghĩa đối với mô hình} \\
-\midrule
-\endhead
-Khách hàng & Tạo yêu cầu; quản lý địa chỉ; theo dõi và xác nhận giao hàng. & Khách hàng, Địa chỉ, Đơn giao hàng, Xác nhận & Xác định nhu cầu giao hàng. \\
-Điều phối viên & Xử lý yêu cầu; lập lịch; phân công drone; lập lịch lại. & Đơn giao hàng, Lần thực hiện, Drone, Lộ trình & Biến yêu cầu thành việc thực hiện cụ thể. \\
-Nhân viên vận hành trạm & Xử lý gói hàng tại trạm và ghi nhận sự kiện. & Gói hàng, Trạm, Sự kiện tại trạm & Ghi nhận việc xử lý gói hàng thực tế. \\
-Quản lý logistics & Theo dõi hoạt động và trạng thái vận hành. & Đơn giao hàng, Lần thực hiện, Theo dõi, Sự cố, Lộ trình, AI & Cần góc nhìn vận hành tổng thể. \\
-Quản trị viên hệ thống & Quản lý user, role, permission và audit. & Người dùng, Vai trò, Quyền, Kiểm toán & Đảm bảo kiểm soát và truy vết. \\
-\bottomrule
-\end{longtable}\normalsize
-
-\subsection{Xác định thực thể: mỗi khái niệm có ý nghĩa gì}
-
-Một thực thể chỉ nên được đưa vào mô hình khi nó đại diện cho một đối tượng nghiệp vụ độc lập, một vòng đời riêng, một loại sự kiện lặp lại, hoặc một mối quan hệ cần được quản lý riêng.
-
-\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}}
-\toprule
-\textbf{Nhóm khái niệm} & \textbf{Thực thể / Quan hệ} & \textbf{Ý nghĩa nghiệp vụ} \\
-\midrule
-\endhead
-Định danh \& Khách hàng & \code{SYSTEM\_USER}, \code{CUSTOMER}, \code{CUSTOMER\_ADDRESS} & Tài khoản, hồ sơ khách hàng và các địa chỉ có thể dùng làm nơi giao. \\
-Đơn giao hàng \& Gói hàng & \code{DELIVERY\_ORDER}, \code{PACKAGE} & Yêu cầu giao hàng và các đơn vị logistics thuộc đơn giao hàng. \\
-Trạm \& Drone & \code{LANDING\_STATION}, \code{DRONE} & Hạ tầng và phương tiện thực hiện giao hàng. \\
-Thực hiện giao hàng & \code{DELIVERY\_ACTIVITY} & Một lần thực hiện/attempt cụ thể của một order; là concept trung tâm. \\
-Lịch sử \& Sự kiện & \code{ORDER\_STATUS\_HISTORY}, \code{STATION\_STATUS\_HISTORY}, \code{PACKAGE\_STATION\_EVENT}, \code{TRACKING\_RECORD}, \code{DELIVERY\_EXCEPTION} & Các sự kiện phát sinh theo thời gian; không nên nhét thành danh sách lặp trong thực thể cha. \\
-Xác nhận & \code{DELIVERY\_CONFIRMATION} & Kết quả giao thành công và tham chiếu evidence. \\
-Lộ trình \& AI & \code{DELIVERY\_ROUTE}, \code{ROUTE\_POINT}, \code{AI\_RECOMMENDATION} & Thông tin route và khuyến nghị hỗ trợ cho execution. \\
-Phân quyền \& Kiểm toán & \code{ROLE}, \code{PERMISSION}, \code{USER\_ROLE}, \code{ROLE\_PERMISSION}, \code{AUDIT\_LOG} & Kiểm soát quyền và khả năng truy vết thao tác. \\
-\bottomrule
-\end{longtable}\normalsize
-
-\paragraph{\code{CUSTOMER} và \code{CUSTOMER\_ADDRESS}.}
-\code{CUSTOMER} đại diện cho chủ thể sử dụng dịch vụ. \code{CUSTOMER\_ADDRESS} không chỉ là một thuộc tính văn bản của khách hàng vì một khách hàng có thể có nhiều địa chỉ và địa chỉ có tọa độ phục vụ giao hàng. Vì vậy, địa chỉ là một khái niệm có vòng đời và được nhận diện riêng.
-
-\paragraph{\code{DELIVERY\_ORDER}.}
-\code{DELIVERY\_ORDER} đại diện cho yêu cầu nghiệp vụ. Nó phải giữ các thông tin thuộc về yêu cầu như customer, địa chỉ giao đã chọn, trạng thái hiện tại, thời gian yêu cầu, ETA và kết quả hoàn thành/hủy. Nó không nên chứa danh sách dữ liệu đo từ xa, sự cố hoặc các lần thực hiện lặp lại.
-
-\paragraph{\code{PACKAGE}.}
-\code{PACKAGE} là đơn vị logistics vật lý thuộc order. Một order có thể có nhiều package và mỗi package có thuộc tính riêng như khối lượng, kích thước và trạng thái dễ vỡ. Vì package có định danh riêng, nó được quản lý độc lập với order.
-
-\paragraph{\code{LANDING\_STATION} và \code{DRONE}.}
-Trạm là hạ tầng vận hành; drone là nguồn lực giao hàng. Hai khái niệm này độc lập với đơn giao hàng và có vòng đời riêng. Một drone có thể thực hiện nhiều lần giao theo thời gian; một trạm có thể phục vụ nhiều gói hàng và nhiều lần thực hiện.
-
-\paragraph{\code{DELIVERY\_ACTIVITY}.}
-\code{DELIVERY\_ACTIVITY} mô tả việc thực hiện yêu cầu. Đây là khái niệm trung tâm vì việc gán drone, trạm lấy/trả, lịch, thời gian bắt đầu/kết thúc, dữ liệu theo dõi, sự cố, lộ trình và khuyến nghị \code{AI} đều gắn với một lần thực hiện cụ thể.
-
-\paragraph{Các thực thể lịch sử/sự kiện.}
-Lịch sử/sự kiện được mô hình hóa riêng khi một đối tượng có nhiều thay đổi hoặc quan sát theo thời gian. Điều này áp dụng cho trạng thái đơn giao hàng, trạng thái trạm, xử lý gói hàng tại trạm, dữ liệu đo từ xa và sự cố.
-
-\paragraph{\code{DELIVERY\_CONFIRMATION}.}
-Xác nhận là kết quả nghiệp vụ của việc giao thành công. Bằng chứng được tham chiếu bằng khóa đối tượng để cơ sở dữ liệu lưu sự kiện nghiệp vụ mà không phải nhúng tệp vật lý vào một dòng dữ liệu.
-
-\paragraph{Phân quyền và kiểm toán.}
-Người dùng, vai trò và quyền là các khái niệm độc lập; quan hệ giữa chúng là N:M. Nhật ký kiểm toán là luồng sự kiện quản trị và bảo mật, nên không thuộc trực tiếp vào đối tượng nghiệp vụ được kiểm toán.
-
-\subsection{Các mối quan hệ cốt lõi}
-
-Lực lượng số phải được quyết định ở mức khái niệm trước khi chuyển thành khóa ngoại. Nó mô tả ``một bên có thể liên quan đến bao nhiêu đối tượng bên kia'' và giúp nhóm biết khi nào cần thực thể con, khi nào cần quan hệ kết hợp.
-
-\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.1\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
-\toprule
-\textbf{Mối quan hệ} & \textbf{Lực lượng số} & \textbf{Diễn giải nghiệp vụ} & \textbf{Hệ quả cho thiết kế logic} \\
-\midrule
-\endhead
-\code{CUSTOMER} -- \code{CUSTOMER\_ADDRESS} & 1:N & Một khách hàng có nhiều địa chỉ; mỗi địa chỉ thuộc một khách hàng. & Tách \code{CUSTOMER\_ADDRESS}, dùng \code{customer\_id} làm FK. \\
-\code{CUSTOMER} -- \code{DELIVERY\_ORDER} & 1:N & Khách hàng có thể tạo nhiều đơn giao hàng; mỗi đơn giao hàng thuộc một khách hàng. & \code{customer\_id} là FK trong order. \\
-\code{DELIVERY\_ORDER} -- \code{PACKAGE} & 1:N & Một đơn giao hàng có thể có nhiều gói hàng. & \code{PACKAGE} là relation riêng. \\
-\code{DELIVERY\_ORDER} -- \code{DELIVERY\_ACTIVITY} & 1:N & Một đơn giao hàng có thể có nhiều lần thực hiện. & Tách request khỏi execution. \\
-\code{DRONE} -- \code{DELIVERY\_ACTIVITY} & 1:N & Một drone thực hiện nhiều lần giao theo thời gian; mỗi lần thực hiện được gán một drone. & \code{DRONE} và \code{ACTIVITY} độc lập; concurrency là business rule. \\
-\code{DELIVERY\_ACTIVITY} -- \code{TRACKING\_RECORD} & 1:N & Một lần thực hiện tạo ra nhiều quan sát dữ liệu đo từ xa. & \code{TRACKING\_RECORD} là event relation. \\
-\code{DELIVERY\_ACTIVITY} -- \code{DELIVERY\_EXCEPTION} & 1:N & Một lần thực hiện có thể có 0 hoặc nhiều sự cố. & Sự cố có định danh và vòng đời riêng. \\
-\code{PACKAGE} -- \code{PACKAGE\_STATION\_EVENT} & 1:N & Một gói hàng có nhiều sự kiện tại trạm. & Không dùng \code{station\_1}, \code{station\_2}, \ldots \\
-\code{DELIVERY\_ACTIVITY} -- \code{DELIVERY\_ROUTE} & 1:N & Một lần thực hiện có thể có nhiều bản ghi lộ trình. & Nếu business yêu cầu đúng một route active, cần thêm rule riêng. \\
-\code{DELIVERY\_ROUTE} -- \code{ROUTE\_POINT} & 1:N & Một lộ trình gồm nhiều điểm có thứ tự. & \code{ROUTE\_POINT} tách khỏi \code{ROUTE}. \\
-\code{DELIVERY\_ORDER} -- \code{DELIVERY\_CONFIRMATION} & 1:0..1 & Đơn hàng chưa thành công thì chưa có xác nhận. & \code{UNIQUE order\_id} hỗ trợ quy tắc này. \\
-USER -- ROLE & N:M & Một người dùng có thể có nhiều vai trò; một vai trò có thể áp dụng cho nhiều người dùng. & Dùng \code{USER\_ROLE}. \\
-ROLE -- PERMISSION & N:M & Một vai trò có nhiều quyền; một quyền có thể thuộc nhiều vai trò. & Dùng \code{ROLE\_PERMISSION}. \\
-\bottomrule
-\end{longtable}\normalsize
+\renewcommand{\arraystretch}{1.2} \small \begin{longtable}{|p{5cm}|p{10.45cm}|} \hline \textbf{Thực thể} & \textbf{Giải thích} \\ \hline \endfirsthead \hline \textbf{Thực thể} & \textbf{Giải thích} \\ \hline \endhead CUSTOMER và CUSTOMER\_ADDRESS & CUSTOMER đại diện cho chủ thể sử dụng dịch vụ. CUSTOMER\_ADDRESS không chỉ là một thuộc tính văn bản của khách hàng vì một khách hàng có thể có nhiều địa chỉ và mỗi địa chỉ có tọa độ phục vụ giao hàng. Do đó địa chỉ là một thực thể độc lập có vòng đời riêng. \\ \hline DELIVERY\_ORDER & Đại diện cho yêu cầu nghiệp vụ giao hàng. Thực thể này lưu thông tin khách hàng, địa chỉ giao, trạng thái đơn hàng, thời gian yêu cầu, ETA và kết quả hoàn thành hoặc hủy. Không chứa dữ liệu theo dõi hay lịch sử thực hiện. \\ \hline PACKAGE & Đại diện cho đơn vị logistics vật lý thuộc một đơn hàng. Một đơn hàng có thể chứa nhiều kiện hàng và mỗi kiện hàng có các thuộc tính riêng như khối lượng, kích thước và trạng thái xử lý. \\ \hline LANDING\_STATION và DRONE & LANDING\_STATION là hạ tầng vận hành, còn DRONE là nguồn lực giao hàng. Hai thực thể này tồn tại độc lập với đơn hàng, có vòng đời riêng và được tái sử dụng cho nhiều lần giao hàng khác nhau. \\ \hline DELIVERY\_ACTIVITY & Mô tả một lần thực hiện giao hàng cụ thể. Đây là thực thể trung tâm liên kết drone, trạm lấy/trả, lịch thực hiện, dữ liệu theo dõi, lộ trình, sự cố và các khuyến nghị AI. \\ \hline Các thực thể lịch sử/sự kiện & Các bảng lịch sử và sự kiện được tách riêng khi thông tin thay đổi theo thời gian hoặc phát sinh nhiều lần. Ví dụ: lịch sử trạng thái đơn hàng, lịch sử trạng thái trạm, sự kiện xử lý kiện hàng, dữ liệu theo dõi và sự cố phát sinh. \\ \hline DELIVERY\_CONFIRMATION & Lưu kết quả xác nhận giao hàng thành công. Các bằng chứng xác nhận được tham chiếu thông qua khóa hoặc đường dẫn lưu trữ thay vì nhúng trực tiếp dữ liệu tệp vào cơ sở dữ liệu. \\ \hline Phân quyền và kiểm toán & Người dùng, vai trò và quyền được mô hình hóa thành các thực thể riêng biệt với quan hệ nhiều-nhiều. Nhật ký kiểm toán được lưu độc lập nhằm phục vụ quản trị, bảo mật và truy vết hoạt động hệ thống. \\ \hline \end{longtable}
+\subsection{Các mối quan hệ cốt lõi}  \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{4cm}|p{1cm}|p{5.0cm}|p{5.5cm}|} \hline \textbf{Mối quan hệ} & \textbf{Bản số} & \textbf{Diễn giải nghiệp vụ} & \textbf{Hệ quả cho thiết kế logic} \\ \hline \endfirsthead \hline \textbf{Mối quan hệ} & \textbf{Bản số} & \textbf{Diễn giải nghiệp vụ} & \textbf{Hệ quả cho thiết kế logic} \\ \hline \endhead \texttt{CUSTOMER} -- \texttt{CUSTOMER\_ADDRESS} & 1:N & Một khách hàng có thể sở hữu nhiều địa chỉ giao hàng. & Tách bảng \texttt{CUSTOMER\_ADDRESS}; sử dụng \texttt{customer\_id} làm khóa ngoại. \\ \hline \texttt{CUSTOMER} -- \texttt{DELIVERY\_ORDER} & 1:N & Một khách hàng có thể tạo nhiều đơn giao hàng. & \texttt{customer\_id} trở thành khóa ngoại trong \texttt{DELIVERY\_ORDER}. \\ \hline \texttt{DELIVERY\_ORDER} -- \texttt{PACKAGE} & 1:N & Một đơn giao hàng gồm một hoặc nhiều kiện hàng. & \texttt{PACKAGE} trở thành thực thể riêng. \\ \hline \texttt{DELIVERY\_ORDER} -- \texttt{DELIVERY\_ACTIVITY} & 1:N & Một đơn hàng có thể trải qua nhiều lần thực hiện do giao lại hoặc lập lịch lại. & Tách yêu cầu giao hàng khỏi quá trình thực hiện. \\ \hline \texttt{DRONE} -- \texttt{DELIVERY\_ACTIVITY} & 1:N & Một drone thực hiện nhiều chuyến giao hàng theo thời gian. & Drone và hoạt động giao hàng là hai thực thể độc lập. \\ \hline \texttt{DELIVERY\_ACTIVITY} -- \texttt{TRACKING\_RECORD} & 1:N & Một lần thực hiện sinh ra nhiều bản ghi đo từ xa. & \texttt{TRACKING\_RECORD} là bảng sự kiện (event relation). \\ \hline \texttt{DELIVERY\_ACTIVITY} -- \texttt{DELIVERY\_EXCEPTION} & 1:N & Một lần thực hiện có thể gặp nhiều sự cố hoặc không có sự cố nào. & Sự cố được mô hình hóa thành thực thể độc lập. \\ \hline \texttt{PACKAGE} -- \texttt{PACKAGE\_STATION\_EVENT} & 1:N & Một kiện hàng trải qua nhiều sự kiện tại các trạm. & Tránh lưu nhiều cột như \texttt{station\_1}, \texttt{station\_2}, ... \\ \hline \texttt{DELIVERY\_ACTIVITY} -- \texttt{DELIVERY\_ROUTE} & 1:N & Một hoạt động có thể có nhiều phiên bản lộ trình. & Nếu chỉ cho phép một lộ trình đang hoạt động cần bổ sung ràng buộc nghiệp vụ. \\ \hline \texttt{DELIVERY\_ROUTE} -- \texttt{ROUTE\_POINT} & 1:N & Một lộ trình bao gồm nhiều điểm hành trình có thứ tự. & Tách \texttt{ROUTE\_POINT} khỏi \texttt{DELIVERY\_ROUTE}. \\ \hline \texttt{DELIVERY\_ORDER} -- \texttt{DELIVERY\_CONFIRMATION} & 1:0..1 & Đơn hàng chỉ có xác nhận khi giao thành công. & Ràng buộc \texttt{UNIQUE(order\_id)} hỗ trợ quy tắc này. \\ \hline \texttt{SYSTEM\_USER} -- \texttt{ROLE} & N:M & Một người dùng có thể có nhiều vai trò và ngược lại. & Triển khai bằng bảng liên kết \texttt{USER\_ROLE}. \\ \hline \texttt{ROLE} -- \texttt{PERMISSION} & N:M & Một vai trò gồm nhiều quyền và một quyền có thể thuộc nhiều vai trò. & Triển khai bằng bảng liên kết \texttt{ROLE\_PERMISSION}. \\ \hline \end{longtable} \normalsize
 
 \subsection{Quyết định khái niệm quan trọng nhất: Đơn giao hàng và Lần thực hiện giao hàng}
 
@@ -169,22 +91,7 @@ Ví dụ: O100 là một yêu cầu. A1 được giao cho D3 nhưng thất bại
     \item Mức khái niệm hỗ trợ các câu hỏi nghiệp vụ cốt lõi của hệ thống.
 \end{itemize}
 
-\subsection{Đối chiếu từ khái niệm đến vấn đề nghiệp vụ}
-
-\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}}
-\toprule
-\textbf{Vấn đề nghiệp vụ} & \textbf{Diễn giải khái niệm} & \textbf{Thực thể / mối quan hệ} & \textbf{Tại sao quan trọng cho bước sau} \\
-\midrule
-\endhead
-Đơn giao hàng có thể giao lại & Yêu cầu và lần thực hiện là hai khái niệm khác nhau. & \code{DELIVERY\_ORDER} 1:N \code{DELIVERY\_ACTIVITY} & Cho phép retry và chain. \\
-Cần kiểm toán vòng đời & Trạng thái hiện tại khác với sự kiện lịch sử. & \code{DELIVERY\_ORDER} + \code{ORDER\_STATUS\_HISTORY} & Dẫn đến history relation. \\
-Gói hàng đi qua nhiều trạm & Xử lý tại trạm là một chuỗi sự kiện. & \code{PACKAGE} 1:N \code{PACKAGE\_STATION\_EVENT} & Dẫn đến event relation. \\
-Theo dõi drone theo từng chuyến & Dữ liệu đo từ xa thuộc về một lần thực hiện cụ thể. & \code{ACTIVITY} 1:N \code{TRACKING\_RECORD} & Không trộn telemetry giữa attempts. \\
-Giao hàng có thể phát sinh sự cố & Sự cố có thời điểm phát sinh và xử lý riêng. & \code{ACTIVITY} 1:N \code{DELIVERY\_EXCEPTION} & Hỗ trợ phân tích sự cố. \\
-Phân quyền có quan hệ N:M & Vai trò và quyền là các khái niệm độc lập. & \code{USER\_ROLE}, \code{ROLE\_PERMISSION} & Dẫn đến associative relations. \\
-Cần bằng chứng giao hàng & Xác nhận là một sự kiện nghiệp vụ. & \code{ORDER} 1:0..1 \code{CONFIRMATION} & Tách fact nghiệp vụ khỏi file storage. \\
-\bottomrule
-\end{longtable}\normalsize
+\subsection{Đối chiếu từ khái niệm đến vấn đề nghiệp vụ} \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{3cm}|p{3.4cm}|p{4cm}|p{4.1cm}|} \hline \textbf{Vấn đề nghiệp vụ} & \textbf{Diễn giải khái niệm} & \textbf{Thực thể / Mối quan hệ} & \textbf{Ý nghĩa thiết kế} \\ \hline \endfirsthead \hline \textbf{Vấn đề nghiệp vụ} & \textbf{Diễn giải khái niệm} & \textbf{Thực thể / Mối quan hệ} & \textbf{Ý nghĩa thiết kế} \\ \hline \endhead Đơn giao hàng có thể giao lại & Yêu cầu giao hàng và lần thực hiện là hai khái niệm khác nhau. & \texttt{DELIVERY\_ORDER} (1:N) \texttt{DELIVERY\_ACTIVITY} & Cho phép retry, reschedule và theo dõi chuỗi thực hiện. \\ \hline Cần kiểm toán vòng đời & Trạng thái hiện tại khác với lịch sử thay đổi trạng thái. & \texttt{DELIVERY\_ORDER}, \texttt{ORDER\_STATUS\_HISTORY} & Dẫn đến việc tách bảng lịch sử trạng thái. \\ \hline Kiện hàng đi qua nhiều trạm & Xử lý kiện hàng tại trạm là chuỗi các sự kiện. & \texttt{PACKAGE} (1:N) \texttt{PACKAGE\_STATION\_EVENT} & Dẫn đến mô hình hóa theo event history. \\ \hline Theo dõi drone theo từng chuyến & Dữ liệu đo từ xa thuộc về một lần thực hiện cụ thể. & \texttt{DELIVERY\_ACTIVITY} (1:N) \texttt{TRACKING\_RECORD} & Tránh trộn telemetry giữa các lần giao hàng. \\ \hline Giao hàng có thể phát sinh sự cố & Sự cố có thời điểm phát sinh và xử lý riêng. & \texttt{DELIVERY\_ACTIVITY} (1:N) \texttt{DELIVERY\_EXCEPTION} & Hỗ trợ thống kê và phân tích nguyên nhân thất bại. \\ \hline Phân quyền có quan hệ N:N & Vai trò và quyền là các khái niệm độc lập. & \texttt{USER\_ROLE}, \texttt{ROLE\_PERMISSION} & Dẫn đến các bảng liên kết (associative entities). \\ \hline Cần bằng chứng giao hàng & Xác nhận giao hàng là một sự kiện nghiệp vụ độc lập. & \texttt{DELIVERY\_ORDER} (1:0..1) \texttt{DELIVERY\_CONFIRMATION} & Tách dữ liệu xác nhận khỏi kho lưu trữ tệp. \\ \hline \end{longtable} \normalsize
 
 \subsection{Từ mô hình khái niệm đến thiết kế logic}
 
@@ -195,60 +102,7 @@ Khái niệm nghiệp vụ $\to$ Thực thể $\to$ Mối quan hệ/lực lượ
 $\to$ Lược đồ quan hệ $\to$ Phụ thuộc hàm $\to$ Chuẩn hóa $\to$ Ràng buộc $\to$ Thiết kế vật lý
 \end{center}
 
-\subsection{Xác định thực thể}\label{s:entities}
-
-Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể sau được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành.
-
-\paragraph{1. Nhóm người dùng và phân quyền.}
-\begin{itemize}
-    \item \textbf{system\_user} — Lưu thông tin xác thực và trạng thái tài khoản của mọi tác nhân; tên bảng tránh sử dụng từ khóa dành riêng của SQL.
-    \item \textbf{role} — Xác định các vai trò vận hành tiêu chuẩn (\texttt{CUSTOMER}, \texttt{DISPATCHER}, \texttt{STATION\_OPERATOR}, \texttt{LOGISTICS\_MANAGER}, \texttt{SYSTEM\_ADMIN}).
-    \item \textbf{permission} — Xác định các quyền hạn chi tiết, chẳng hạn \texttt{CREATE\_ORDER}, \texttt{ASSIGN\_DRONE}, \texttt{CONFIRM\_PICKUP}.
-    \item \textbf{user\_role} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa người dùng và vai trò.
-    \item \textbf{role\_permission} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa vai trò và quyền hạn.
-\end{itemize}
-
-\paragraph{2. Nhóm khách hàng và địa chỉ.}
-\begin{itemize}
-    \item \textbf{customer} — Lưu thông tin hồ sơ khách hàng và có thể liên kết với một tài khoản người dùng hệ thống.
-    \item \textbf{customer\_address} — Lưu một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm tọa độ địa lý chính xác phục vụ định vị cho máy bay không người lái.
-\end{itemize}
-
-\paragraph{3. Nhóm đơn giao hàng và kiện hàng.}
-\begin{itemize}
-    \item \textbf{delivery\_order} — Đại diện cho yêu cầu giao hàng của khách hàng, lưu thời gian khách hàng mong muốn, thời gian đến dự kiến và trạng thái vòng đời.
-    \item \textbf{package} — Lưu thông số vật lý của kiện hàng (khối lượng và kích thước tính bằng centimét) thuộc một đơn hàng.
-    \item \textbf{order\_status\_history} — Bản ghi chỉ cho phép ghi nối tiếp, lưu mọi lần chuyển trạng thái của đơn giao hàng.
-\end{itemize}
-
-\paragraph{4. Nhóm quản lý trạm hạ cánh và máy bay.}
-\begin{itemize}
-    \item \textbf{landing\_station} — Lưu các trạm cất/hạ cánh vật lý, tọa độ và sức chứa máy bay.
-    \item \textbf{station\_status\_history} — Lưu lịch sử chuyển trạng thái trạm, chẳng hạn trạng thái bảo trì hoặc sẵn sàng.
-    \item \textbf{station\_operator\_assignment} — Lưu việc phân công nhân viên vận hành vào trạm trong những khoảng thời gian xác định.
-    \item \textbf{drone} — Lưu số sê-ri, mẫu, trạng thái vận hành, mức pin và tải trọng của máy bay không người lái.
-\end{itemize}
-
-\paragraph{5. Nhóm thực hiện giao hàng và dữ liệu đo từ xa.}
-\begin{itemize}
-    \item \textbf{delivery\_activity} — Thực thể vận hành trung tâm đại diện cho từng lần thực hiện một đơn hàng, liên kết máy bay, trạm khởi hành và trạm đích.
-    \item \textbf{package\_station\_event} — Lưu các sự kiện xử lý vật lý của kiện hàng tại trạm hạ cánh như tiếp nhận, xác nhận lấy hàng, chất hàng và dỡ hàng.
-    \item \textbf{tracking\_record} — Lưu dữ liệu GPS và dữ liệu đo từ xa tần suất cao được thu thập trong chuyến bay.
-    \item \textbf{delivery\_exception} — Lưu các thất bại, bất thường hoặc gián đoạn của chuyến bay trong một hoạt động giao hàng.
-\end{itemize}
-
-\paragraph{6. Nhóm xác nhận giao hàng.}
-\begin{itemize}
-    \item \textbf{delivery\_confirmation} — Lưu bằng chứng bàn giao chính thức sau khi giao hàng thành công, liên kết 1:0..1 với đơn hàng và tham chiếu tới bằng chứng số trong kho lưu trữ đối tượng.
-\end{itemize}
-
-\paragraph{7. Nhóm kiểm toán, tuyến đường và hỗ trợ trí tuệ nhân tạo.}
-\begin{itemize}
-    \item \textbf{audit\_log} — Dấu vết kiểm toán hệ thống không thể sửa đổi, lưu thao tác người dùng, ảnh chụp JSON trước/sau và địa chỉ IP.
-    \item \textbf{delivery\_route} — Lưu siêu dữ liệu về đường bay dự kiến của một hoạt động giao hàng.
-    \item \textbf{route\_point} — Lưu các điểm hành trình có thứ tự trên một tuyến giao hàng dự kiến.
-    \item \textbf{ai\_recommendation} — Lưu bền vững đầu ra của các mô hình đề xuất bằng trí tuệ nhân tạo, gồm đề xuất máy bay và dự đoán ETA.
-\end{itemize}
+\subsection{Xác định thực thể}\label{s:entities} Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành. \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{1cm}|p{4cm}|p{3.5cm}|p{7cm}|} \hline \textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Thực thể} & \textbf{Mô tả} \\ \hline \endfirsthead \hline \textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Thực thể} & \textbf{Mô tả} \\ \hline \endhead 1 & Người dùng và phân quyền & \texttt{system\_user} & Lưu thông tin xác thực và trạng thái tài khoản của mọi tác nhân trong hệ thống. \\ \hline 2 & Người dùng và phân quyền & \texttt{role} & Xác định các vai trò vận hành như khách hàng, điều phối viên, nhân viên trạm và quản trị viên. \\ \hline 3 & Người dùng và phân quyền & \texttt{permission} & Xác định các quyền thao tác chi tiết trong hệ thống. \\ \hline 4 & Người dùng và phân quyền & \texttt{user\_role} & Bảng liên kết triển khai quan hệ nhiều-nhiều giữa người dùng và vai trò. \\ \hline 5 & Người dùng và phân quyền & \texttt{role\_permission} & Bảng liên kết triển khai quan hệ nhiều-nhiều giữa vai trò và quyền hạn. \\ \hline 6 & Khách hàng và địa chỉ & \texttt{customer} & Lưu hồ sơ khách hàng và liên kết với tài khoản người dùng nếu có. \\ \hline 7 & Khách hàng và địa chỉ & \texttt{customer\_address} & Lưu nhiều địa chỉ giao hàng của khách hàng kèm tọa độ địa lý. \\ \hline 8 & Đơn hàng và kiện hàng & \texttt{delivery\_order} & Đại diện cho yêu cầu giao hàng của khách hàng và vòng đời đơn hàng. \\ \hline 9 & Đơn hàng và kiện hàng & \texttt{package} & Lưu thông tin vật lý của các kiện hàng thuộc đơn giao hàng. \\ \hline 10 & Đơn hàng và kiện hàng & \texttt{order\_status\_history} & Lưu lịch sử thay đổi trạng thái đơn hàng dưới dạng chỉ ghi nối tiếp. \\ \hline 11 & Trạm hạ cánh và máy bay & \texttt{landing\_station} & Lưu thông tin các trạm cất và hạ cánh của máy bay. \\ \hline 12 & Trạm hạ cánh và máy bay & \texttt{station\_status\_history} & Lưu lịch sử thay đổi trạng thái hoạt động của trạm. \\ \hline 13 & Trạm hạ cánh và máy bay & \texttt{station\_operator\_assignment} & Lưu thông tin phân công nhân viên vận hành tại các trạm. \\ \hline 14 & Trạm hạ cánh và máy bay & \texttt{drone} & Lưu thông tin nhận dạng và tình trạng vận hành của drone. \\ \hline 15 & Thực hiện giao hàng & \texttt{delivery\_activity} & Đại diện cho một lần thực hiện giao hàng cụ thể. \\ \hline 16 & Thực hiện giao hàng & \texttt{package\_station\_event} & Lưu các sự kiện xử lý kiện hàng tại trạm. \\ \hline 17 & Thực hiện giao hàng & \texttt{tracking\_record} & Lưu dữ liệu GPS và dữ liệu đo từ xa trong chuyến bay. \\ \hline 18 & Thực hiện giao hàng & \texttt{delivery\_exception} & Lưu các sự cố, thất bại hoặc bất thường trong quá trình giao hàng. \\ \hline 19 & Xác nhận giao hàng & \texttt{delivery\_confirmation} & Lưu bằng chứng giao hàng thành công và thông tin người nhận. \\ \hline 20 & Kiểm toán, tuyến đường và AI & \texttt{audit\_log} & Lưu nhật ký kiểm toán và truy vết các thao tác trong hệ thống. \\ \hline 21 & Kiểm toán, tuyến đường và AI & \texttt{delivery\_route} & Lưu siêu dữ liệu của tuyến đường giao hàng dự kiến. \\ \hline 22 & Kiểm toán, tuyến đường và AI & \texttt{route\_point} & Lưu danh sách các điểm hành trình thuộc một tuyến đường. \\ \hline 23 & Kiểm toán, tuyến đường và AI & \texttt{ai\_recommendation} & Lưu kết quả đề xuất từ các mô hình trí tuệ nhân tạo như drone phù hợp hoặc ETA dự kiến. \\ \hline \end{longtable}
 
 \clearpage
 \subsection{Thuộc tính của thực thể}\label{s:attributes}
@@ -266,134 +120,11 @@ Hình dưới đây trình bày tổng thể các thực thể, thuộc tính, k
     \label{fig:entity-attributes}
 \end{figure}
 
-\subsection{Mối quan hệ và bản số}\label{s:relationships}
-
-Mối quan hệ và bản số giữa hai mươi ba thực thể được xác định như sau, tuân thủ nghiêm ngặt các quy tắc nghiệp vụ:
-
-\begin{itemize}
-    \item \textbf{customer} 1 : N \textbf{customer\_address} — Một khách hàng sở hữu nhiều địa chỉ; mỗi địa chỉ thuộc về chính xác một khách hàng (BR-01).
-    \item \textbf{customer} 1 : N \textbf{delivery\_order} — Một khách hàng tạo nhiều đơn giao hàng; mỗi đơn thuộc về một khách hàng (BR-02).
-    \item \textbf{customer\_address} 1 : N \textbf{delivery\_order} — Một địa chỉ có thể là điểm đến của nhiều đơn; mỗi đơn chỉ định một địa chỉ đích (BR-03, BR-04).
-    \item \textbf{delivery\_order} 1 : N \textbf{package} — Một đơn chứa một hoặc nhiều kiện hàng; mỗi kiện hàng thuộc về một đơn (BR-06, BR-07).
-    \item \textbf{delivery\_order} 1 : N \textbf{order\_status\_history} — Một đơn tích lũy nhiều bản ghi lịch sử trạng thái (BR-10, BR-11).
-    \item \textbf{delivery\_order} 1 : N \textbf{delivery\_activity} — Một đơn có thể có nhiều lần thực hiện, gồm lần đầu và các lần được lập lịch lại (BR-19, BR-20).
-    \item \textbf{delivery\_order} 1 : 0..1 \textbf{delivery\_confirmation} — Một đơn có tối đa một xác nhận giao hàng thành công (BR-33).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_confirmation} — Một xác nhận gắn với chính xác một lần thực hiện giao hàng thành công (BR-35).
-    \item \textbf{delivery\_activity} 0..1 : 1 \textbf{delivery\_activity} — Hoạt động được lập lịch lại liên kết với lần thực hiện trước đó thông qua \texttt{previous\_activity\_id} (BR-22).
-    \item \textbf{drone} 1 : N \textbf{delivery\_activity} — Một máy bay phục vụ nhiều hoạt động giao hàng theo thời gian, nhưng tại mỗi thời điểm chỉ có một chuyến bay đang hoạt động (BR-15, BR-16).
-    \item \textbf{landing\_station} 1 : N \textbf{drone} — Một trạm có thể chứa nhiều máy bay đang đỗ (BR-25).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_status\_history} — Một trạm bảo toàn các thay đổi trạng thái vận hành (BR-26).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_operator\_assignment} — Một trạm có nhiều lượt phân công nhân viên theo thời gian (BR-27).
-    \item \textbf{system\_user} 1 : N \textbf{station\_operator\_assignment} — Một người dùng là nhân viên vận hành có thể được phân công tới nhiều trạm theo thời gian (BR-27).
-    \item \textbf{package} 1 : N \textbf{package\_station\_event} — Một kiện hàng trải qua nhiều sự kiện xử lý tại trạm như tiếp nhận, lấy hàng và chất hàng (BR-29, BR-30).
-    \item \textbf{landing\_station} 1 : N \textbf{package\_station\_event} — Một trạm xử lý sự kiện của nhiều kiện hàng (BR-31).
-    \item \textbf{delivery\_activity} 1 : N \textbf{tracking\_record} — Mỗi hoạt động tạo ra một chuỗi điểm dữ liệu đo từ xa không thể sửa đổi (BR-12).
-    \item \textbf{delivery\_activity} 1 : N \textbf{delivery\_exception} — Một hoạt động có thể gặp không, một hoặc nhiều sự cố ngoại lệ (BR-13, BR-21).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_route} — Một hoạt động có tối đa một tuyến đường dự kiến.
-    \item \textbf{delivery\_route} 1 : N \textbf{route\_point} — Một tuyến đường gồm một chuỗi điểm hành trình có thứ tự.
-    \item \textbf{delivery\_order} 1 : N \textbf{ai\_recommendation} — Theo thời gian, một đơn có thể nhận đề xuất từ nhiều mô hình trí tuệ nhân tạo.
-    \item \textbf{system\_user} N : N \textbf{role} — Được liên kết thông qua \textbf{user\_role}.
-    \item \textbf{role} N : N \textbf{permission} — Được liên kết thông qua \textbf{role\_permission}.
-    \item \textbf{system\_user} 1 : N \textbf{audit\_log} — Người dùng tạo các bản ghi nhật ký kiểm toán trong toàn hệ thống (BR-37, BR-38).
-\end{itemize}
-
 \section{Thiết kế cơ sở dữ liệu mức logic}\label{s:logical}
 
 Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức khái niệm. Lược đồ quan hệ được trình bày theo ký hiệu chuẩn, trong đó khóa chính được ký hiệu là (PK), khóa ngoại là (FK) và ràng buộc duy nhất là UNIQUE.
 
-\subsection{Lược đồ quan hệ}
-
-\begin{verbatim}
-SYSTEM_USER(user_id PK, username UNIQUE, password_hash,
-  email UNIQUE, phone_number UNIQUE, is_active,
-  created_at, updated_at)
-
-ROLE(role_id PK, role_name UNIQUE, description)
-
-PERMISSION(permission_id PK, permission_name UNIQUE,
-  description)
-
-USER_ROLE(user_id PK/FK, role_id PK/FK, assigned_at)
-
-ROLE_PERMISSION(role_id PK/FK, permission_id PK/FK)
-
-CUSTOMER(customer_id PK, user_id FK UNIQUE,
-  customer_name, phone_number UNIQUE, email UNIQUE,
-  created_at)
-
-CUSTOMER_ADDRESS(address_id PK, customer_id FK,
-  address_label, address_line, ward, district, city,
-  latitude, longitude, is_default, created_at)
-
-DELIVERY_ORDER(order_id PK, customer_id FK,
-  delivery_address_id FK, order_status,
-  requested_delivery_time, estimated_arrival_at,
-  created_at, completed_at, cancelled_at,
-  cancellation_reason)
-
-PACKAGE(package_id PK, order_id FK, description,
-  weight_kg, length_cm, width_cm, height_cm,
-  package_status, created_at)
-
-ORDER_STATUS_HISTORY(status_history_id PK, order_id FK,
-  status, changed_by FK, reason, changed_at)
-
-LANDING_STATION(station_id PK, station_code UNIQUE,
-  station_name, address, latitude, longitude,
-  capacity, status, created_at)
-
-STATION_STATUS_HISTORY(history_id PK, station_id FK,
-  status, changed_by FK, reason, changed_at)
-
-STATION_OPERATOR_ASSIGNMENT(assignment_id PK,
-  station_id FK, user_id FK, assigned_from,
-  assigned_to, is_active, created_at)
-
-DRONE(drone_id PK, serial_number UNIQUE, model, status,
-  max_payload_kg, battery_level, station_id FK,
-  created_at)
-
-DELIVERY_ACTIVITY(activity_id PK, order_id FK,
-  drone_id FK, pickup_station_id FK,
-  destination_station_id FK, assigned_by FK,
-  scheduled_at, activity_status, started_at, ended_at,
-  previous_activity_id FK, created_at)
-
-PACKAGE_STATION_EVENT(event_id PK, package_id FK,
-  station_id FK, event_type, performed_by FK,
-  occurred_at, note)
-
-TRACKING_RECORD(tracking_id PK, activity_id FK,
-  latitude, longitude, altitude_m, speed_kmh,
-  battery_level, recorded_at)
-
-DELIVERY_CONFIRMATION(confirmation_id PK,
-  order_id FK UNIQUE, activity_id FK UNIQUE,
-  confirmed_by FK, receiver_name, receiver_phone,
-  confirmation_method, evidence_object_key,
-  confirmed_at, note)
-
-DELIVERY_EXCEPTION(exception_id PK, activity_id FK,
-  exception_type, description, detected_at,
-  resolved_at, resolved_by FK, resolution)
-
-AUDIT_LOG(log_id PK, user_id FK, entity_name,
-  record_id, action_type, old_value, new_value,
-  action_time, ip_address)
-
-DELIVERY_ROUTE(route_id PK, activity_id FK UNIQUE,
-  total_distance_km, estimated_duration_min,
-  created_at)
-
-ROUTE_POINT(route_point_id PK, route_id FK,
-  sequence_number, latitude, longitude, altitude_m)
-
-AI_RECOMMENDATION(recommendation_id PK, order_id FK,
-  activity_id FK, recommendation_type,
-  recommended_drone_id FK, estimated_duration_min,
-  confidence_score, model_version, created_at)
-\end{verbatim}
-
+\subsection{Lược đồ quan hệ} \small \renewcommand{\arraystretch}{1.1} \begin{longtable}{|>{\raggedright\arraybackslash}p{5.5cm}| >{\raggedright\arraybackslash}p{9cm}|} \hline \textbf{Quan hệ} & \textbf{Thuộc tính} \\ \hline \endfirsthead \hline \textbf{Quan hệ} & \textbf{Thuộc tính} \\ \hline \endhead SYSTEM\_USER & \underline{user\_id}, username, password\_hash, email, phone\_number, is\_active, created\_at, updated\_at \\ \hline ROLE & \underline{role\_id}, role\_name, description \\ \hline PERMISSION & \underline{permission\_id}, permission\_name, description \\ \hline USER\_ROLE & \underline{user\_id}, \underline{role\_id}, assigned\_at \\ \hline ROLE\_PERMISSION & \underline{role\_id}, \underline{permission\_id} \\ \hline CUSTOMER & \underline{customer\_id}, user\_id, customer\_name, phone\_number, email, created\_at \\ \hline CUSTOMER\_ADDRESS & \underline{address\_id}, customer\_id, address\_label, address\_line, ward, district, city, latitude, longitude, is\_default, created\_at \\ \hline DELIVERY\_ORDER & \underline{order\_id}, customer\_id, delivery\_address\_id, order\_status, requested\_delivery\_time, estimated\_arrival\_at, created\_at, completed\_at, cancelled\_at, cancellation\_reason \\ \hline PACKAGE & \underline{package\_id}, order\_id, description, weight\_kg, length\_cm, width\_cm, height\_cm, package\_status, created\_at \\ \hline ORDER\_STATUS\_HISTORY & \underline{status\_history\_id}, order\_id, status, changed\_by, reason, changed\_at \\ \hline LANDING\_STATION & \underline{station\_id}, station\_code, station\_name, address, latitude, longitude, capacity, status, created\_at \\ \hline STATION\_STATUS\_HISTORY & \underline{history\_id}, station\_id, status, changed\_by, reason, changed\_at \\ \hline STATION\_OPERATOR\_ASSIGNMENT & \underline{assignment\_id}, station\_id, user\_id, assigned\_from, assigned\_to, is\_active, created\_at \\ \hline DRONE & \underline{drone\_id}, serial\_number, model, status, max\_payload\_kg, battery\_level, station\_id, created\_at \\ \hline DELIVERY\_ACTIVITY & \underline{activity\_id}, order\_id, drone\_id, pickup\_station\_id, destination\_station\_id, assigned\_by, scheduled\_at, activity\_status, started\_at, ended\_at, previous\_activity\_id, created\_at \\ \hline PACKAGE\_STATION\_EVENT & \underline{event\_id}, package\_id, station\_id, event\_type, performed\_by, occurred\_at, note \\ \hline TRACKING\_RECORD & \underline{tracking\_id}, activity\_id, latitude, longitude, altitude\_m, speed\_kmh, battery\_level, recorded\_at \\ \hline DELIVERY\_CONFIRMATION & \underline{confirmation\_id}, order\_id, activity\_id, confirmed\_by, receiver\_name, receiver\_phone, confirmation\_method, evidence\_object\_key, confirmed\_at, note \\ \hline DELIVERY\_EXCEPTION & \underline{exception\_id}, activity\_id, exception\_type, description, detected\_at, resolved\_at, resolved\_by, resolution \\ \hline AUDIT\_LOG & \underline{log\_id}, user\_id, entity\_name, record\_id, action\_type, old\_value, new\_value, action\_time, ip\_address \\ \hline DELIVERY\_ROUTE & \underline{route\_id}, activity\_id, total\_distance\_km, estimated\_duration\_min, created\_at \\ \hline ROUTE\_POINT & \underline{route\_point\_id}, route\_id, sequence\_number, latitude, longitude, altitude\_m \\ \hline AI\_RECOMMENDATION & \underline{recommendation\_id}, order\_id, activity\_id, recommendation\_type, recommended\_drone\_id, estimated\_duration\_min, confidence\_score, model\_version, created\_at \\ \hline \end{longtable} \textit{Ghi chú: Thuộc tính được gạch chân là khóa chính (PK). Các thuộc tính tham chiếu tới quan hệ khác là khóa ngoại (FK).}
 \subsection{Khóa chính, khóa ngoại và khóa ứng viên}
 
 Mỗi bảng cơ sở có một khóa chính thay thế gồm một cột (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}). Các bảng liên kết (\texttt{user\_role}, \texttt{role\_permission}) sử dụng khóa chính ghép. Các khóa tự nhiên ứng viên được bảo vệ bằng ràng buộc \texttt{UNIQUE}:
@@ -470,8 +201,6 @@ ASSIGNED -> PREPARING -> IN_TRANSIT -> DELIVERED / FAILED / CANCELLED
 
 \section{Thiết kế cơ sở dữ liệu mức vật lý}\label{s:physical}
 
-Phần này trình bày chi tiết việc triển khai vật lý bằng PostgreSQL. Tất cả các bảng sử dụng \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} cho khóa chính, \texttt{TIMESTAMPTZ} cho trường thời gian và các miền số, hình học phù hợp.
-
 \subsection{Các truy vấn nghiệp vụ tiêu biểu}
 
 Các truy vấn sau xác nhận thiết kế vật lý đáp ứng trực tiếp nhu cầu vận hành:
@@ -513,4 +242,3 @@ WHERE  activity_id = :activity_id
 ORDER  BY recorded_at DESC
 LIMIT  50;
 \end{verbatim}
-

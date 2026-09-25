@@ -33,7 +33,6 @@ Các mối quan hệ giữa thực thể được thực thi thông qua khóa ng
     \item Dữ liệu đo từ xa và ngoại lệ liên kết với hoạt động giao hàng (\texttt{tracking\_record.activity\_id $\to$ delivery\_activity.activity\_id}, \texttt{delivery\_exception.activity\_id $\to$ delivery\_activity.activity\_id}).
     \item Hoạt động được lập lịch lại liên kết với lần thực hiện trước bằng khóa ngoại tự tham chiếu (\texttt{delivery\_activity.previous\_activity\_id $\to$ delivery\_activity.activity\_id}).
 \end{itemize}
-\textbf{Kết luận kiểm chứng}: Được thực thi đầy đủ ở cấp cơ sở dữ liệu. Các dòng tham chiếu tới bản ghi cha không tồn tại sẽ bị từ chối.
 
 \subsection{Ràng buộc duy nhất}
 Các khóa ứng viên và bản số một--một hoặc một--không/một được thực thi bằng ràng buộc \texttt{UNIQUE} ở cấp cơ sở dữ liệu:
@@ -47,7 +46,7 @@ Các khóa ứng viên và bản số một--một hoặc một--không/một đ
     \item \texttt{delivery\_route.activity\_id} — Bảo đảm một hoạt động có tối đa một tuyến đường dự kiến.
     \item \texttt{route\_point(route\_id, sequence\_number)} — Bảo đảm thứ tự điểm hành trình là duy nhất trong một tuyến đường.
 \end{itemize}
-\textbf{Kết luận kiểm chứng}: Được thực thi đầy đủ ở cấp cơ sở dữ liệu.
+
 
 \subsection{Ràng buộc kiểm tra}
 Tính toàn vẹn miền được kiểm chứng bằng các ràng buộc khai báo \texttt{CHECK}:
@@ -58,11 +57,6 @@ Tính toàn vẹn miền được kiểm chứng bằng các ràng buộc khai b
     \item \textbf{Tập trạng thái rời rạc}: Được kiểm tra trên \texttt{delivery\_order.order\_status}, \texttt{package.package\_status}, \texttt{drone.status}, \texttt{landing\_station.status}, \texttt{delivery\_activity.activity\_status} và \texttt{package\_station\_event.event\_type}.
     \item \textbf{Giới hạn thời gian}: \texttt{delivery\_activity.started\_at <= delivery\_activity.ended\_at} và \texttt{station\_operator\_assignment.assigned\_from < station\_operator\_assignment.assigned\_to}.
 \end{itemize}
-\textbf{Kết luận kiểm chứng}: Được thực thi đầy đủ ở cấp cơ sở dữ liệu.
-
-\section{Kiểm chứng từ quy tắc nghiệp vụ đến lược đồ}\label{s:brvalidation}
-
-\textsc{Bảng}~\ref{tab:br_validation_part1} và \textsc{Bảng}~\ref{tab:br_validation_part2} trình bày kết quả kiểm chứng có hệ thống đối với toàn bộ ba mươi chín quy tắc nghiệp vụ, bao gồm cách biểu diễn quan hệ chính xác và mức thực thi cơ sở dữ liệu cụ thể.
 
 \begin{table}[htbp]
 \caption{Ma trận kiểm chứng: quy tắc về khách hàng, đơn hàng, máy bay và thực hiện giao hàng (BR-01 đến BR-24)}
@@ -156,9 +150,6 @@ CREATE UNIQUE INDEX uq_customer_default_address
 \end{verbatim}
 Chỉ mục này chỉ đánh chỉ mục các dòng có \texttt{is\_default} bằng true. Mỗi khách hàng vẫn có thể có số lượng địa chỉ không mặc định tùy ý, trong khi quy tắc tối đa một địa chỉ mặc định được thực thi nghiêm ngặt ở cấp cơ sở dữ liệu.
 
-\subsection{Bản số tối thiểu của kiện hàng (BR-06)}
-Khóa ngoại tiêu chuẩn bảo đảm một kiện hàng tham chiếu một đơn ($N:1$), nhưng DDL quan hệ không thể tự thực thi việc mỗi đơn vừa được thêm phải có ngay ít nhất một kiện hàng ($1:1..N$ ở phía cha) trong một câu lệnh nguyên tử mà không tạo phụ thuộc vòng. Trong thiết kế này, đây là ràng buộc lược đồ cần được thực thi ở cấp giao dịch (thêm đơn và kiện hàng trong cùng một giao dịch cơ sở dữ liệu) hoặc bằng trigger ràng buộc trì hoãn.
-
 \section{Toàn vẹn tham chiếu và chính sách xóa}\label{s:referentialval}
 
 Lược đồ thiết lập các chính sách xóa (\texttt{ON DELETE}) rõ ràng và nhất quán cho toàn bộ khóa ngoại:
@@ -176,24 +167,6 @@ Lược đồ thiết lập các chính sách xóa (\texttt{ON DELETE}) rõ ràn
     Điều này bảo đảm dữ liệu đo từ xa, ngoại lệ và nhật ký kiểm toán lịch sử vẫn nguyên vẹn để đáp ứng yêu cầu tuân thủ, ngay cả khi bản ghi người dùng ban đầu bị thay đổi.
 \end{itemize}
 
-\section{Kiến trúc bảo toàn lịch sử và kiểm toán}\label{s:historyauditval}
-
-Một yêu cầu thiết kế trung tâm là phân biệt lịch sử trạng thái nghiệp vụ với dấu vết kiểm toán bảo mật:
-
-\begin{itemize}
-    \item \textbf{Lịch sử nghiệp vụ (\texttt{order\_status\_history}, \texttt{station\_status\_history})}:
-    \begin{itemize}
-        \item Trả lời câu hỏi: \textit{``Trạng thái vận hành của thực thể nghiệp vụ này đã thay đổi như thế nào theo thời gian?''}
-        \item Lưu các lần chuyển trạng thái nghiệp vụ rời rạc (\texttt{PENDING $\to$ APPROVED $\to$ ASSIGNED $\to$ IN\_TRANSIT $\to$ DELIVERED}) cùng thời điểm và lý do nghiệp vụ.
-        \item Được thiết kế theo chính sách chỉ ghi nối tiếp ở cấp vận hành.
-    \end{itemize}
-    \item \textbf{Nhật ký kiểm toán (\texttt{audit\_log})}:
-    \begin{itemize}
-        \item Trả lời câu hỏi: \textit{``Ai đã sửa bản ghi nào, vào thời điểm nào và nội dung nào đã thay đổi?''}
-        \item Lưu các thay đổi DML cấp thấp (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}), ảnh chụp \texttt{JSONB} của bản ghi trước và sau thay đổi, địa chỉ IP máy khách và mã tác nhân.
-        \item Sự tách biệt về cấu trúc bảo đảm nhật ký bảo mật có dung lượng lớn không gây nhiễu cho các truy vấn báo cáo nghiệp vụ.
-    \end{itemize}
-\end{itemize}
 
 \section{Kiểm chứng chuẩn hóa}\label{s:normalizationval}
 
@@ -236,33 +209,3 @@ CREATE INDEX idx_tracking_activity_time
     \item \textbf{Chỉ mục ràng buộc ngầm định}: Không tạo lại chỉ mục tường minh trên các cột đã được chỉ mục b-tree duy nhất do ràng buộc \texttt{UNIQUE} tạo ra (\texttt{system\_user.username}, \texttt{drone.serial\_number}, \texttt{landing\_station.station\_code}, \texttt{delivery\_confirmation.order\_id}).
 \end{itemize}
 
-\section{Giới hạn và ranh giới thực thi}\label{s:limitationsval}
-
-Một thiết kế cơ sở dữ liệu chặt chẽ phải chỉ rõ ranh giới giữa nội dung có thể thực thi trực tiếp bằng định nghĩa lược đồ SQL khai báo và nội dung cần cơ chế thủ tục hoặc tầng ứng dụng:
-
-\begin{enumerate}
-    \item \textbf{Thực thi bằng lược đồ khai báo (trực tiếp trong PostgreSQL)}:
-    \begin{itemize}
-        \item Toàn vẹn thực thể (PK, cột định danh).
-        \item Toàn vẹn tham chiếu (FK, chính sách xóa).
-        \item Tính duy nhất (một địa chỉ mặc định bằng chỉ mục từng phần, một xác nhận cho mỗi đơn bằng ràng buộc duy nhất).
-        \item Quyền sở hữu địa chỉ (FK ghép liên kết đơn và địa chỉ thông qua mã khách hàng).
-        \item Kiểm tra miền vô hướng (khối lượng dương, tọa độ, mã trạng thái hợp lệ).
-    \end{itemize}
-    \item \textbf{Thực thi bằng thủ tục/trigger (cần logic được lưu trữ)}:
-    \begin{itemize}
-        \item \textbf{Giới hạn tải trọng liên bản ghi (BR-18)}: Việc kiểm tra tổng khối lượng các kiện hàng của một hoạt động không vượt quá \texttt{drone.max\_payload\_kg} cần phép tổng hợp trên nhiều bản ghi kiện hàng.
-        \item \textbf{Tính đồng thời của chuyến bay (BR-16)}: Ngăn lịch bay chồng lấn của cùng một máy bay khi đang hoạt động cần ràng buộc loại trừ theo thời gian (\texttt{EXCLUDE USING gist}) hoặc trigger kiểm tra trước khi kích hoạt hoạt động.
-        \item \textbf{Vòng đời chuyển trạng thái (BR-12, BR-13, BR-14)}: Ngăn chuyển lùi trạng thái không hợp lệ, chẳng hạn từ \texttt{DELIVERED} về \texttt{ASSIGNED}, cần trigger kiểm tra chuyển trạng thái hoặc máy trạng thái tại tầng ứng dụng.
-        \item \textbf{Quyền của nhân viên đang được phân công (BR-28)}: Xác nhận người dùng ghi sự kiện kiện hàng đang được phân công vào trạm đó cần trigger đối chiếu với \texttt{station\_operator\_assignment}.
-    \end{itemize}
-\end{enumerate}
-Việc ghi rõ những ranh giới này bảo đảm tính trung thực học thuật và tránh các tuyên bố thiếu cơ sở khi bảo vệ dự án.
-
-\section{Tóm tắt chương}\label{s:ch4summary}
-
-\qquad Chương này đã kiểm chứng có hệ thống thiết kế cơ sở dữ liệu SmartDroneDelivery được đề xuất. Mọi khía cạnh cấu trúc, bao gồm khóa chính, khóa ngoại, khóa ứng viên, ràng buộc kiểm tra miền và hành động tham chiếu, đều được đối chiếu với các yêu cầu hệ thống.
-
-Ma trận kiểm chứng xác nhận cả ba mươi chín quy tắc nghiệp vụ đều được biểu diễn rõ ràng trong mô hình quan hệ. Các kỹ thuật quan hệ nâng cao như khóa ngoại ghép để bảo đảm quyền sở hữu địa chỉ khách hàng (BR-04) và chỉ mục duy nhất từng phần cho địa chỉ mặc định (BR-05) đã được minh họa. Sự tách biệt về cấu trúc giữa lịch sử trạng thái nghiệp vụ và nhật ký kiểm toán bảo mật đã được kiểm chứng, đồng thời việc tuân thủ 3NF cũng được xác nhận.
-
-Cuối cùng, chương đã phân định rõ ràng ranh giới giữa các ràng buộc cơ sở dữ liệu khai báo và logic nghiệp vụ ở cấp thủ tục/ứng dụng, qua đó cung cấp một nền tảng trung thực, chặt chẽ và có thể bảo vệ cho thiết kế cơ sở dữ liệu.
