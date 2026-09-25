@@ -1,14 +1,16 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
 \documentclass[letterpaper,11pt,leqno,openany]{book}
 \usepackage{book}
 \bibliographystyle{book}
 
-% Enter book title to populate PDF metadata:
-\hypersetup {pdftitle={AI-powered Drone Delivery Management Platform}}
+% Tiêu đề hiển thị trong thuộc tính của tệp PDF:
+\hypersetup {pdftitle={Nền tảng quản lý giao hàng bằng máy bay không người lái ứng dụng trí tuệ nhân tạo}}
 
-% Enter path to BibTeX file with references:
+% Đường dẫn tới tệp BibTeX chứa tài liệu tham khảo:
 \newcommand{\bib}{book.bib}
 
-% Enter path to PDF file with figures:
+% Đường dẫn tới tệp PDF chứa hình ảnh:
 \newcommand{\pdf}{figures.pdf}
 
 \usepackage{iftex}
@@ -19,25 +21,25 @@
   \usepackage{fontspec}
   \setmainfont{Times New Roman}
 \else
-  \usepackage[vietnamese,english]{babel}
+  \usepackage[english,vietnamese]{babel}
 \fi\fi
 
 
 \begin{document}
 
-% Enter title:
-\title{AI-powered Drone Delivery Management Platform }
+% Tên đề tài:
+\title{Nền tảng quản lý giao hàng bằng máy bay không người lái ứng dụng trí tuệ nhân tạo}
 
-% Enter subtitle (can be commented out):
+% Tên nhóm:
 
-\subtitle{Group 4}
+\subtitle{Nhóm 4}
 
-% Enter author:
-\author{089206011070 - Tran Tan Phat\\
-        079206000967 - Tran Hoang Son\\
-        056206000983 - Nguyen Duy Quy\\
-        054206007389 - Nguyen Quoc Dung\\
-        079206004792 - Le Huy Hoang}
+% Danh sách thành viên:
+\author{089206011070 - Trần Tấn Phát\\
+        079206000967 - Trần Hoàng Sơn\\
+        056206000983 - Nguyễn Duy Quy\\
+        054206007389 - Nguyễn Quốc Dũng\\
+        079206004792 - Lê Huy Hoàng}
 
 \begin{titlepage}
 \maketitle
@@ -47,23 +49,25 @@
 
 \tableofcontents
 
-% Enter book structure
-\chapter{Preface}
+% Cấu trúc tài liệu
+\chapter{Lời nói đầu}
 \input{preface}
 
-\chapter{Introduction}\label{c:introduction}
+\mainmatter
+
+\chapter{Giới thiệu}\label{c:introduction}
 \input{chapter1}
 
-\chapter{Database Requirements Analysis}\label{c:analysis}
+\chapter{Phân tích yêu cầu cơ sở dữ liệu}\label{c:analysis}
 \input{chapter2}
 
-\chapter{Database Design}\label{c:design}
+\chapter{Thiết kế cơ sở dữ liệu}\label{c:design}
 \input{chapter3}
 
-\chapter{Database Design Validation}\label{c:test}
+\chapter{Kiểm chứng thiết kế cơ sở dữ liệu}\label{c:test}
 \input{chapter4}
 
-\chapter{Conclusion} \label{c:conclusion}
+\chapter{Kết luận} \label{c:conclusion}
 \input{chapter5}
 
 \end{document}
