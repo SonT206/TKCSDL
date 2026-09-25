@@ -31,7 +31,7 @@ The report focuses exclusively on the **database design** of an AI-powered Drone
 
 The final schema consists of **21 tables** organized into six groups:
 
-- **User & Authorization**: `system_user`, `role`, `permission`, `user_role`, `role_permission`
+- **User & Authorization**: `app_user`, `role`, `permission`, `user_role`, `role_permission`
 - **Customer**: `customer`, `customer_address`
 - **Delivery Order**: `delivery_order`, `package`, `order_status_history`
 - **Delivery Execution**: `drone`, `landing_station`, `delivery_activity`, `tracking_record`, `delivery_confirmation`, `delivery_exception`, `station_status_history`
