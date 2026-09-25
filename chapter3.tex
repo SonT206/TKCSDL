@@ -3,6 +3,198 @@
 
 Phần này trình bày mô hình cơ sở dữ liệu mức khái niệm cho nền tảng SmartDroneDelivery. Mô hình xác định các thực thể chính, thuộc tính của chúng, mối quan hệ giữa các thực thể và bản số của những mối quan hệ đó. Đây là cơ sở để xây dựng lược đồ quan hệ mức logic trong Phần~\ref{s:logical}.
 
+\subsection{Vì sao mức khái niệm phải được xác định trước}
+
+Trong SmartDroneDelivery, mức khái niệm xác định được:
+\begin{itemize}
+    \item Phạm vi nghiệp vụ của nền tảng và ranh giới với các hệ thống/thiết bị bên ngoài.
+    \item Tác nhân, trách nhiệm của từng tác nhân và điểm họ tương tác với hệ thống.
+    \item Các thực thể nghiệp vụ cốt lõi và ý nghĩa nghiệp vụ của từng thực thể.
+    \item Mối quan hệ giữa các thực thể cùng lực lượng số và tính bắt buộc/tùy chọn khi phù hợp.
+    \item Các vòng đời và sự kiện cần lưu lại, đặc biệt là trạng thái, dữ liệu theo dõi, sự cố và việc xử lý tại trạm.
+    \item Các quy tắc nghiệp vụ phải luôn đúng dù giao diện hay dịch vụ ứng dụng thay đổi.
+\end{itemize}
+
+\subsection{Từ việc hiểu nghiệp vụ đến mô hình khái niệm}
+
+Chuỗi chuyển đổi từ bài toán kinh doanh sang thiết kế:
+
+\begin{center}
+Nhu cầu nghiệp vụ $\to$ Tác nhân $\to$ Quy trình/sự kiện nghiệp vụ $\to$ Thực thể nghiệp vụ\\
+$\to$ Mối quan hệ/lực lượng số $\to$ Mô hình khái niệm
+\end{center}
+
+Ví dụ: yêu cầu ``hệ thống phải hỗ trợ giao lại khi một lần giao thất bại'' dẫn đến việc nhận diện hai khái niệm khác nhau: Đơn giao hàng (\code{DELIVERY\_ORDER}) và Lần thực hiện giao hàng (\code{DELIVERY\_ACTIVITY}).
+
+Yêu cầu chức năng và quy tắc nghiệp vụ là nguồn đầu vào của mức khái niệm, nhưng chúng không đồng nghĩa với khái niệm. Yêu cầu chức năng mô tả hệ thống phải làm gì; mô hình khái niệm mô tả hệ thống cần biết gì.
+
+\subsection{Ranh giới hệ thống và kịch bản nghiệp vụ}
+
+SmartDroneDelivery được xác định là nền tảng quản lý nghiệp vụ và logistics cho giao hàng bằng drone. Phạm vi gồm khách hàng, địa chỉ, đơn giao hàng, gói hàng, trạm hạ cánh, drone, lần thực hiện giao hàng, dữ liệu theo dõi, sự cố, xác nhận, lộ trình, khuyến nghị \code{AI}, phân quyền và kiểm toán. Điều khiển bay mức thấp, phần sụn, phần cứng động cơ và chi tiết bên trong kho lưu trữ đối tượng không phải là các thực thể nghiệp vụ cốt lõi của cơ sở dữ liệu này.
+
+Một kịch bản nghiệp vụ dùng để kiểm tra mức khái niệm có thể diễn ra như sau:
+\begin{itemize}
+    \item Khách hàng chọn một địa chỉ và tạo đơn giao hàng.
+    \item Một đơn giao hàng có thể chứa một hoặc nhiều gói hàng.
+    \item Điều phối viên xử lý đơn và tạo một lần thực hiện giao hàng để thực hiện việc giao.
+    \item Lần thực hiện được gán một drone và các trạm liên quan; nhân viên vận hành xử lý gói hàng tại trạm.
+    \item Trong khi bay, nhiều bản ghi theo dõi được sinh ra; nếu có sự cố thì tạo bản ghi sự cố giao hàng.
+    \item Nếu lần thực hiện thất bại, một lần thực hiện mới được tạo và liên kết với lần trước để bảo toàn lịch sử lập lịch lại.
+    \item Khi giao thành công, xác nhận giao hàng ghi nhận kết quả và tham chiếu bằng chứng.
+\end{itemize}
+
+\subsection{Các tác nhân và trách nhiệm nghiệp vụ}
+
+\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.2\textwidth}}
+\toprule
+\textbf{Tác nhân} & \textbf{Trách nhiệm nghiệp vụ} & \textbf{Khái niệm chính} & \textbf{Ý nghĩa đối với mô hình} \\
+\midrule
+\endhead
+Khách hàng & Tạo yêu cầu; quản lý địa chỉ; theo dõi và xác nhận giao hàng. & Khách hàng, Địa chỉ, Đơn giao hàng, Xác nhận & Xác định nhu cầu giao hàng. \\
+Điều phối viên & Xử lý yêu cầu; lập lịch; phân công drone; lập lịch lại. & Đơn giao hàng, Lần thực hiện, Drone, Lộ trình & Biến yêu cầu thành việc thực hiện cụ thể. \\
+Nhân viên vận hành trạm & Xử lý gói hàng tại trạm và ghi nhận sự kiện. & Gói hàng, Trạm, Sự kiện tại trạm & Ghi nhận việc xử lý gói hàng thực tế. \\
+Quản lý logistics & Theo dõi hoạt động và trạng thái vận hành. & Đơn giao hàng, Lần thực hiện, Theo dõi, Sự cố, Lộ trình, AI & Cần góc nhìn vận hành tổng thể. \\
+Quản trị viên hệ thống & Quản lý user, role, permission và audit. & Người dùng, Vai trò, Quyền, Kiểm toán & Đảm bảo kiểm soát và truy vết. \\
+\bottomrule
+\end{longtable}\normalsize
+
+\subsection{Xác định thực thể: mỗi khái niệm có ý nghĩa gì}
+
+Một thực thể chỉ nên được đưa vào mô hình khi nó đại diện cho một đối tượng nghiệp vụ độc lập, một vòng đời riêng, một loại sự kiện lặp lại, hoặc một mối quan hệ cần được quản lý riêng.
+
+\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}}
+\toprule
+\textbf{Nhóm khái niệm} & \textbf{Thực thể / Quan hệ} & \textbf{Ý nghĩa nghiệp vụ} \\
+\midrule
+\endhead
+Định danh \& Khách hàng & \code{SYSTEM\_USER}, \code{CUSTOMER}, \code{CUSTOMER\_ADDRESS} & Tài khoản, hồ sơ khách hàng và các địa chỉ có thể dùng làm nơi giao. \\
+Đơn giao hàng \& Gói hàng & \code{DELIVERY\_ORDER}, \code{PACKAGE} & Yêu cầu giao hàng và các đơn vị logistics thuộc đơn giao hàng. \\
+Trạm \& Drone & \code{LANDING\_STATION}, \code{DRONE} & Hạ tầng và phương tiện thực hiện giao hàng. \\
+Thực hiện giao hàng & \code{DELIVERY\_ACTIVITY} & Một lần thực hiện/attempt cụ thể của một order; là concept trung tâm. \\
+Lịch sử \& Sự kiện & \code{ORDER\_STATUS\_HISTORY}, \code{STATION\_STATUS\_HISTORY}, \code{PACKAGE\_STATION\_EVENT}, \code{TRACKING\_RECORD}, \code{DELIVERY\_EXCEPTION} & Các sự kiện phát sinh theo thời gian; không nên nhét thành danh sách lặp trong thực thể cha. \\
+Xác nhận & \code{DELIVERY\_CONFIRMATION} & Kết quả giao thành công và tham chiếu evidence. \\
+Lộ trình \& AI & \code{DELIVERY\_ROUTE}, \code{ROUTE\_POINT}, \code{AI\_RECOMMENDATION} & Thông tin route và khuyến nghị hỗ trợ cho execution. \\
+Phân quyền \& Kiểm toán & \code{ROLE}, \code{PERMISSION}, \code{USER\_ROLE}, \code{ROLE\_PERMISSION}, \code{AUDIT\_LOG} & Kiểm soát quyền và khả năng truy vết thao tác. \\
+\bottomrule
+\end{longtable}\normalsize
+
+\paragraph{\code{CUSTOMER} và \code{CUSTOMER\_ADDRESS}.}
+\code{CUSTOMER} đại diện cho chủ thể sử dụng dịch vụ. \code{CUSTOMER\_ADDRESS} không chỉ là một thuộc tính văn bản của khách hàng vì một khách hàng có thể có nhiều địa chỉ và địa chỉ có tọa độ phục vụ giao hàng. Vì vậy, địa chỉ là một khái niệm có vòng đời và được nhận diện riêng.
+
+\paragraph{\code{DELIVERY\_ORDER}.}
+\code{DELIVERY\_ORDER} đại diện cho yêu cầu nghiệp vụ. Nó phải giữ các thông tin thuộc về yêu cầu như customer, địa chỉ giao đã chọn, trạng thái hiện tại, thời gian yêu cầu, ETA và kết quả hoàn thành/hủy. Nó không nên chứa danh sách dữ liệu đo từ xa, sự cố hoặc các lần thực hiện lặp lại.
+
+\paragraph{\code{PACKAGE}.}
+\code{PACKAGE} là đơn vị logistics vật lý thuộc order. Một order có thể có nhiều package và mỗi package có thuộc tính riêng như khối lượng, kích thước và trạng thái dễ vỡ. Vì package có định danh riêng, nó được quản lý độc lập với order.
+
+\paragraph{\code{LANDING\_STATION} và \code{DRONE}.}
+Trạm là hạ tầng vận hành; drone là nguồn lực giao hàng. Hai khái niệm này độc lập với đơn giao hàng và có vòng đời riêng. Một drone có thể thực hiện nhiều lần giao theo thời gian; một trạm có thể phục vụ nhiều gói hàng và nhiều lần thực hiện.
+
+\paragraph{\code{DELIVERY\_ACTIVITY}.}
+\code{DELIVERY\_ACTIVITY} mô tả việc thực hiện yêu cầu. Đây là khái niệm trung tâm vì việc gán drone, trạm lấy/trả, lịch, thời gian bắt đầu/kết thúc, dữ liệu theo dõi, sự cố, lộ trình và khuyến nghị \code{AI} đều gắn với một lần thực hiện cụ thể.
+
+\paragraph{Các thực thể lịch sử/sự kiện.}
+Lịch sử/sự kiện được mô hình hóa riêng khi một đối tượng có nhiều thay đổi hoặc quan sát theo thời gian. Điều này áp dụng cho trạng thái đơn giao hàng, trạng thái trạm, xử lý gói hàng tại trạm, dữ liệu đo từ xa và sự cố.
+
+\paragraph{\code{DELIVERY\_CONFIRMATION}.}
+Xác nhận là kết quả nghiệp vụ của việc giao thành công. Bằng chứng được tham chiếu bằng khóa đối tượng để cơ sở dữ liệu lưu sự kiện nghiệp vụ mà không phải nhúng tệp vật lý vào một dòng dữ liệu.
+
+\paragraph{Phân quyền và kiểm toán.}
+Người dùng, vai trò và quyền là các khái niệm độc lập; quan hệ giữa chúng là N:M. Nhật ký kiểm toán là luồng sự kiện quản trị và bảo mật, nên không thuộc trực tiếp vào đối tượng nghiệp vụ được kiểm toán.
+
+\subsection{Các mối quan hệ cốt lõi}
+
+Lực lượng số phải được quyết định ở mức khái niệm trước khi chuyển thành khóa ngoại. Nó mô tả ``một bên có thể liên quan đến bao nhiêu đối tượng bên kia'' và giúp nhóm biết khi nào cần thực thể con, khi nào cần quan hệ kết hợp.
+
+\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.1\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
+\toprule
+\textbf{Mối quan hệ} & \textbf{Lực lượng số} & \textbf{Diễn giải nghiệp vụ} & \textbf{Hệ quả cho thiết kế logic} \\
+\midrule
+\endhead
+\code{CUSTOMER} -- \code{CUSTOMER\_ADDRESS} & 1:N & Một khách hàng có nhiều địa chỉ; mỗi địa chỉ thuộc một khách hàng. & Tách \code{CUSTOMER\_ADDRESS}, dùng \code{customer\_id} làm FK. \\
+\code{CUSTOMER} -- \code{DELIVERY\_ORDER} & 1:N & Khách hàng có thể tạo nhiều đơn giao hàng; mỗi đơn giao hàng thuộc một khách hàng. & \code{customer\_id} là FK trong order. \\
+\code{DELIVERY\_ORDER} -- \code{PACKAGE} & 1:N & Một đơn giao hàng có thể có nhiều gói hàng. & \code{PACKAGE} là relation riêng. \\
+\code{DELIVERY\_ORDER} -- \code{DELIVERY\_ACTIVITY} & 1:N & Một đơn giao hàng có thể có nhiều lần thực hiện. & Tách request khỏi execution. \\
+\code{DRONE} -- \code{DELIVERY\_ACTIVITY} & 1:N & Một drone thực hiện nhiều lần giao theo thời gian; mỗi lần thực hiện được gán một drone. & \code{DRONE} và \code{ACTIVITY} độc lập; concurrency là business rule. \\
+\code{DELIVERY\_ACTIVITY} -- \code{TRACKING\_RECORD} & 1:N & Một lần thực hiện tạo ra nhiều quan sát dữ liệu đo từ xa. & \code{TRACKING\_RECORD} là event relation. \\
+\code{DELIVERY\_ACTIVITY} -- \code{DELIVERY\_EXCEPTION} & 1:N & Một lần thực hiện có thể có 0 hoặc nhiều sự cố. & Sự cố có định danh và vòng đời riêng. \\
+\code{PACKAGE} -- \code{PACKAGE\_STATION\_EVENT} & 1:N & Một gói hàng có nhiều sự kiện tại trạm. & Không dùng \code{station\_1}, \code{station\_2}, \ldots \\
+\code{DELIVERY\_ACTIVITY} -- \code{DELIVERY\_ROUTE} & 1:N & Một lần thực hiện có thể có nhiều bản ghi lộ trình. & Nếu business yêu cầu đúng một route active, cần thêm rule riêng. \\
+\code{DELIVERY\_ROUTE} -- \code{ROUTE\_POINT} & 1:N & Một lộ trình gồm nhiều điểm có thứ tự. & \code{ROUTE\_POINT} tách khỏi \code{ROUTE}. \\
+\code{DELIVERY\_ORDER} -- \code{DELIVERY\_CONFIRMATION} & 1:0..1 & Đơn hàng chưa thành công thì chưa có xác nhận. & \code{UNIQUE order\_id} hỗ trợ quy tắc này. \\
+USER -- ROLE & N:M & Một người dùng có thể có nhiều vai trò; một vai trò có thể áp dụng cho nhiều người dùng. & Dùng \code{USER\_ROLE}. \\
+ROLE -- PERMISSION & N:M & Một vai trò có nhiều quyền; một quyền có thể thuộc nhiều vai trò. & Dùng \code{ROLE\_PERMISSION}. \\
+\bottomrule
+\end{longtable}\normalsize
+
+\subsection{Quyết định khái niệm quan trọng nhất: Đơn giao hàng và Lần thực hiện giao hàng}
+
+Đây là quyết định quan trọng nhất của mô hình khái niệm hiện tại. \code{DELIVERY\_ORDER} và \code{DELIVERY\_ACTIVITY} không phải hai tên gọi của cùng một thứ:
+\begin{itemize}
+    \item \code{DELIVERY\_ORDER} = ``khách hàng yêu cầu hệ thống thực hiện một lần giao''.
+    \item \code{DELIVERY\_ACTIVITY} = ``một lần thực hiện cụ thể mà hệ thống thực sự tổ chức để thực hiện yêu cầu đó''.
+    \item Một order có thể có nhiều activity; mỗi activity có drone, thời gian, trạm, dữ liệu theo dõi và sự cố riêng.
+    \item \code{previous\_activity\_id} tạo chuỗi liên kết khi lần thực hiện sau được sinh ra do lập lịch lại.
+\end{itemize}
+
+Ví dụ: O100 là một yêu cầu. A1 được giao cho D3 nhưng thất bại. Điều phối viên tạo A2 và \code{A2.previous\_activity\_id = A1}. Cơ sở dữ liệu giữ một O100 nhưng hai activity với lịch sử đầy đủ.
+
+\subsection{Các khái niệm về vòng đời và sự kiện}
+
+\paragraph{Trạng thái hiện tại và lịch sử.}
+\code{DELIVERY\_ORDER} và \code{LANDING\_STATION} có trạng thái hiện tại để đọc nhanh. \code{ORDER\_STATUS\_HISTORY} và \code{STATION\_STATUS\_HISTORY} lưu các lần chuyển trạng thái để kiểm toán.
+
+\paragraph{Di chuyển của gói hàng.}
+\code{PACKAGE\_STATION\_EVENT} ghi mỗi lần package được xử lý tại một station cùng operator, loại sự kiện và thời điểm.
+
+\paragraph{Dữ liệu đo từ xa.}
+\code{TRACKING\_RECORD} là chuỗi quan sát theo thời gian của một lần thực hiện giao hàng; mỗi dòng là một quan sát thay vì nhiều cột \code{coordinate\_1}, \code{coordinate\_2}, \ldots
+
+\paragraph{Sự cố.}
+\code{DELIVERY\_EXCEPTION} ghi sự cố phát sinh trong một activity, có thời điểm xảy ra và trạng thái xử lý.
+
+\paragraph{Xác nhận.}
+\code{DELIVERY\_CONFIRMATION} ghi sự kiện giao thành công; \code{evidence\_object\_key} là tham chiếu đến bằng chứng bên ngoài.
+
+\subsection{Danh sách kiểm tra mô hình khái niệm}
+
+\begin{itemize}
+    \item Mỗi đối tượng nghiệp vụ cốt lõi có ý nghĩa rõ ràng và không bị chồng lấn trách nhiệm.
+    \item Mỗi mối quan hệ quan trọng có lực lượng số rõ ràng.
+    \item Các dữ liệu lặp theo thời gian đã được nhận diện thành lịch sử/sự kiện.
+    \item Các vòng đời độc lập được tách ra thay vì gắn tất cả vào một thực thể.
+    \item Mức khái niệm biểu diễn được các tình huống bình thường, thất bại, thử lại, hủy và hoàn thành.
+    \item Mức khái niệm có thể dẫn tới lược đồ logic mà không phải thay đổi ý nghĩa nghiệp vụ.
+    \item Mức khái niệm không kéo các thành phần ngoài phạm vi vào thành thực thể nghiệp vụ cốt lõi.
+    \item Mức khái niệm hỗ trợ các câu hỏi nghiệp vụ cốt lõi của hệ thống.
+\end{itemize}
+
+\subsection{Đối chiếu từ khái niệm đến vấn đề nghiệp vụ}
+
+\small\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}}
+\toprule
+\textbf{Vấn đề nghiệp vụ} & \textbf{Diễn giải khái niệm} & \textbf{Thực thể / mối quan hệ} & \textbf{Tại sao quan trọng cho bước sau} \\
+\midrule
+\endhead
+Đơn giao hàng có thể giao lại & Yêu cầu và lần thực hiện là hai khái niệm khác nhau. & \code{DELIVERY\_ORDER} 1:N \code{DELIVERY\_ACTIVITY} & Cho phép retry và chain. \\
+Cần kiểm toán vòng đời & Trạng thái hiện tại khác với sự kiện lịch sử. & \code{DELIVERY\_ORDER} + \code{ORDER\_STATUS\_HISTORY} & Dẫn đến history relation. \\
+Gói hàng đi qua nhiều trạm & Xử lý tại trạm là một chuỗi sự kiện. & \code{PACKAGE} 1:N \code{PACKAGE\_STATION\_EVENT} & Dẫn đến event relation. \\
+Theo dõi drone theo từng chuyến & Dữ liệu đo từ xa thuộc về một lần thực hiện cụ thể. & \code{ACTIVITY} 1:N \code{TRACKING\_RECORD} & Không trộn telemetry giữa attempts. \\
+Giao hàng có thể phát sinh sự cố & Sự cố có thời điểm phát sinh và xử lý riêng. & \code{ACTIVITY} 1:N \code{DELIVERY\_EXCEPTION} & Hỗ trợ phân tích sự cố. \\
+Phân quyền có quan hệ N:M & Vai trò và quyền là các khái niệm độc lập. & \code{USER\_ROLE}, \code{ROLE\_PERMISSION} & Dẫn đến associative relations. \\
+Cần bằng chứng giao hàng & Xác nhận là một sự kiện nghiệp vụ. & \code{ORDER} 1:0..1 \code{CONFIRMATION} & Tách fact nghiệp vụ khỏi file storage. \\
+\bottomrule
+\end{longtable}\normalsize
+
+\subsection{Từ mô hình khái niệm đến thiết kế logic}
+
+Chuỗi các bước thiết kế:
+
+\begin{center}
+Khái niệm nghiệp vụ $\to$ Thực thể $\to$ Mối quan hệ/lực lượng số $\to$ Thuộc tính $\to$ Khóa\\
+$\to$ Lược đồ quan hệ $\to$ Phụ thuộc hàm $\to$ Chuẩn hóa $\to$ Ràng buộc $\to$ Thiết kế vật lý
+\end{center}
+
 \subsection{Xác định thực thể}\label{s:entities}
 
 Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể sau được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành.
@@ -521,350 +713,6 @@ ASSIGNED -> PREPARING -> IN_TRANSIT -> DELIVERED / FAILED / CANCELLED
 
 Phần này trình bày chi tiết việc triển khai vật lý bằng PostgreSQL. Tất cả các bảng sử dụng \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} cho khóa chính, \texttt{TIMESTAMPTZ} cho trường thời gian và các miền số, hình học phù hợp.
 
-\subsection{Các câu lệnh CREATE TABLE}
-
-\begin{verbatim}
--- 1. Nhóm người dùng và phân quyền
-
-CREATE TABLE system_user (
-  user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  username      VARCHAR(100) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  email         VARCHAR(255) UNIQUE,
-  phone_number  VARCHAR(20)  UNIQUE,
-  is_active     BOOLEAN      NOT NULL DEFAULT TRUE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE role (
-  role_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  role_name   VARCHAR(50)  NOT NULL UNIQUE,
-  description VARCHAR(255)
-);
-
-CREATE TABLE permission (
-  permission_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  permission_name VARCHAR(100) NOT NULL UNIQUE,
-  description     VARCHAR(255)
-);
-
-CREATE TABLE user_role (
-  user_id     BIGINT      NOT NULL,
-  role_id     BIGINT      NOT NULL,
-  assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (user_id, role_id),
-  CONSTRAINT fk_ur_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ur_role FOREIGN KEY (role_id)
-    REFERENCES role(role_id) ON DELETE CASCADE
-);
-
-CREATE TABLE role_permission (
-  role_id       BIGINT NOT NULL,
-  permission_id BIGINT NOT NULL,
-  PRIMARY KEY (role_id, permission_id),
-  CONSTRAINT fk_rp_role FOREIGN KEY (role_id)
-    REFERENCES role(role_id) ON DELETE CASCADE,
-  CONSTRAINT fk_rp_perm FOREIGN KEY (permission_id)
-    REFERENCES permission(permission_id) ON DELETE CASCADE
-);
-
--- 2. Nhóm khách hàng và địa chỉ
-
-CREATE TABLE customer (
-  customer_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id       BIGINT       UNIQUE,
-  customer_name VARCHAR(100) NOT NULL,
-  phone_number  VARCHAR(20)  UNIQUE,
-  email         VARCHAR(255) UNIQUE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_customer_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE customer_address (
-  address_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  customer_id   BIGINT       NOT NULL,
-  address_label VARCHAR(50),
-  address_line  VARCHAR(255) NOT NULL,
-  ward          VARCHAR(100),
-  district      VARCHAR(100),
-  city          VARCHAR(100),
-  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  is_default    BOOLEAN      NOT NULL DEFAULT FALSE,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_addr_customer FOREIGN KEY (customer_id)
-    REFERENCES customer(customer_id) ON DELETE RESTRICT,
-  CONSTRAINT uq_customer_address UNIQUE (address_id, customer_id)
-);
-
--- 3. Nhóm trạm hạ cánh và nhân viên vận hành
-
-CREATE TABLE landing_station (
-  station_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_code VARCHAR(50)  NOT NULL UNIQUE,
-  station_name VARCHAR(100) NOT NULL,
-  address      VARCHAR(255),
-  latitude     NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude    NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  capacity     INTEGER      NOT NULL DEFAULT 0 CHECK (capacity >= 0),
-  status       VARCHAR(30)  NOT NULL
-    CHECK (status IN ('AVAILABLE', 'FULL', 'MAINTENANCE', 'OFFLINE')),
-  created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE station_status_history (
-  history_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_id  BIGINT      NOT NULL,
-  status      VARCHAR(30) NOT NULL,
-  changed_by  BIGINT,
-  reason      VARCHAR(255),
-  changed_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_ssh_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_ssh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE station_operator_assignment (
-  assignment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  station_id    BIGINT      NOT NULL,
-  user_id       BIGINT      NOT NULL,
-  assigned_from TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  assigned_to   TIMESTAMPTZ,
-  is_active     BOOLEAN     NOT NULL DEFAULT TRUE,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_soa_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_soa_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE RESTRICT,
-  CONSTRAINT chk_soa_interval CHECK (assigned_to IS NULL OR assigned_from < assigned_to)
-);
-
--- 4. Nhóm máy bay không người lái
-
-CREATE TABLE drone (
-  drone_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  serial_number   VARCHAR(100) NOT NULL UNIQUE,
-  model           VARCHAR(100),
-  status          VARCHAR(30)  NOT NULL
-    CHECK (status IN ('AVAILABLE', 'BUSY', 'MAINTENANCE', 'OFFLINE')),
-  max_payload_kg  NUMERIC(10,2) NOT NULL CHECK (max_payload_kg > 0),
-  battery_level   NUMERIC(5,2) CHECK (battery_level BETWEEN 0 AND 100),
-  station_id      BIGINT,
-  created_at      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_drone_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL
-);
-
--- 5. Nhóm đơn giao hàng và kiện hàng
-
-CREATE TABLE delivery_order (
-  order_id                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  customer_id             BIGINT      NOT NULL,
-  delivery_address_id     BIGINT      NOT NULL,
-  order_status            VARCHAR(30) NOT NULL
-    CHECK (order_status IN (
-      'PENDING', 'APPROVED', 'REJECTED', 'ASSIGNED',
-      'IN_TRANSIT', 'DELIVERED', 'FAILED', 'CANCELLED')),
-  requested_delivery_time TIMESTAMPTZ,
-  estimated_arrival_at    TIMESTAMPTZ,
-  created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  completed_at            TIMESTAMPTZ,
-  cancelled_at            TIMESTAMPTZ,
-  cancellation_reason     VARCHAR(255),
-  CONSTRAINT fk_order_customer FOREIGN KEY (customer_id)
-    REFERENCES customer(customer_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_order_address  FOREIGN KEY (delivery_address_id, customer_id)
-    REFERENCES customer_address(address_id, customer_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE package (
-  package_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id       BIGINT        NOT NULL,
-  description    VARCHAR(500),
-  weight_kg      NUMERIC(10,2) NOT NULL CHECK (weight_kg > 0),
-  length_cm      NUMERIC(10,2) CHECK (length_cm > 0),
-  width_cm       NUMERIC(10,2) CHECK (width_cm > 0),
-  height_cm      NUMERIC(10,2) CHECK (height_cm > 0),
-  package_status VARCHAR(30)   NOT NULL
-    CHECK (package_status IN (
-      'CREATED', 'AT_STATION', 'PICKED_UP', 'IN_TRANSIT',
-      'DELIVERED', 'FAILED', 'RETURNED', 'DAMAGED')),
-  created_at     TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_pkg_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE order_status_history (
-  status_history_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id          BIGINT      NOT NULL,
-  status            VARCHAR(30) NOT NULL,
-  changed_by        BIGINT,
-  reason            VARCHAR(255),
-  changed_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_osh_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_osh_user FOREIGN KEY (changed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
--- 6. Nhóm thực hiện giao hàng và sự kiện
-
-CREATE TABLE delivery_activity (
-  activity_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id               BIGINT      NOT NULL,
-  drone_id               BIGINT      NOT NULL,
-  pickup_station_id      BIGINT,
-  destination_station_id BIGINT,
-  assigned_by            BIGINT,
-  scheduled_at           TIMESTAMPTZ,
-  activity_status        VARCHAR(30) NOT NULL
-    CHECK (activity_status IN (
-      'ASSIGNED', 'PREPARING', 'IN_TRANSIT',
-      'DELIVERED', 'FAILED', 'CANCELLED')),
-  started_at             TIMESTAMPTZ,
-  ended_at               TIMESTAMPTZ,
-  previous_activity_id   BIGINT,
-  created_at             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_act_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_act_drone FOREIGN KEY (drone_id)
-    REFERENCES drone(drone_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_act_pickup FOREIGN KEY (pickup_station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_dest FOREIGN KEY (destination_station_id)
-    REFERENCES landing_station(station_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_user FOREIGN KEY (assigned_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL,
-  CONSTRAINT fk_act_prev FOREIGN KEY (previous_activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
-  CONSTRAINT chk_act_time CHECK (ended_at IS NULL OR started_at <= ended_at)
-);
-
-CREATE TABLE package_station_event (
-  event_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  package_id   BIGINT      NOT NULL,
-  station_id   BIGINT      NOT NULL,
-  event_type   VARCHAR(30) NOT NULL
-    CHECK (event_type IN ('ARRIVED', 'PICKUP_CONFIRMED', 'LOADED', 'UNLOADED')),
-  performed_by BIGINT,
-  occurred_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  note         VARCHAR(255),
-  CONSTRAINT fk_pse_package FOREIGN KEY (package_id)
-    REFERENCES package(package_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_pse_station FOREIGN KEY (station_id)
-    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_pse_user FOREIGN KEY (performed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE tracking_record (
-  tracking_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id   BIGINT       NOT NULL,
-  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  altitude_m    NUMERIC(10,2) CHECK (altitude_m >= 0),
-  speed_kmh     NUMERIC(10,2) CHECK (speed_kmh >= 0),
-  battery_level NUMERIC(5,2)  CHECK (battery_level BETWEEN 0 AND 100),
-  recorded_at   TIMESTAMPTZ  NOT NULL,
-  CONSTRAINT fk_tr_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE delivery_confirmation (
-  confirmation_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id            BIGINT       NOT NULL UNIQUE,
-  activity_id         BIGINT       NOT NULL UNIQUE,
-  confirmed_by        BIGINT,
-  receiver_name       VARCHAR(100) NOT NULL,
-  receiver_phone      VARCHAR(20),
-  confirmation_method VARCHAR(30)  NOT NULL,
-  evidence_object_key VARCHAR(255),
-  confirmed_at        TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  note                VARCHAR(500),
-  CONSTRAINT fk_conf_order FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_conf_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_conf_user FOREIGN KEY (confirmed_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE delivery_exception (
-  exception_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id    BIGINT      NOT NULL,
-  exception_type VARCHAR(50) NOT NULL,
-  description    TEXT,
-  detected_at    TIMESTAMPTZ NOT NULL,
-  resolved_at    TIMESTAMPTZ,
-  resolved_by    BIGINT,
-  resolution     TEXT,
-  CONSTRAINT fk_exc_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_exc_resolver FOREIGN KEY (resolved_by)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
--- 7. Nhóm kiểm toán, tuyến đường và trí tuệ nhân tạo
-
-CREATE TABLE audit_log (
-  log_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id     BIGINT,
-  entity_name VARCHAR(100) NOT NULL,
-  record_id   BIGINT,
-  action_type VARCHAR(50)  NOT NULL,
-  old_value   JSONB,
-  new_value   JSONB,
-  action_time TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  ip_address  INET,
-  CONSTRAINT fk_al_user FOREIGN KEY (user_id)
-    REFERENCES system_user(user_id) ON DELETE SET NULL
-);
-
-CREATE TABLE delivery_route (
-  route_id               BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  activity_id            BIGINT        NOT NULL UNIQUE,
-  total_distance_km      NUMERIC(12,3) CHECK (total_distance_km >= 0),
-  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
-  created_at             TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_route_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE route_point (
-  route_point_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  route_id        BIGINT       NOT NULL,
-  sequence_number INTEGER      NOT NULL,
-  latitude        NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
-  longitude       NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
-  altitude_m      NUMERIC(10,2) CHECK (altitude_m >= 0),
-  CONSTRAINT fk_rp_route FOREIGN KEY (route_id)
-    REFERENCES delivery_route(route_id) ON DELETE CASCADE,
-  CONSTRAINT uq_rp_seq UNIQUE (route_id, sequence_number)
-);
-
-CREATE TABLE ai_recommendation (
-  recommendation_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  order_id               BIGINT       NOT NULL,
-  activity_id            BIGINT,
-  recommendation_type    VARCHAR(50)  NOT NULL,
-  recommended_drone_id   BIGINT,
-  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
-  confidence_score       NUMERIC(5,4) CHECK (confidence_score BETWEEN 0 AND 1),
-  model_version          VARCHAR(50),
-  created_at             TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_ai_order    FOREIGN KEY (order_id)
-    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
-  CONSTRAINT fk_ai_activity FOREIGN KEY (activity_id)
-    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
-  CONSTRAINT fk_ai_drone    FOREIGN KEY (recommended_drone_id)
-    REFERENCES drone(drone_id) ON DELETE SET NULL
-);
-\end{verbatim}
-
 \subsection{Chiến lược chỉ mục}\label{s:indexes}
 
 Chỉ mục được ưu tiên cho khóa ngoại và các điều kiện lọc truy vấn thường xuyên, đồng thời tránh tạo chỉ mục dư thừa trên những cột đã được bao phủ bởi ràng buộc duy nhất:
@@ -940,10 +788,3 @@ ORDER  BY recorded_at DESC
 LIMIT  50;
 \end{verbatim}
 
-\section{Tóm tắt chương}\label{s:ch3summary}
-
-\qquad Chương này đã trình bày chi tiết thiết kế cơ sở dữ liệu mức khái niệm, mức logic và mức vật lý cho nền tảng SmartDroneDelivery. Mô hình gồm hai mươi ba quan hệ đã chuẩn hóa, được tổ chức thành bảy nhóm chức năng.
-
-Các cải tiến kiến trúc chính gồm đưa vào \texttt{delivery\_activity} để tách đơn hàng khỏi máy bay; bổ sung \texttt{station\_operator\_assignment} và \texttt{package\_station\_event} để chính thức hóa quy trình bố trí nhân sự tại trạm và lấy kiện hàng; sử dụng \texttt{previous\_activity\_id} để theo dõi chuỗi lập lịch lại; và tham chiếu khóa bằng chứng số bên ngoài trong \texttt{delivery\_confirmation}.
-
-Lược đồ logic thỏa mãn 3NF và thực thi sáu nhóm ràng buộc toàn vẹn. Cuối cùng, chương đã trình bày đầy đủ các câu lệnh DDL PostgreSQL và chiến lược chỉ mục, cung cấp một triển khai chặt chẽ, hiệu quả, có khả năng truy vết đầy đủ và sẵn sàng được kiểm chứng toàn diện trong Chương~\ref{c:test}.
