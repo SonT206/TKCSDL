@@ -1,4 +1,206 @@
 % !TeX root = book.tex
+\section{Tổng quan hệ thống}\label{s:overview}
+
+\qquad Nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo được thiết kế để hỗ trợ quản lý các hoạt động giao hàng. Hệ thống tập trung vào quản lý nghiệp vụ và logistics thay vì trực tiếp điều khiển máy bay không người lái.
+
+Nền tảng hỗ trợ toàn bộ vòng đời giao hàng, bắt đầu từ khi tạo yêu cầu, sau đó là quản lý kiện hàng, lập lịch, thực hiện, theo dõi và xác nhận giao hàng.
+
+Từ góc nhìn cơ sở dữ liệu, hệ thống cần một tầng quản lý dữ liệu có cấu trúc và đáng tin cậy, có khả năng lưu trữ và duy trì toàn bộ thông tin phát sinh trong các quy trình nghiệp vụ. Chương này xác định các tác nhân, yêu cầu chức năng, quy tắc nghiệp vụ và yêu cầu dữ liệu làm nền tảng cho quá trình thiết kế cơ sở dữ liệu.
+
+\section{Tác nhân hệ thống và trách nhiệm dữ liệu}\label{s:actors}
+
+Nền tảng hỗ trợ năm tác nhân chính là con người. Mỗi tác nhân tương tác với những chức năng khác nhau của hệ thống và gắn với các nhóm dữ liệu cụ thể mà cơ sở dữ liệu phải quản lý.
+
+\subsection{Khách hàng}
+
+Tác nhân Khách hàng đại diện cho những cá nhân sử dụng nền tảng để yêu cầu dịch vụ giao hàng bằng máy bay không người lái. Cơ sở dữ liệu phải quản lý các dữ liệu sau cho tác nhân này:
+\begin{itemize}
+    \item Thông tin định danh và hồ sơ khách hàng.
+    \item Tài khoản khách hàng được liên kết với bản ghi người dùng hệ thống.
+    \item Một hoặc nhiều địa chỉ giao hàng của khách hàng.
+    \item Các đơn giao hàng do khách hàng tạo.
+    \item Các bản ghi xác nhận giao hàng của những đơn đã hoàn thành.
+\end{itemize}
+
+\subsection{Điều phối viên}
+
+Điều phối viên là nhân viên chịu trách nhiệm xem xét và lập lịch các đơn giao hàng. Cơ sở dữ liệu phải cung cấp cho tác nhân này quyền truy cập vào:
+\begin{itemize}
+    \item Các đơn giao hàng đang chờ xem xét.
+    \item Trạng thái hiện tại và lịch sử trạng thái của đơn hàng.
+    \item Các bản ghi hoạt động giao hàng, bao gồm việc phân công máy bay không người lái.
+    \item Thông tin lập lịch lại đối với những lần giao hàng thất bại hoặc bị hủy.
+\end{itemize}
+
+\subsection{Nhân viên vận hành trạm}
+
+Nhân viên vận hành trạm quản lý các trạm hạ cánh vật lý được sử dụng trong hoạt động giao hàng. Dữ liệu liên quan bao gồm:
+\begin{itemize}
+    \item Thông tin định danh và vị trí trạm hạ cánh.
+    \item Trạng thái hiện tại và sức chứa của trạm.
+    \item Các bản ghi lịch sử trạng thái trạm.
+    \item Việc phân công nhân viên vận hành với các trạm được chỉ định.
+    \item Các sự kiện của kiện hàng tại trạm, bao gồm tiếp nhận, xác nhận lấy hàng, chất hàng và dỡ hàng.
+    \item Các hoạt động giao hàng khởi hành từ hoặc kết thúc tại một trạm nhất định.
+\end{itemize}
+
+\subsection{Quản lý logistics}
+
+Quản lý logistics giám sát hoạt động tổng thể và sử dụng dữ liệu cho báo cáo, phân tích. Dữ liệu liên quan bao gồm:
+\begin{itemize}
+    \item Dữ liệu tổng hợp về đơn hàng và hoạt động giao hàng.
+    \item Các bản ghi theo dõi tiến độ giao hàng và quỹ đạo bay.
+    \item Các bản ghi ngoại lệ, sự cố và thất bại trong giao hàng.
+    \item Các chỉ số vận hành trạm và việc phân công nhân viên.
+    \item Dữ liệu cần thiết cho báo cáo hoạt động và phân tích có hỗ trợ của trí tuệ nhân tạo.
+\end{itemize}
+
+\subsection{Quản trị viên hệ thống}
+
+Quản trị viên hệ thống quản lý các khía cạnh kỹ thuật của hệ thống. Dữ liệu liên quan bao gồm:
+\begin{itemize}
+    \item Tài khoản người dùng hệ thống và trạng thái tài khoản.
+    \item Việc gán vai trò và quyền hạn.
+    \item Các bản ghi nhật ký kiểm toán đối với mọi thao tác quan trọng trong hệ thống.
+\end{itemize}
+
+\section{Yêu cầu chức năng}\label{s:functional}
+
+Phần này mô tả những chức năng chính mà nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo phải hỗ trợ từ góc nhìn cơ sở dữ liệu. Các yêu cầu chức năng được phân nhóm theo những phân hệ cốt lõi của hệ thống.
+
+\subsection{Quản lý người dùng}
+
+Phân hệ quản lý người dùng xử lý việc đăng ký tài khoản, xác thực và kiểm soát truy cập theo vai trò cho tất cả tác nhân hệ thống.
+\begin{enumerate}
+    \item Hệ thống phải cho phép khách hàng đăng ký và quản lý tài khoản của mình.
+    \item Hệ thống phải cho phép quản trị viên tạo, cập nhật và vô hiệu hóa tài khoản nhân viên, bao gồm điều phối viên, nhân viên vận hành trạm và quản lý logistics.
+    \item Hệ thống phải xác thực người dùng thông qua cơ chế đăng nhập an toàn sử dụng mật khẩu đã được băm.
+    \item Hệ thống phải gán vai trò và quyền hạn cho từng tài khoản, đồng thời giới hạn quyền truy cập chức năng theo vai trò đó.
+    \item Hệ thống phải cho phép người dùng xem và cập nhật thông tin hồ sơ cá nhân.
+\end{enumerate}
+Phân hệ này yêu cầu cơ sở dữ liệu lưu thông tin xác thực tài khoản (\texttt{system\_user}), vai trò (\texttt{role}), quyền hạn (\texttt{permission}) và các bảng liên kết tương ứng (\texttt{user\_role}, \texttt{role\_permission}).
+
+\subsection{Quản lý khách hàng và đơn giao hàng}
+
+Phân hệ này hỗ trợ quản lý thông tin khách hàng và các đơn giao hàng.
+\begin{enumerate}
+    \item Hệ thống phải cho phép khách hàng quản lý một hoặc nhiều địa chỉ giao hàng, bao gồm đặt địa chỉ mặc định và lưu tọa độ địa lý.
+    \item Hệ thống phải cho phép khách hàng tạo yêu cầu giao hàng bằng cách cung cấp địa chỉ, thời gian mong muốn và thông tin vật lý của kiện hàng.
+    \item Hệ thống phải cho phép điều phối viên xem xét, phê duyệt hoặc từ chối các yêu cầu đã gửi.
+    \item Hệ thống phải cho phép khách hàng và nhân viên xem trạng thái hiện tại cùng toàn bộ lịch sử của đơn giao hàng.
+    \item Hệ thống phải cho phép sửa đổi hoặc hủy đơn giao hàng trước khi đơn được lập lịch.
+\end{enumerate}
+Phân hệ này yêu cầu cơ sở dữ liệu lưu hồ sơ khách hàng (\texttt{customer}), địa chỉ giao hàng (\texttt{customer\_address}), đơn giao hàng (\texttt{delivery\_order}), thông tin kiện hàng (\texttt{package}) và lịch sử trạng thái đơn (\texttt{order\_status\_history}).
+
+\subsection{Quy trình và thực hiện giao hàng}
+
+Phân hệ này hỗ trợ lập lịch, thực hiện và xác nhận các hoạt động giao hàng.
+\begin{enumerate}
+    \item Hệ thống phải cho phép điều phối viên lập lịch cho một đơn đã được phê duyệt bằng cách tạo hoạt động giao hàng, chọn trạm lấy hàng và trạm đích, đồng thời phân công một máy bay không người lái đang sẵn sàng hoạt động.
+    \item Hệ thống phải kiểm tra để bảo đảm tổng khối lượng kiện hàng không vượt quá tải trọng của máy bay được phân công.
+    \item Hệ thống phải ghi nhận các sự kiện kiện hàng tại trạm, bảo đảm việc lấy và chất hàng đã được một nhân viên được phân công tại trạm xác nhận trước khi máy bay khởi hành.
+    \item Hệ thống phải ghi nhận dữ liệu đo từ xa và thông tin theo dõi thời gian thực phát sinh trong quá trình giao hàng.
+    \item Hệ thống phải cho phép xác nhận khi bàn giao thành công, bao gồm thông tin người nhận, phương thức xác nhận và khóa tham chiếu bằng chứng số.
+    \item Hệ thống phải ghi nhận các lần giao hàng thất bại cùng nguyên nhân ngoại lệ đầy đủ và hỗ trợ lập lịch lại bằng cách tạo một hoạt động giao hàng mới có liên kết.
+\end{enumerate}
+Phân hệ này yêu cầu cơ sở dữ liệu lưu hoạt động giao hàng (\texttt{delivery\_activity}), sự kiện kiện hàng tại trạm (\texttt{package\_station\_event}), bản ghi theo dõi (\texttt{tracking\_record}), xác nhận giao hàng (\texttt{delivery\_confirmation}) và ngoại lệ giao hàng (\texttt{delivery\_exception}).
+
+\subsection{Quản lý trạm hạ cánh và nhân viên vận hành}
+
+Phân hệ này hỗ trợ quản lý các trạm hạ cánh và nhân sự vận hành trạm được sử dụng trong quá trình giao hàng.
+\begin{enumerate}
+    \item Hệ thống phải cho phép nhân viên vận hành đăng ký và cập nhật thông tin trạm hạ cánh, bao gồm tọa độ địa lý và sức chứa.
+    \item Hệ thống phải ghi nhận việc phân công nhân viên vào trạm, bảo đảm chỉ nhân viên được phân công mới được thực hiện thao tác tại trạm.
+    \item Hệ thống phải giám sát khả năng hoạt động của trạm và ghi lại mọi thay đổi trạng thái, chẳng hạn bảo trì hoặc giới hạn sức chứa, trong một lịch sử không thể sửa đổi.
+\end{enumerate}
+Phân hệ này yêu cầu cơ sở dữ liệu lưu trạm hạ cánh (\texttt{landing\_station}), lịch sử trạng thái trạm (\texttt{station\_status\_history}) và việc phân công nhân viên vận hành trạm (\texttt{station\_operator\_assignment}).
+
+\subsection{Bảng điều khiển và dịch vụ hỗ trợ bởi trí tuệ nhân tạo}
+
+Phân hệ này cung cấp chức năng giám sát hoạt động và hỗ trợ bằng trí tuệ nhân tạo cho quản lý logistics và điều phối viên.
+\begin{enumerate}
+    \item Hệ thống phải cung cấp bảng điều khiển hiển thị trạng thái của đơn giao hàng, máy bay không người lái và trạm hạ cánh.
+    \item Hệ thống phải lưu các đề xuất do trí tuệ nhân tạo tạo ra cho việc lựa chọn máy bay, lập kế hoạch tuyến đường và dự kiến thời gian đến (ETA).
+    \item Hệ thống phải cung cấp các phân tích hoạt động dựa trên dữ liệu lịch sử giao hàng và theo dõi.
+\end{enumerate}
+Phân hệ này yêu cầu cơ sở dữ liệu lưu dữ liệu hoạt động lịch sử, các tuyến đường dự kiến (\texttt{delivery\_route}, \texttt{route\_point}) và kết quả đề xuất của trí tuệ nhân tạo (\texttt{ai\_recommendation}). Cơ sở dữ liệu không lưu trọng số mô hình hoặc mã nguồn trí tuệ nhân tạo.
+
+\section{Yêu cầu phi chức năng}\label{s:nonfunctional}
+
+Bên cạnh các yêu cầu chức năng, hệ thống phải đáp ứng một số yêu cầu phi chức năng có ảnh hưởng trực tiếp đến các quyết định thiết kế cơ sở dữ liệu.
+
+\subsection{Bảo mật}
+Hệ thống phải cung cấp cơ chế xác thực an toàn và phân quyền theo vai trò. Thông tin xác thực nhạy cảm phải được lưu dưới dạng giá trị băm mật mã (\texttt{password\_hash}). Thiết kế cơ sở dữ liệu phải thực thi kiểm soát truy cập thông qua các quyền hạn quan hệ và ngăn chặn truy cập trái phép vào dữ liệu khách hàng cũng như dữ liệu vận hành.
+
+\subsection{Hiệu năng}
+Hệ thống được kỳ vọng cung cấp thời gian phản hồi dưới ba giây đối với các truy vấn vận hành thông thường. Cần triển khai chỉ mục có chọn lọc, kiểu dữ liệu phù hợp và lược đồ không dư thừa để hỗ trợ ghi dữ liệu đo từ xa với thông lượng cao và tra cứu nhanh.
+
+\subsection{Tính đồng thời}
+Hệ thống phải hỗ trợ đồng thời nhiều người dùng, điều phối viên và tiến trình tự động tiếp nhận dữ liệu đo từ xa mà vẫn duy trì tính nhất quán nghiêm ngặt. Giao dịch và ràng buộc phải ngăn ngừa các điều kiện tranh chấp, chẳng hạn phân công cùng một máy bay cho hai chuyến bay có thời gian chồng lấn.
+
+\subsection{Tích hợp}
+Cơ sở dữ liệu đóng vai trò nền tảng lưu trữ bền vững cho các API RESTful và dịch vụ hướng sự kiện. Các khóa lưu trữ đối tượng (\texttt{evidence\_object\_key}) được lưu để liên kết với hệ thống lưu trữ đối tượng bên ngoài (MinIO/S3), tránh làm PostgreSQL phình to bởi các tệp nhị phân.
+
+\subsection{Khả năng mở rộng và bảo trì}
+Thiết kế cơ sở dữ liệu phải có tính mô-đun và tuân thủ Dạng chuẩn thứ ba (3NF), cho phép mở rộng chức năng trong tương lai, chẳng hạn lịch bảo trì hoặc tuyến đường nhiều chặng, mà không phá vỡ các lược đồ quan hệ hiện có.
+
+\subsection{Kiểm toán và khả năng truy vết}
+Hệ thống phải duy trì khả năng kiểm toán đầy đủ. Một bảng nhật ký kiểm toán chỉ cho phép ghi nối tiếp phải lưu tác nhân, loại thao tác, thực thể, giá trị thay đổi và thời điểm của tất cả thay đổi dữ liệu quan trọng.
+
+\section{Quy trình nghiệp vụ}\label{s:process}
+
+Quy trình nghiệp vụ chính của hệ thống được trình bày trong bảng sau:
+
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{1.2cm}|p{4cm}|p{8.5cm}|}
+\hline
+\textbf{Bước} & \textbf{Giai đoạn} & \textbf{Mô tả nghiệp vụ} \\ \hline
+\endfirsthead
+
+\hline
+\textbf{Bước} & \textbf{Giai đoạn} & \textbf{Mô tả nghiệp vụ} \\ \hline
+\endhead
+
+1 &
+Đề xuất bằng trợ lý AI &
+Khách hàng tạo yêu cầu giao hàng. Hệ thống lưu đơn ở trạng thái
+\texttt{PENDING}, sau đó AI đề xuất máy bay, trạm và thời gian giao hàng
+dự kiến trong bảng \texttt{ai\_recommendation}. \\ \hline
+
+2 &
+Xem xét và phê duyệt &
+Điều phối viên kiểm tra yêu cầu và đề xuất của AI. Đơn hàng được chuyển
+sang trạng thái \texttt{APPROVED} nếu được chấp nhận hoặc
+\texttt{REJECTED} nếu bị từ chối. \\ \hline
+
+3 &
+Lập lịch và phân công &
+Điều phối viên tạo một lần thực hiện giao hàng trong
+\texttt{delivery\_activity}, liên kết đơn hàng với máy bay, trạm khởi hành
+và trạm đích. Trạng thái thực hiện được chuyển thành
+\texttt{ASSIGNED}. \\ \hline
+
+4 &
+Xử lý tại trạm và lấy kiện hàng &
+Kiện hàng được đưa đến trạm khởi hành. Nhân viên xác nhận các sự kiện
+như \texttt{PICKUP\_CONFIRMED} và \texttt{LOADED} trong
+\texttt{package\_station\_event}. \\ \hline
+
+5 &
+Thực hiện chuyến bay và theo dõi &
+Máy bay chuyển sang trạng thái \texttt{IN\_TRANSIT}. Các thông tin như
+tọa độ, độ cao, tốc độ và mức pin được lưu trong
+\texttt{tracking\_record}. \\ \hline
+
+6 &
+Xác nhận giao hàng và thử lại khi cần &
+Khi giao thành công, hệ thống lưu bằng chứng trong
+\texttt{delivery\_confirmation}. Nếu giao thất bại, hệ thống có thể tạo
+lần thực hiện mới và liên kết với lần trước bằng
+\texttt{previous\_activity\_id}. \\ \hline
+
+\end{longtable}
+\renewcommand{\arraystretch}{1}
 \section{Quy tắc nghiệp vụ}
 \label{s:rules} 
 
@@ -59,36 +261,75 @@ BR-39 & Kiểm toán và truy vết & Lịch sử trạng thái nghiệp vụ v�
 
 
 \section{Yêu cầu dữ liệu}
-\label{s:datareq}
 
-Dựa trên các yêu cầu hệ thống và ba mươi chín quy tắc nghiệp vụ, cơ sở dữ liệu phải quản lý những nhóm dữ liệu chính sau.
+Các nhóm dữ liệu chính mà hệ thống cần lưu trữ được trình bày trong bảng sau:
 
-\subsection{Dữ liệu người dùng và phân quyền}
-Lưu thông tin xác thực, trạng thái tài khoản, vai trò, quyền hạn và các phép gán vai trò/quyền hạn nhiều--nhiều (\texttt{system\_user}, \texttt{role}, \texttt{permission}, \texttt{user\_role}, \texttt{role\_permission}).
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.8cm}|p{4.3cm}|p{5.8cm}|}
+\hline
+\textbf{Nhóm dữ liệu} & 
+\textbf{Bảng/thực thể liên quan} &
+\textbf{Nội dung cần lưu trữ} \\ \hline
+\endfirsthead
 
-\subsection{Dữ liệu khách hàng và địa chỉ}
-Lưu hồ sơ khách hàng và một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm địa chỉ đường phố, đơn vị hành chính và tọa độ địa lý phục vụ định vị (\texttt{customer}, \texttt{customer\_address}).
+\hline
+\textbf{Nhóm dữ liệu} &
+\textbf{Bảng/thực thể liên quan} &
+\textbf{Nội dung cần lưu trữ} \\ \hline
+\endhead
 
-\subsection{Dữ liệu đơn giao hàng và kiện hàng}
-Lưu đơn giao hàng của khách hàng, thời gian giao mong muốn, thời gian đến dự kiến, thời điểm hoàn thành, cùng kích thước và khối lượng chi tiết của kiện hàng (\texttt{delivery\_order}, \texttt{package}, \texttt{order\_status\_history}).
+Người dùng và phân quyền &
+\texttt{system\_user}, \texttt{role}, \texttt{permission},
+\texttt{user\_role}, \texttt{role\_permission} &
+Thông tin tài khoản, trạng thái người dùng, vai trò, quyền hạn và quan hệ
+nhiều--nhiều giữa người dùng, vai trò và quyền. \\ \hline
 
-\subsection{Dữ liệu máy bay và trạm}
-Lưu thông số vật lý, trạng thái vận hành, mức pin của máy bay; tọa độ, sức chứa, lịch sử chuyển trạng thái của trạm; và việc phân công nhân viên vận hành (\texttt{drone}, \texttt{landing\_station}, \texttt{station\_status\_history}, \texttt{station\_operator\_assignment}).
+Khách hàng và địa chỉ &
+\texttt{customer}, \texttt{customer\_address} &
+Hồ sơ khách hàng và một hoặc nhiều địa chỉ giao hàng, bao gồm nhãn địa
+chỉ, nội dung địa chỉ và tọa độ địa lý. \\ \hline
 
-\subsection{Dữ liệu hoạt động giao hàng và sự kiện}
-Lưu từng lần thực hiện giao hàng riêng biệt, việc phân công máy bay, trạm khởi hành/đích, liên kết tới hoạt động trước khi lập lịch lại và các sự kiện xử lý kiện hàng tại trạm (\texttt{delivery\_activity}, \texttt{package\_station\_event}).
+Đơn giao hàng và kiện hàng &
+\texttt{delivery\_order}, \texttt{package},
+\texttt{order\_status\_history} &
+Thông tin yêu cầu giao hàng, trạng thái đơn, lịch sử thay đổi trạng thái
+và thông tin vật lý của từng kiện hàng. \\ \hline
 
-\subsection{Dữ liệu theo dõi và ngoại lệ}
-Lưu dữ liệu đo từ xa tần suất cao trong chuyến bay gồm tọa độ, độ cao, tốc độ và pin; đồng thời lưu các sự cố, nhóm lỗi và phương án xử lý (\texttt{tracking\_record}, \texttt{delivery\_exception}).
+Máy bay và trạm hạ cánh &
+\texttt{drone}, \texttt{landing\_station},
+\texttt{station\_status\_history},
+\texttt{station\_operator\_assignment} &
+Thông số máy bay, trạng thái vận hành, thông tin trạm và việc phân công
+nhân viên vận hành tại trạm. \\ \hline
 
-\subsection{Dữ liệu xác nhận}
-Lưu bằng chứng giao hàng chính thức, tên và số liên hệ của người nhận, phương thức xác nhận cùng khóa lưu trữ đối tượng cho chữ ký số hoặc hình ảnh (\texttt{delivery\_confirmation}).
+Hoạt động giao hàng và sự kiện &
+\texttt{delivery\_activity}, \texttt{package\_station\_event} &
+Thông tin từng lần thực hiện giao hàng, máy bay được phân công, trạm
+khởi hành, trạm đích và các sự kiện xử lý kiện hàng tại trạm. \\ \hline
 
-\subsection{Dữ liệu tuyến đường và đề xuất của trí tuệ nhân tạo}
-Lưu các điểm hành trình dự kiến và đầu ra đề xuất của trí tuệ nhân tạo, bao gồm lựa chọn máy bay, dự đoán thời lượng và điểm tin cậy (\texttt{delivery\_route}, \texttt{route\_point}, \texttt{ai\_recommendation}).
+Theo dõi và ngoại lệ &
+\texttt{tracking\_record}, \texttt{delivery\_exception} &
+Dữ liệu tọa độ, độ cao, tốc độ, mức pin và các sự cố hoặc ngoại lệ phát
+sinh trong quá trình giao hàng. \\ \hline
 
-\subsection{Dữ liệu kiểm toán}
-Bảo toàn dấu vết kiểm toán không thể sửa đổi, gồm mã tác nhân, loại thao tác, tên bảng, mã bản ghi bị tác động, ảnh chụp JSON trước/sau và địa chỉ IP (\texttt{audit\_log}).
+Xác nhận giao hàng &
+\texttt{delivery\_confirmation} &
+Thông tin người nhận, thời điểm xác nhận, mã bằng chứng và kết quả giao
+hàng thành công. \\ \hline
+
+Tuyến đường và đề xuất AI &
+\texttt{delivery\_route}, \texttt{route\_point},
+\texttt{ai\_recommendation} &
+Tuyến đường dự kiến, các điểm trên hành trình và kết quả đề xuất máy
+bay, trạm hoặc thời gian giao hàng từ mô hình AI. \\ \hline
+
+Dữ liệu kiểm toán &
+\texttt{audit\_log} &
+Nhật ký thao tác, đối tượng bị thay đổi, giá trị cũ, giá trị mới, người
+thực hiện và thời điểm thực hiện. \\ \hline
+
+\end{longtable}
+\renewcommand{\arraystretch}{1}
 
 
 \section{Truy vết từ yêu cầu đến thực thể}\label{s:traceability}

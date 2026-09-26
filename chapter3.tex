@@ -98,346 +98,151 @@ Ví dụ: O100 là một yêu cầu. A1 được giao cho D3 nhưng thất bại
 Chuỗi các bước thiết kế:
 \subsection{Xác định thực thể}\label{s:entities}
 
-Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể sau được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành.
+Dựa trên yêu cầu và quy tắc nghiệp vụ, các thực thể được chia thành các nhóm chức năng như sau:
 
-\paragraph{1. Nhóm người dùng và phân quyền.}
-\begin{itemize}
-    \item \textbf{system\_user} — Lưu thông tin xác thực và trạng thái tài khoản của mọi tác nhân; tên bảng tránh sử dụng từ khóa dành riêng của SQL.
-    \item \textbf{role} — Xác định các vai trò vận hành tiêu chuẩn (\texttt{CUSTOMER}, \texttt{DISPATCHER}, \texttt{STATION\_OPERATOR}, \texttt{LOGISTICS\_MANAGER}, \texttt{SYSTEM\_ADMIN}).
-    \item \textbf{permission} — Xác định các quyền hạn chi tiết, chẳng hạn \texttt{CREATE\_ORDER}, \texttt{ASSIGN\_DRONE}, \texttt{CONFIRM\_PICKUP}.
-    \item \textbf{user\_role} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa người dùng và vai trò.
-    \item \textbf{role\_permission} — Bảng liên kết triển khai mối quan hệ nhiều--nhiều giữa vai trò và quyền hạn.
-\end{itemize}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{1cm}|p{4cm}|p{8.5cm}|}
+\hline
+\textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Các thực thể} \\ \hline
+\endfirsthead
 
-\paragraph{2. Nhóm khách hàng và địa chỉ.}
-\begin{itemize}
-    \item \textbf{customer} — Lưu thông tin hồ sơ khách hàng và có thể liên kết với một tài khoản người dùng hệ thống.
-    \item \textbf{customer\_address} — Lưu một hoặc nhiều địa chỉ giao hàng của mỗi khách hàng, bao gồm tọa độ địa lý chính xác phục vụ định vị cho máy bay không người lái.
-\end{itemize}
+\hline
+\textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Các thực thể} \\ \hline
+\endhead
 
-\paragraph{3. Nhóm đơn giao hàng và kiện hàng.}
-\begin{itemize}
-    \item \textbf{delivery\_order} — Đại diện cho yêu cầu giao hàng của khách hàng, lưu thời gian khách hàng mong muốn, thời gian đến dự kiến và trạng thái vòng đời.
-    \item \textbf{package} — Lưu thông số vật lý của kiện hàng (khối lượng và kích thước tính bằng centimét) thuộc một đơn hàng.
-    \item \textbf{order\_status\_history} — Bản ghi chỉ cho phép ghi nối tiếp, lưu mọi lần chuyển trạng thái của đơn giao hàng.
-\end{itemize}
+1 &
+Người dùng và phân quyền &
+\texttt{system\_user}, \texttt{role}, \texttt{permission},
+\texttt{user\_role}, \texttt{role\_permission}. \\ \hline
 
-\paragraph{4. Nhóm quản lý trạm hạ cánh và máy bay.}
-\begin{itemize}
-    \item \textbf{landing\_station} — Lưu các trạm cất/hạ cánh vật lý, tọa độ và sức chứa máy bay.
-    \item \textbf{station\_status\_history} — Lưu lịch sử chuyển trạng thái trạm, chẳng hạn trạng thái bảo trì hoặc sẵn sàng.
-    \item \textbf{station\_operator\_assignment} — Lưu việc phân công nhân viên vận hành vào trạm trong những khoảng thời gian xác định.
-    \item \textbf{drone} — Lưu số sê-ri, mẫu, trạng thái vận hành, mức pin và tải trọng của máy bay không người lái.
-\end{itemize}
+2 &
+Khách hàng và địa chỉ &
+\texttt{customer}, \texttt{customer\_address}. \\ \hline
 
-\paragraph{5. Nhóm thực hiện giao hàng và dữ liệu đo từ xa.}
-\begin{itemize}
-    \item \textbf{delivery\_activity} — Thực thể vận hành trung tâm đại diện cho từng lần thực hiện một đơn hàng, liên kết máy bay, trạm khởi hành và trạm đích.
-    \item \textbf{package\_station\_event} — Lưu các sự kiện xử lý vật lý của kiện hàng tại trạm hạ cánh như tiếp nhận, xác nhận lấy hàng, chất hàng và dỡ hàng.
-    \item \textbf{tracking\_record} — Lưu dữ liệu GPS và dữ liệu đo từ xa tần suất cao được thu thập trong chuyến bay.
-    \item \textbf{delivery\_exception} — Lưu các thất bại, bất thường hoặc gián đoạn của chuyến bay trong một hoạt động giao hàng.
-\end{itemize}
+3 &
+Đơn hàng và kiện hàng &
+\texttt{delivery\_order}, \texttt{package},
+\texttt{order\_status\_history}. \\ \hline
 
-\paragraph{6. Nhóm xác nhận giao hàng.}
-\begin{itemize}
-    \item \textbf{delivery\_confirmation} — Lưu bằng chứng bàn giao chính thức sau khi giao hàng thành công, liên kết 1:0..1 với đơn hàng và tham chiếu tới bằng chứng số trong kho lưu trữ đối tượng.
-\end{itemize}
+4 &
+Trạm hạ cánh và máy bay &
+\texttt{landing\_station}, \texttt{station\_status\_history},
+\texttt{station\_operator\_assignment}, \texttt{drone}. \\ \hline
 
-\paragraph{7. Nhóm kiểm toán, tuyến đường và hỗ trợ trí tuệ nhân tạo.}
-\begin{itemize}
-    \item \textbf{audit\_log} — Dấu vết kiểm toán hệ thống không thể sửa đổi, lưu thao tác người dùng, ảnh chụp JSON trước/sau và địa chỉ IP.
-    \item \textbf{delivery\_route} — Lưu siêu dữ liệu về đường bay dự kiến của một hoạt động giao hàng.
-    \item \textbf{route\_point} — Lưu các điểm hành trình có thứ tự trên một tuyến giao hàng dự kiến.
-    \item \textbf{ai\_recommendation} — Lưu bền vững đầu ra của các mô hình đề xuất bằng trí tuệ nhân tạo, gồm đề xuất máy bay và dự đoán ETA.
-\end{itemize}
+5 &
+Thực hiện giao hàng &
+\texttt{delivery\_activity}, \texttt{package\_station\_event},
+\texttt{tracking\_record}, \texttt{delivery\_exception}. \\ \hline
 
-\subsection{Thuộc tính của thực thể}\label{s:attributes}
+6 &
+Xác nhận giao hàng &
+\texttt{delivery\_confirmation}. \\ \hline
 
-Phần này xác định các thuộc tính và kiểu dữ liệu của từng thực thể.
+7 &
+Kiểm toán, tuyến đường và AI &
+\texttt{audit\_log}, \texttt{delivery\_route},
+\texttt{route\_point}, \texttt{ai\_recommendation}. \\ \hline
 
-\paragraph{system\_user.}
-Lưu thông tin xác thực tài khoản và trạng thái xác thực người dùng.
-\begin{itemize}
-    \item \texttt{user\_id} — Khóa chính (\texttt{BIGINT GENERATED ALWAYS AS IDENTITY}).
-    \item \texttt{username} — Tên đăng nhập duy nhất (\texttt{VARCHAR(100)}).
-    \item \texttt{password\_hash} — Giá trị băm mật mã của mật khẩu (\texttt{VARCHAR(255)}).
-    \item \texttt{email} — Địa chỉ thư điện tử duy nhất (\texttt{VARCHAR(255)}).
-    \item \texttt{phone\_number} — Số điện thoại duy nhất (\texttt{VARCHAR(20)}).
-    \item \texttt{is\_active} — Cờ cho biết tài khoản đang hoạt động (\texttt{BOOLEAN}).
-    \item \texttt{created\_at}, \texttt{updated\_at} — Các mốc thời gian kiểm toán tài khoản (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{role.}
-Xác định các vai trò trong hệ thống.
-\begin{itemize}
-    \item \texttt{role\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{role\_name} — Mã vai trò duy nhất (\texttt{VARCHAR(50)}).
-    \item \texttt{description} — Mô tả trách nhiệm của vai trò (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{permission.}
-Xác định các quyền chức năng.
-\begin{itemize}
-    \item \texttt{permission\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{permission\_name} — Mã quyền hạn duy nhất (\texttt{VARCHAR(100)}).
-    \item \texttt{description} — Nội dung giải thích quyền hạn (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{user\_role.}
-Liên kết người dùng với các vai trò.
-\begin{itemize}
-    \item \texttt{user\_id}, \texttt{role\_id} — Khóa chính ghép và đồng thời là các khóa ngoại.
-    \item \texttt{assigned\_at} — Thời điểm gán vai trò (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{role\_permission.}
-Liên kết vai trò với các quyền hạn.
-\begin{itemize}
-    \item \texttt{role\_id}, \texttt{permission\_id} — Khóa chính ghép và đồng thời là các khóa ngoại.
-\end{itemize}
-
-\paragraph{customer.}
-Lưu hồ sơ khách hàng.
-\begin{itemize}
-    \item \texttt{customer\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT UNIQUE NULL}).
-    \item \texttt{customer\_name} — Họ và tên (\texttt{VARCHAR(100)}).
-    \item \texttt{phone\_number} — Số điện thoại liên hệ chính (\texttt{VARCHAR(20) UNIQUE}).
-    \item \texttt{email} — Thư điện tử liên hệ (\texttt{VARCHAR(255) UNIQUE}).
-    \item \texttt{created\_at} — Thời điểm đăng ký (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{customer\_address.}
-Lưu các địa điểm giao hàng của khách hàng.
-\begin{itemize}
-    \item \texttt{address\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Khóa ngoại tham chiếu \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{address\_label} — Nhãn như ``Nhà'' hoặc ``Văn phòng'' (\texttt{VARCHAR(50)}).
-    \item \texttt{address\_line} — Địa chỉ đường phố (\texttt{VARCHAR(255) NOT NULL}).
-    \item \texttt{ward}, \texttt{district}, \texttt{city} — Các đơn vị hành chính (\texttt{VARCHAR(100)}).
-    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
-    \item \texttt{is\_default} — Cờ địa chỉ mặc định (\texttt{BOOLEAN NOT NULL DEFAULT FALSE}).
-    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{delivery\_order.}
-Đại diện cho các yêu cầu giao hàng.
-\begin{itemize}
-    \item \texttt{order\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{customer\_id} — Khóa ngoại tham chiếu \texttt{customer} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{delivery\_address\_id} — Khóa ngoại tham chiếu \texttt{customer\_address} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{order\_status} — Trạng thái vòng đời hiện tại (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{requested\_delivery\_time} — Thời gian giao hàng khách hàng mong muốn (\texttt{TIMESTAMPTZ}).
-    \item \texttt{estimated\_arrival\_at} — Thời gian đến do hệ thống dự kiến (\texttt{TIMESTAMPTZ}).
-    \item \texttt{created\_at} — Thời điểm tạo đơn (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{completed\_at}, \texttt{cancelled\_at} — Các thời điểm kết thúc (\texttt{TIMESTAMPTZ}).
-    \item \texttt{cancellation\_reason} — Nội dung giải thích nếu đơn bị hủy (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{package.}
-Lưu thông số kiện hàng.
-\begin{itemize}
-    \item \texttt{package\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{description} — Mô tả nội dung kiện hàng (\texttt{VARCHAR(500)}).
-    \item \texttt{weight\_kg} — Khối lượng tính bằng kilôgam (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{length\_cm}, \texttt{width\_cm}, \texttt{height\_cm} — Kích thước tính bằng centimét (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{package\_status} — Mã trạng thái (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{order\_status\_history.}
-Duy trì lịch sử vòng đời đơn hàng không thể sửa đổi.
-\begin{itemize}
-    \item \texttt{status\_history\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Giá trị trạng thái được ghi nhận (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Lý do chuyển trạng thái (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Thời điểm chuyển trạng thái (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{landing\_station.}
-Lưu các trạm hạ cánh vật lý.
-\begin{itemize}
-    \item \texttt{station\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{station\_code} — Mã trạm duy nhất (\texttt{VARCHAR(50) UNIQUE NOT NULL}).
-    \item \texttt{station\_name} — Tên trạm dễ đọc (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{address} — Địa chỉ vật lý (\texttt{VARCHAR(255)}).
-    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
-    \item \texttt{capacity} — Sức chứa máy bay tối đa (\texttt{INTEGER >= 0}).
-    \item \texttt{status} — Trạng thái vận hành (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{station\_status\_history.}
-Duy trì lịch sử vận hành của trạm.
-\begin{itemize}
-    \item \texttt{history\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{status} — Trạng thái trạm được ghi nhận (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{changed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} (\texttt{BIGINT}).
-    \item \texttt{reason} — Lý do chuyển trạng thái (\texttt{VARCHAR(255)}).
-    \item \texttt{changed\_at} — Thời điểm chuyển trạng thái (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{station\_operator\_assignment.}
-Lưu việc bố trí nhân viên vận hành tại các trạm.
-\begin{itemize}
-    \item \texttt{assignment\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{user\_id} — Khóa ngoại tham chiếu \texttt{system\_user}, đại diện cho nhân viên vận hành (\texttt{BIGINT NOT NULL}).
-    \item \texttt{assigned\_from}, \texttt{assigned\_to} — Khoảng thời gian phân công có hiệu lực (\texttt{TIMESTAMPTZ}).
-    \item \texttt{is\_active} — Cờ cho biết phân công đang có hiệu lực (\texttt{BOOLEAN NOT NULL DEFAULT TRUE}).
-    \item \texttt{created\_at} — Thời điểm tạo phân công (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{drone.}
-Lưu thông số và trạng thái của máy bay không người lái.
-\begin{itemize}
-    \item \texttt{drone\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{serial\_number} — Mã định danh vật lý (\texttt{VARCHAR(100) UNIQUE NOT NULL}).
-    \item \texttt{model} — Tên mẫu máy bay (\texttt{VARCHAR(100)}).
-    \item \texttt{status} — Trạng thái vận hành (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{max\_payload\_kg} — Tải trọng tối đa (\texttt{NUMERIC(10,2) > 0}).
-    \item \texttt{battery\_level} — Mức pin hiện tại (\texttt{NUMERIC(5,2)}, từ 0 đến 100).
-    \item \texttt{station\_id} — Khóa ngoại tham chiếu trạm \texttt{landing\_station} hiện tại (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Thời điểm đăng ký (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-Lưu ý: Máy bay không lưu trực tiếp \texttt{order\_id}; việc phân công máy bay được thực hiện thông qua \texttt{delivery\_activity}.
-
-\paragraph{delivery\_activity.}
-Thực thể trung gian vận hành đại diện cho các lần thực hiện giao hàng.
-\begin{itemize}
-    \item \texttt{activity\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{drone\_id} — Khóa ngoại tham chiếu \texttt{drone} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{pickup\_station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} khởi hành (\texttt{BIGINT}).
-    \item \texttt{destination\_station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} đích (\texttt{BIGINT}).
-    \item \texttt{assigned\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện phân công (\texttt{BIGINT}).
-    \item \texttt{scheduled\_at} — Thời gian dự kiến thực hiện (\texttt{TIMESTAMPTZ}).
-    \item \texttt{activity\_status} — Trạng thái thực hiện (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{started\_at}, \texttt{ended\_at} — Các mốc thời gian thực hiện (\texttt{TIMESTAMPTZ}).
-    \item \texttt{previous\_activity\_id} — Khóa ngoại tự tham chiếu, liên kết với lần thực hiện thất bại trước đó (\texttt{BIGINT NULL}).
-    \item \texttt{created\_at} — Thời điểm tạo (\texttt{TIMESTAMPTZ}).
-\end{itemize}
-
-\paragraph{package\_station\_event.}
-Lưu quá trình xử lý kiện hàng tại các trạm.
-\begin{itemize}
-    \item \texttt{event\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{package\_id} — Khóa ngoại tham chiếu \texttt{package} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{station\_id} — Khóa ngoại tham chiếu \texttt{landing\_station} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{event\_type} — Loại sự kiện xử lý (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{performed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} là nhân viên vận hành trạm (\texttt{BIGINT}).
-    \item \texttt{occurred\_at} — Thời điểm xảy ra sự kiện (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Ghi chú vận hành (\texttt{VARCHAR(255)}).
-\end{itemize}
-
-\paragraph{tracking\_record.}
-Lưu dữ liệu đo từ xa tần suất cao trong chuyến bay.
-\begin{itemize}
-    \item \texttt{tracking\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{latitude}, \texttt{longitude} — Tọa độ (\texttt{NUMERIC(9,6)}).
-    \item \texttt{altitude\_m} — Độ cao tính bằng mét (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{speed\_kmh} — Tốc độ so với mặt đất tính bằng km/h (\texttt{NUMERIC(10,2) >= 0}).
-    \item \texttt{battery\_level} — Phần trăm pin (\texttt{NUMERIC(5,2)}).
-    \item \texttt{recorded\_at} — Thời điểm thu thập dữ liệu đo từ xa (\texttt{TIMESTAMPTZ NOT NULL}).
-\end{itemize}
-
-\paragraph{delivery\_confirmation.}
-Bằng chứng giao hàng chính thức.
-\begin{itemize}
-    \item \texttt{confirmation\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} thành công (\texttt{BIGINT UNIQUE NOT NULL}).
-    \item \texttt{confirmed\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện xác minh (\texttt{BIGINT}).
-    \item \texttt{receiver\_name} — Tên người nhận kiện hàng (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{receiver\_phone} — Số điện thoại liên hệ của người nhận (\texttt{VARCHAR(20)}).
-    \item \texttt{confirmation\_method} — Mã phương thức xác nhận (\texttt{VARCHAR(30) NOT NULL}).
-    \item \texttt{evidence\_object\_key} — Khóa lưu trữ đối tượng của bằng chứng chữ ký số/hình ảnh (\texttt{VARCHAR(255)}).
-    \item \texttt{confirmed\_at} — Thời điểm bàn giao (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{note} — Ghi chú giao hàng (\texttt{VARCHAR(500)}).
-\end{itemize}
-
-\paragraph{delivery\_exception.}
-Lưu các thất bại và sự cố chuyến bay.
-\begin{itemize}
-    \item \texttt{exception\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{exception\_type} — Nhóm sự cố (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{description} — Mô tả chi tiết sự cố (\texttt{TEXT}).
-    \item \texttt{detected\_at} — Thời điểm phát hiện sự cố (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{resolved\_at} — Thời điểm xử lý xong (\texttt{TIMESTAMPTZ}).
-    \item \texttt{resolved\_by} — Khóa ngoại tham chiếu \texttt{system\_user} thực hiện xử lý (\texttt{BIGINT}).
-    \item \texttt{resolution} — Mô tả biện pháp khắc phục (\texttt{TEXT}).
-\end{itemize}
-
-\paragraph{audit\_log.}
-Nhật ký kiểm toán bảo mật và thay đổi trên toàn hệ thống.
-\begin{itemize}
-    \item \texttt{log\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{user\_id} — Khóa ngoại tham chiếu tác nhân \texttt{system\_user} (\texttt{BIGINT NULL}).
-    \item \texttt{entity\_name} — Tên bảng đích (\texttt{VARCHAR(100) NOT NULL}).
-    \item \texttt{record\_id} — Khóa chính của bản ghi đích (\texttt{BIGINT}).
-    \item \texttt{action\_type} — Loại thao tác (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{old\_value}, \texttt{new\_value} — Ảnh chụp JSON trước/sau (\texttt{JSONB}).
-    \item \texttt{action\_time} — Thời điểm kiểm toán (\texttt{TIMESTAMPTZ NOT NULL}).
-    \item \texttt{ip\_address} — Địa chỉ mạng của máy khách (\texttt{INET}).
-\end{itemize}
-
-\paragraph{delivery\_route và route\_point.}
-Các quỹ đạo bay và điểm hành trình dự kiến.
-\begin{itemize}
-    \item \texttt{delivery\_route}: \texttt{route\_id} (PK), \texttt{activity\_id} (FK UNIQUE), \texttt{total\_distance\_km}, \texttt{estimated\_duration\_min}, \texttt{created\_at}.
-    \item \texttt{route\_point}: \texttt{route\_point\_id} (PK), \texttt{route\_id} (FK), \texttt{sequence\_number}, \texttt{latitude}, \texttt{longitude}, \texttt{altitude\_m}.
-\end{itemize}
-
-\paragraph{ai\_recommendation.}
-Đầu ra được lưu bền vững từ các dịch vụ phân tích bằng trí tuệ nhân tạo.
-\begin{itemize}
-    \item \texttt{recommendation\_id} — Khóa chính (\texttt{BIGINT}).
-    \item \texttt{order\_id} — Khóa ngoại tham chiếu \texttt{delivery\_order} (\texttt{BIGINT NOT NULL}).
-    \item \texttt{activity\_id} — Khóa ngoại tham chiếu \texttt{delivery\_activity} (\texttt{BIGINT NULL}).
-    \item \texttt{recommendation\_type} — Nhóm đề xuất (\texttt{VARCHAR(50) NOT NULL}).
-    \item \texttt{recommended\_drone\_id} — Khóa ngoại tham chiếu \texttt{drone} được đề xuất (\texttt{BIGINT NULL}).
-    \item \texttt{estimated\_duration\_min} — Số phút bay do mô hình dự kiến (\texttt{NUMERIC(10,2)}).
-    \item \texttt{confidence\_score} — Mức độ tin cậy (\texttt{NUMERIC(5,4)}, từ 0 đến 1).
-    \item \texttt{model\_version} — Mã phiên bản của dịch vụ trí tuệ nhân tạo (\texttt{VARCHAR(50)}).
-    \item \texttt{created\_at} — Thời điểm tạo đề xuất (\texttt{TIMESTAMPTZ}).
-\end{itemize}
+\end{longtable}
+\renewcommand{\arraystretch}{1}
 
 \subsection{Mối quan hệ và bản số}\label{s:relationships}
 
-Mối quan hệ và bản số giữa hai mươi ba thực thể được xác định như sau, tuân thủ nghiêm ngặt các quy tắc nghiệp vụ:
+Các mối quan hệ chính giữa các thực thể được trình bày trong bảng sau:
 
-\begin{itemize}
-    \item \textbf{customer} 1 : N \textbf{customer\_address} — Một khách hàng sở hữu nhiều địa chỉ; mỗi địa chỉ thuộc về chính xác một khách hàng (BR-01).
-    \item \textbf{customer} 1 : N \textbf{delivery\_order} — Một khách hàng tạo nhiều đơn giao hàng; mỗi đơn thuộc về một khách hàng (BR-02).
-    \item \textbf{customer\_address} 1 : N \textbf{delivery\_order} — Một địa chỉ có thể là điểm đến của nhiều đơn; mỗi đơn chỉ định một địa chỉ đích (BR-03, BR-04).
-    \item \textbf{delivery\_order} 1 : N \textbf{package} — Một đơn chứa một hoặc nhiều kiện hàng; mỗi kiện hàng thuộc về một đơn (BR-06, BR-07).
-    \item \textbf{delivery\_order} 1 : N \textbf{order\_status\_history} — Một đơn tích lũy nhiều bản ghi lịch sử trạng thái (BR-10, BR-11).
-    \item \textbf{delivery\_order} 1 : N \textbf{delivery\_activity} — Một đơn có thể có nhiều lần thực hiện, gồm lần đầu và các lần được lập lịch lại (BR-19, BR-20).
-    \item \textbf{delivery\_order} 1 : 0..1 \textbf{delivery\_confirmation} — Một đơn có tối đa một xác nhận giao hàng thành công (BR-33).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_confirmation} — Một xác nhận gắn với chính xác một lần thực hiện giao hàng thành công (BR-35).
-    \item \textbf{delivery\_activity} 0..1 : 1 \textbf{delivery\_activity} — Hoạt động được lập lịch lại liên kết với lần thực hiện trước đó thông qua \texttt{previous\_activity\_id} (BR-22).
-    \item \textbf{drone} 1 : N \textbf{delivery\_activity} — Một máy bay phục vụ nhiều hoạt động giao hàng theo thời gian, nhưng tại mỗi thời điểm chỉ có một chuyến bay đang hoạt động (BR-15, BR-16).
-    \item \textbf{landing\_station} 1 : N \textbf{drone} — Một trạm có thể chứa nhiều máy bay đang đỗ (BR-25).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_status\_history} — Một trạm bảo toàn các thay đổi trạng thái vận hành (BR-26).
-    \item \textbf{landing\_station} 1 : N \textbf{station\_operator\_assignment} — Một trạm có nhiều lượt phân công nhân viên theo thời gian (BR-27).
-    \item \textbf{system\_user} 1 : N \textbf{station\_operator\_assignment} — Một người dùng là nhân viên vận hành có thể được phân công tới nhiều trạm theo thời gian (BR-27).
-    \item \textbf{package} 1 : N \textbf{package\_station\_event} — Một kiện hàng trải qua nhiều sự kiện xử lý tại trạm như tiếp nhận, lấy hàng và chất hàng (BR-29, BR-30).
-    \item \textbf{landing\_station} 1 : N \textbf{package\_station\_event} — Một trạm xử lý sự kiện của nhiều kiện hàng (BR-31).
-    \item \textbf{delivery\_activity} 1 : N \textbf{tracking\_record} — Mỗi hoạt động tạo ra một chuỗi điểm dữ liệu đo từ xa không thể sửa đổi (BR-12).
-    \item \textbf{delivery\_activity} 1 : N \textbf{delivery\_exception} — Một hoạt động có thể gặp không, một hoặc nhiều sự cố ngoại lệ (BR-13, BR-21).
-    \item \textbf{delivery\_activity} 1 : 0..1 \textbf{delivery\_route} — Một hoạt động có tối đa một tuyến đường dự kiến.
-    \item \textbf{delivery\_route} 1 : N \textbf{route\_point} — Một tuyến đường gồm một chuỗi điểm hành trình có thứ tự.
-    \item \textbf{delivery\_order} 1 : N \textbf{ai\_recommendation} — Theo thời gian, một đơn có thể nhận đề xuất từ nhiều mô hình trí tuệ nhân tạo.
-    \item \textbf{system\_user} N : N \textbf{role} — Được liên kết thông qua \textbf{user\_role}.
-    \item \textbf{role} N : N \textbf{permission} — Được liên kết thông qua \textbf{role\_permission}.
-    \item \textbf{system\_user} 1 : N \textbf{audit\_log} — Người dùng tạo các bản ghi nhật ký kiểm toán trong toàn hệ thống (BR-37, BR-38).
-\end{itemize}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|p{3.2cm}|p{1.5cm}|p{3.5cm}|p{6cm}|}
+\hline
+\textbf{Thực thể A} &
+\textbf{Bản số} &
+\textbf{Thực thể B} &
+\textbf{Ý nghĩa nghiệp vụ} \\ \hline
+\endfirsthead
+
+\hline
+\textbf{Thực thể A} &
+\textbf{Bản số} &
+\textbf{Thực thể B} &
+\textbf{Ý nghĩa nghiệp vụ} \\ \hline
+\endhead
+
+\texttt{customer} &
+1:N &
+\texttt{customer\_address} &
+Một khách hàng có thể có nhiều địa chỉ giao hàng. \\ \hline
+
+\texttt{customer} &
+1:N &
+\texttt{delivery\_order} &
+Một khách hàng có thể tạo nhiều đơn giao hàng. \\ \hline
+
+\texttt{delivery\_order} &
+1:N &
+\texttt{package} &
+Một đơn giao hàng có thể chứa nhiều kiện hàng. \\ \hline
+
+\texttt{delivery\_order} &
+1:N &
+\texttt{order\_status\_history} &
+Một đơn hàng có nhiều bản ghi lịch sử trạng thái. \\ \hline
+
+\texttt{delivery\_order} &
+1:N &
+\texttt{delivery\_activity} &
+Một đơn hàng có thể được thực hiện nhiều lần khi giao lại hoặc lập lịch lại. \\ \hline
+
+\texttt{drone} &
+1:N &
+\texttt{delivery\_activity} &
+Một máy bay có thể thực hiện nhiều hoạt động giao hàng theo thời gian. \\ \hline
+
+\texttt{landing\_station} &
+1:N &
+\texttt{delivery\_activity} &
+Một trạm có thể là trạm khởi hành hoặc trạm đích của nhiều hoạt động giao hàng. \\ \hline
+
+\texttt{delivery\_activity} &
+1:N &
+\texttt{tracking\_record} &
+Một lần thực hiện giao hàng sinh ra nhiều bản ghi theo dõi. \\ \hline
+
+\texttt{delivery\_activity} &
+1:N &
+\texttt{delivery\_exception} &
+Một lần giao hàng có thể phát sinh nhiều sự cố hoặc ngoại lệ. \\ \hline
+
+\texttt{package} &
+1:N &
+\texttt{package\_station\_event} &
+Một kiện hàng có thể trải qua nhiều sự kiện tại các trạm. \\ \hline
+
+\texttt{delivery\_order} &
+1:0..1 &
+\texttt{delivery\_confirmation} &
+Một đơn hàng có tối đa một xác nhận giao hàng thành công. \\ \hline
+
+\texttt{system\_user} &
+N:M &
+\texttt{role} &
+Quan hệ nhiều--nhiều được triển khai qua bảng \texttt{user\_role}. \\ \hline
+
+\texttt{role} &
+N:M &
+\texttt{permission} &
+Quan hệ nhiều--nhiều được triển khai qua bảng \texttt{role\_permission}. \\ \hline
+
+\texttt{delivery\_route} &
+1:N &
+\texttt{route\_point} &
+Một tuyến đường gồm nhiều điểm hành trình có thứ tự. \\ \hline
+
+\texttt{delivery\_order} &
+1:N &
+\texttt{ai\_recommendation} &
+Một đơn hàng có thể có nhiều kết quả đề xuất từ mô hình AI. \\ \hline
+
+\end{longtable}
+\renewcommand{\arraystretch}{1}
 
 \section{Thiết kế cơ sở dữ liệu mức logic}\label{s:logical}
 
@@ -467,7 +272,6 @@ Hình dưới đây trình bày tổng thể các thực thể, thuộc tính, k
     \label{fig:entity-attributes}
 \end{figure}
 
-\section{Thiết kế cơ sở dữ liệu mức logic}\label{s:logical}
 
 Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức khái niệm. Lược đồ quan hệ được trình bày theo ký hiệu chuẩn, trong đó khóa chính được ký hiệu là (PK), khóa ngoại là (FK) và ràng buộc duy nhất là UNIQUE.
 
