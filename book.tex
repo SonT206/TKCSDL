@@ -1,6 +1,6 @@
-% !TeX program = xelatex
-% !TeX encoding = UTF-8
-\documentclass[a4paper,11pt]{book}
+%!TeX program = xelatex
+%!TeX encoding = UTF-8
+\documentclass[a4paper,11pt,openany]{book}
 \usepackage{book}
 \bibliographystyle{book}
 
@@ -25,7 +25,7 @@
 \usepackage{tabularx}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{float}
+\newcommand{\code}[1]{\texttt{#1}}
 \begin{document}
 
 % Tên đề tài:
@@ -44,7 +44,12 @@
 \maketitle
 %-------MỤC LỤC-------%
 
+\begingroup
+\small
+\setlength{\cftbeforechapskip}{2pt}
+\setlength{\cftbeforesecskip}{0pt}
 \tableofcontents
+\endgroup
 
 % Cấu trúc tài liệu
 \chapter{Lời nói đầu}
