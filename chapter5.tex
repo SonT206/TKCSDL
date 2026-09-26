@@ -2,7 +2,7 @@
 
 \section{Kết quả thiết kế cơ sở dữ liệu}\label{s:results}
 
-\qquad Tài liệu này đã trình bày thiết kế cơ sở dữ liệu hoàn chỉnh cho nền tảng SmartDroneDelivery, bao gồm phân tích yêu cầu dữ liệu và quy tắc nghiệp vụ, mô hình thực thể mức khái niệm, lược đồ quan hệ mức logic và triển khai vật lý bằng PostgreSQL.
+\qquad Tài liệu này đã trình bày thiết kế cơ sở dữ liệu hoàn chỉnh cho nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, bao gồm phân tích yêu cầu dữ liệu và quy tắc nghiệp vụ, mô hình thực thể mức khái niệm, lược đồ quan hệ mức logic và triển khai vật lý bằng PostgreSQL.
 
 Cơ sở dữ liệu cuối cùng gồm hai mươi ba bảng được tổ chức thành bảy nhóm chức năng: người dùng và phân quyền; khách hàng và địa chỉ; đơn giao hàng và kiện hàng; quản lý trạm hạ cánh và nhân viên vận hành; thực hiện giao hàng và dữ liệu đo từ xa; xác nhận giao hàng; cùng các bảng kiểm toán, tuyến đường và đề xuất của trí tuệ nhân tạo. Thiết kế mức khái niệm và mức logic bao phủ toàn bộ ba mươi chín yêu cầu và quy tắc nghiệp vụ đã xác định. Các ràng buộc cấu trúc được thực thi ở cấp cơ sở dữ liệu; những quy tắc nghiệp vụ liên bản ghi như chuyển trạng thái, tính đồng thời của máy bay, kiểm tra tải trọng và quyền vận hành cần được thực thi bằng trigger hoặc ở cấp giao dịch.
 
@@ -24,11 +24,6 @@ Các cải tiến bổ sung bao gồm:
     \item Việc bố trí nhân viên tại trạm và xử lý kiện hàng được chính thức hóa bằng \texttt{station\_operator\_assignment} và \texttt{package\_station\_event}, cho phép xác minh toàn trình việc lấy kiện hàng trước khi máy bay khởi hành.
     \item Các bảng \texttt{order\_status\_history} và \texttt{station\_status\_history} cung cấp bản ghi đầy đủ, chỉ ghi nối tiếp cho mọi lần chuyển trạng thái. Lịch sử nghiệp vụ và dữ liệu nhật ký kiểm toán được duy trì trong các bảng riêng phục vụ những mục đích khác nhau.
     \item Bảng \texttt{delivery\_confirmation} thực thi ràng buộc \texttt{UNIQUE} trên cả \texttt{order\_id} và \texttt{activity\_id}, hiện thực quy tắc mỗi đơn có tối đa một xác nhận và liên kết trực tiếp xác nhận đó với lần thực hiện thành công.
-<<<<<<< HEAD
-=======
-    \item Lược đồ sử dụng \texttt{evidence\_object\_key} để tham chiếu hệ thống lưu trữ đối tượng bên ngoài, chẳng hạn MinIO/S3, dành cho chữ ký và ảnh giao hàng; nhờ đó tránh lưu dữ liệu nhị phân làm PostgreSQL phình to.
-    \item Mọi cột khóa chính sử dụng \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} và mọi cột thời gian sử dụng \texttt{TIMESTAMPTZ}, phù hợp với các thông lệ tốt của PostgreSQL.
->>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6
     \item Bảng có tên \texttt{system\_user} giúp tránh từ khóa dành riêng \texttt{USER} trong SQL.
 \end{itemize}
 
@@ -44,19 +39,3 @@ Thiết kế hiện tại có những hạn chế sau:
     \item \textbf{Các bảng tùy chọn chưa được kiểm thử ở quy mô lớn}: Các bảng \texttt{delivery\_route}, \texttt{route\_point} và \texttt{ai\_recommendation} đã được đưa vào lược đồ nhưng chưa được kiểm thử hiệu năng chuyên biệt trong tài liệu này.
 \end{itemize}
 
-<<<<<<< HEAD
-=======
-\section{Hướng cải tiến cơ sở dữ liệu trong tương lai}\label{s:future}
-
-Các phiên bản thiết kế cơ sở dữ liệu trong tương lai có thể cân nhắc những cải tiến sau:
-
-\begin{itemize}
-    \item \textbf{Phân vùng bảng}: Triển khai phân vùng theo khoảng trên \texttt{tracking\_record(recorded\_at)} và \texttt{audit\_log(action\_time)} để quản lý tăng trưởng dữ liệu hiệu quả và cải thiện hiệu năng của truy vấn theo khoảng thời gian.
-    \item \textbf{Bảng tham chiếu trạng thái}: Thay các ràng buộc \texttt{CHECK} trên cột trạng thái bằng những bảng tham chiếu chuyên biệt, giúp quản lý giá trị trạng thái linh hoạt hơn mà không cần thay đổi lược đồ.
-    \item \textbf{Tìm kiếm toàn văn}: Bổ sung chỉ mục tìm kiếm toàn văn của PostgreSQL trên \texttt{delivery\_exception.description} và các trường của \texttt{audit\_log} để hỗ trợ truy vấn phân tích vận hành.
-    \item \textbf{Trigger cơ sở dữ liệu}: Triển khai trigger tự động thêm dòng vào \texttt{order\_status\_history} và \texttt{station\_status\_history} mỗi khi cột trạng thái tương ứng được cập nhật, bảo đảm không bỏ sót bản ghi lịch sử.
-    \item \textbf{Khung nhìn vật hóa}: Tạo các khung nhìn vật hóa cho những truy vấn phân tích phổ biến, chẳng hạn tỷ lệ giao hàng thành công theo trạm hoặc thời lượng giao hàng trung bình theo mẫu máy bay, nhằm giảm chi phí của các truy vấn tổng hợp lặp lại.
-    \item \textbf{Gộp kết nối và bản sao chỉ đọc}: Trong môi trường sản xuất, cấu hình bộ gộp kết nối và các bản sao chỉ đọc để phân phối tải truy vấn và cải thiện tính sẵn sàng.
-    \item \textbf{Tích hợp dữ liệu đo từ xa IoT}: Kết nối trực tiếp dữ liệu đo từ xa theo thời gian thực từ phần cứng máy bay vào bảng \texttt{tracking\_record} thông qua một quy trình tiếp nhận chuyên biệt, thay thế hoặc bổ sung việc cập nhật thủ công.
-\end{itemize}
->>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6
