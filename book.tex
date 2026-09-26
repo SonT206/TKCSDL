@@ -1,6 +1,6 @@
 % !TeX program = xelatex
 % !TeX encoding = UTF-8
-\documentclass[letterpaper,11pt,leqno,openany]{book}
+\documentclass[a4paper,11pt,openany]{book}
 \usepackage{book}
 \bibliographystyle{book}
 
@@ -9,9 +9,6 @@
 
 % Đường dẫn tới tệp BibTeX chứa tài liệu tham khảo:
 \newcommand{\bib}{book.bib}
-
-% Đường dẫn tới tệp PDF chứa hình ảnh:
-\newcommand{\pdf}{figures.pdf}
 
 \usepackage{iftex}
 \ifXeTeX
@@ -28,11 +25,11 @@
 \usepackage{tabularx}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{float}
+\newcommand{\code}[1]{\texttt{#1}}
 \begin{document}
 
 % Tên đề tài:
-\title{Nền tảng quản lý giao hàng bằng máy bay không người lái ứng dụng trí tuệ nhân tạo}
+\title{Nền tảng quản lý giao hàng bằng drone tích hợp AI}
 
 % Tên nhóm:
 
@@ -44,20 +41,19 @@
         056206000983 - Nguyễn Duy Quy\\
         054206007389 - Nguyễn Quốc Dũng\\
         079206004792 - Lê Huy Hoàng}
-
-\begin{titlepage}
 \maketitle
-\end{titlepage}
+%-------MỤC LỤC-------%
 
-\frontmatter
-
+\begingroup
+\small
+\setlength{\cftbeforechapskip}{2pt}
+\setlength{\cftbeforesecskip}{0pt}
 \tableofcontents
+\endgroup
 
 % Cấu trúc tài liệu
 \chapter{Lời nói đầu}
 \input{preface}
-
-\mainmatter
 
 \chapter{Giới thiệu}\label{c:introduction}
 \input{chapter1}
@@ -67,12 +63,7 @@
 
 \chapter{Thiết kế cơ sở dữ liệu}\label{c:design}
 \input{chapter3}
-<<<<<<< HEAD
-\usepackage{graphicx}
-\usepackage{float}
-=======
 
->>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6
 \chapter{Kiểm chứng thiết kế cơ sở dữ liệu}\label{c:test}
 \input{chapter4}
 
