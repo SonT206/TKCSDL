@@ -110,7 +110,7 @@ Chuỗi các bước thiết kế:
 Các mối quan hệ chính giữa các thực thể được trình bày trong bảng sau:
 
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}{|p{3.2cm}|p{1.5cm}|p{3.5cm}|p{6cm}|}
+\begin{longtable}{|p{3.4cm}|p{1cm}|p{5.3cm}|p{6cm}|}
 \hline
 \textbf{Thực thể A} &
 \textbf{Bản số} &
@@ -125,75 +125,108 @@ Các mối quan hệ chính giữa các thực thể được trình bày trong 
 \textbf{Ý nghĩa nghiệp vụ} \\ \hline
 \endhead
 
-\texttt{customer} &
-1:N &
-\texttt{customer\_address} &
-Một khách hàng có thể có nhiều địa chỉ giao hàng. \\ \hline
+\texttt{System\_User} &
+N-1 & 
+\texttt{Role} & Nhiều người dùng thuộc về một vai trò, thể hiện qua bảng trung gian \texttt{user\_role}. \\ \hline
 
-\texttt{customer} &
-1:N &
-\texttt{delivery\_order} &
-Một khách hàng có thể tạo nhiều đơn giao hàng. \\ \hline
+\texttt{Role} & 
+1-N & 
+\texttt{Permission} & Một vai trò có nhiều quyền, thể hiện qua bảng trung gian \texttt{role\_permission}. \\ \hline
 
-\texttt{delivery\_order} &
-1:N &
-\texttt{package} &
-Một đơn giao hàng có thể chứa nhiều kiện hàng. \\ \hline
+\texttt{System\_User} &
+1-N & 
+\texttt{Audit\_log} & Một người dùng có thể có nhiều bản ghi log hành động. \\ \hline
 
-\texttt{delivery\_order} &
-1:N &
-\texttt{order\_status\_history} &
-Một đơn hàng có nhiều bản ghi lịch sử trạng thái. \\ \hline
+\texttt{Customer} & 
+1-N & \texttt{Delivery\_order} & Một khách hàng có thể tạo nhiều đơn hàng giao hàng. \\ \hline
 
-\texttt{delivery\_order} &
-1:N &
-\texttt{delivery\_activity} &
-Một đơn hàng có thể được thực hiện nhiều lần khi giao lại hoặc lập lịch lại. \\ \hline
+\texttt{Delivery\_order} & 
+1-N & 
+\texttt{Package} & Một đơn hàng chứa một hoặc nhiều gói hàng. \\ \hline
 
-\texttt{drone} &
-1:N &
-\texttt{delivery\_activity} &
-Một máy bay có thể thực hiện nhiều hoạt động giao hàng theo thời gian. \\ \hline
+\texttt{Delivery\_order} & 
+1-N & 
+\texttt{Order\_status\_history} & Một đơn hàng có nhiều bản ghi lịch sử trạng thái. \\ \hline
 
-\texttt{landing\_station} &
-1:N &
-\texttt{delivery\_activity} &
-Một trạm có thể là trạm khởi hành hoặc trạm đích của nhiều hoạt động giao hàng. \\ \hline
+\texttt{Delivery\_order} & 
+1-N & 
+\texttt{Delivery\_activity} & Một đơn hàng có thể được thực hiện bởi nhiều hoạt động giao hàng. \\ \hline
 
-\texttt{delivery\_activity} &
-1:N &
-\texttt{tracking\_record} &
-Một lần thực hiện giao hàng sinh ra nhiều bản ghi theo dõi. \\ \hline
+\texttt{Delivery\_order} & 
+1-1 & 
+\texttt{Delivery\_confirmation} & Một đơn hàng có một bản ghi xác nhận giao hàng thành công. \\ \hline
 
-\texttt{delivery\_activity} &
-1:N &
-\texttt{delivery\_exception} &
-Một lần giao hàng có thể phát sinh nhiều sự cố hoặc ngoại lệ. \\ \hline
+\texttt{Package} & 
+1-N & 
+\texttt{Package\_station\_event} & Một gói hàng có nhiều sự kiện tại các trạm. \\ \hline
 
-\texttt{package} &
-1:N &
-\texttt{package\_station\_event} &
-Một kiện hàng có thể trải qua nhiều sự kiện tại các trạm. \\ \hline
+\texttt{Landing\_station} & 
+1-N & 
+\texttt{Station\_status\_history} & Một trạm hạ cánh có nhiều bản ghi lịch sử trạng thái. \\ \hline
 
-\texttt{delivery\_order} &
-1:0..1 &
-\texttt{delivery\_confirmation} &
-Một đơn hàng có tối đa một xác nhận giao hàng thành công. \\ \hline
+\texttt{Landing\_station} & 
+1-N & 
+\texttt{Station\_operator\_assignment} & Một trạm có nhiều phân công cho các nhân viên vận hành. \\ \hline
 
-\texttt{system\_user} &
-N:M &
-\texttt{role} &
-Quan hệ nhiều--nhiều được triển khai qua bảng \texttt{user\_role}. \\ \hline
+\texttt{Landing\_station} & 
+1-N & 
+\texttt{Drone} & Một trạm hạ cánh có thể quản lý nhiều drone. \\ \hline
 
-\texttt{role} &
-N:M &
-\texttt{permission} &
-Quan hệ nhiều--nhiều được triển khai qua bảng \texttt{role\_permission}. \\ \hline
+\texttt{Landing\_station} & 
+1-N & 
+\texttt{Delivery\_activity} & Một trạm có thể là điểm lấy hàng hoặc điểm đến. \\ \hline
 
-\texttt{delivery\_route} &
-1:N &
-\texttt{route\_point} &
-Một tuyến đường gồm nhiều điểm hành trình có thứ tự. \\ \hline
+\texttt{System\_User} & 
+1-N & 
+\texttt{Station\_operator\_assignment} & Một người dùng có thể được phân công vào nhiều trạm. \\ \hline
+
+\texttt{System\_User} & 
+1-N & 
+\texttt{Package\_station\_event} & Một người dùng thực hiện nhiều sự kiện gói hàng. \\ \hline
+
+\texttt{Drone} & 
+1-N & 
+\texttt{Delivery\_activity} & Một drone thực hiện nhiều chuyến giao hàng. \\ \hline
+
+\texttt{Delivery\_activity} & 
+1-N & 
+\texttt{Tracking\_record} & Một hoạt động giao hàng có nhiều bản ghi theo dõi tọa độ GPS. \\ \hline
+
+\texttt{Delivery\_activity} & 
+1-N & 
+\texttt{Delivery\_exception} & Một hoạt động giao hàng có thể gặp nhiều ngoại lệ. \\ \hline
+
+\texttt{Delivery\_activity} & 
+1-1 & 
+\texttt{Delivery\_confirmation} & Một hoạt động giao hàng có một xác nhận hoàn thành. \\ \hline
+
+\texttt{Delivery\_activity} & 
+1-1 & 
+\texttt{Delivery\_route} & Một hoạt động giao hàng có một lộ trình được vạch sẵn. \\ \hline
+
+\texttt{Delivery\_activity} & 
+1-N & 
+\texttt{AI\_recommendation} & Một hoạt động giao hàng có thể nhận nhiều đề xuất từ AI. \\ \hline
+
+\texttt{Delivery\_route} & 
+1-N & 
+\texttt{Route\_point} & Một lộ trình bao gồm nhiều điểm đường. \\ \hline
+
+\texttt{System\_User} & 
+1-N & 
+\texttt{Delivery\_confirmation} & Người dùng xác nhận giao hàng. \\ \hline
+
+\texttt{System\_User} & 
+1-N & 
+\texttt{Delivery\_exception} & Người dùng xử lý ngoại lệ. \\ \hline
+
+\texttt{System\_User} & 
+1-N & 
+\texttt{Order\_status\_history} & Người dùng thay đổi trạng thái đơn hàng. \\ \hline
+
+\texttt{System\_User} & 
+1-N & 
+\texttt{Station\_status\_history} & Người dùng thay đổi trạng thái trạm. \\ \hline
 
 \texttt{delivery\_order} &
 1:N &
