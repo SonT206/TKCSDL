@@ -63,8 +63,7 @@ Tính toàn vẹn miền được kiểm chứng bằng các ràng buộc khai b
 \label{tab:br_validation_part1}
 \centering
 \small
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{1.2cm} p{5.5cm} p{4.2cm} p{3.5cm}}
-\toprule
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{1.2cm} p{4.2cm} p{5.5cm} p{3.5cm}}\toprule
 \textbf{Mã} & \textbf{Tóm tắt quy tắc nghiệp vụ} & \textbf{Biểu diễn trong CSDL} & \textbf{Mức thực thi} \\
 \midrule
 BR-01 & Khách hàng có nhiều địa chỉ giao hàng & \texttt{customer 1:N customer\_address} & Được xác định bởi lược đồ \\
@@ -142,12 +141,8 @@ CONSTRAINT fk_order_address
 Cơ chế này bảo đảm hoàn toàn rằng không thể thêm một đơn hàng với địa chỉ thuộc khách hàng khác. Việc kiểm tra được thực thi trực tiếp bởi hệ quản trị cơ sở dữ liệu mà không cần mã ứng dụng hoặc trigger.
 
 \subsection{Một địa chỉ mặc định cho mỗi khách hàng (BR-05)}
-Nếu đặt ràng buộc \texttt{UNIQUE} tiêu chuẩn trên \texttt{is\_default}, toàn bộ bảng sẽ bị giới hạn sai thành chỉ có một địa chỉ mặc định. Vì vậy, thiết kế sử dụng tính năng chỉ mục từng phần của PostgreSQL:
-\begin{verbatim}
-CREATE UNIQUE INDEX uq_customer_default_address
-  ON customer_address(customer_id)
-  WHERE is_default = TRUE;
-\end{verbatim}
+Nếu đặt ràng buộc \texttt{UNIQUE} tiêu chuẩn trên \texttt{is\_default}, toàn bộ bảng sẽ bị giới hạn sai thành chỉ có một địa chỉ mặc định. Vì vậy, thiết kế sử dụng tính năng chỉ mục từng phần của PostgreSQL.
+
 Chỉ mục này chỉ đánh chỉ mục các dòng có \texttt{is\_default} bằng true. Mỗi khách hàng vẫn có thể có số lượng địa chỉ không mặc định tùy ý, trong khi quy tắc tối đa một địa chỉ mặc định được thực thi nghiêm ngặt ở cấp cơ sở dữ liệu.
 
 \section{Toàn vẹn tham chiếu và chính sách xóa}\label{s:referentialval}
@@ -199,13 +194,7 @@ Thiết kế lược đồ được kiểm chứng chính thức theo các quy t
 Các chỉ mục được thiết kế chặt chẽ để hỗ trợ những mẫu truy vấn vận hành dự kiến mà không tạo chi phí ghi không cần thiết trên các bảng có tần suất cao:
 
 \begin{itemize}
-    \item \textbf{Chỉ mục tra cứu khóa ngoại}: Cần thiết cho các phép nối quan hệ tần suất cao. Chỉ mục trên \texttt{delivery\_order(customer\_id)}, \texttt{order\_status\_history(order\_id)}, \texttt{delivery\_activity(order\_id)}, \texttt{delivery\_activity(drone\_id)}, \texttt{station\_operator\_assignment(station\_id)} và \texttt{package\_station\_event(package\_id)} ngăn quét tuần tự toàn bảng khi thực hiện phép nối.
-    \item \textbf{Chỉ mục ghép cho chuỗi thời gian}: Bảng \texttt{tracking\_record} liên tục nhận các điểm GPS và dữ liệu đo từ xa trong chuyến bay. Chỉ mục ghép:
-\begin{verbatim}
-CREATE INDEX idx_tracking_activity_time
-  ON tracking_record(activity_id, recorded_at DESC);
-\end{verbatim}
-    tối ưu việc truy xuất tọa độ đo từ xa gần nhất cho bảng điều khiển giám sát trực tiếp, đồng thời giới hạn phạm vi quét trong một hoạt động giao hàng.
-    \item \textbf{Chỉ mục ràng buộc ngầm định}: Không tạo lại chỉ mục tường minh trên các cột đã được chỉ mục b-tree duy nhất do ràng buộc \texttt{UNIQUE} tạo ra (\texttt{system\_user.username}, \texttt{drone.serial\_number}, \texttt{landing\_station.station\_code}, \texttt{delivery\_confirmation.order\_id}).
+\item \textbf{Chỉ mục ghép cho chuỗi thời gian}: Bảng \texttt{tracking\_record} liên tục nhận các điểm GPS và dữ liệu đo từ xa trong chuyến bay. Chỉ mục ghép trên \texttt{activity\_id} và \texttt{recorded\_at} tối ưu việc truy xuất tọa độ đo từ xa gần nhất cho bảng điều khiển giám sát trực tiếp, đồng thời giới hạn phạm vi quét trong một hoạt động giao hàng.
+\item \textbf{Chỉ mục ràng buộc ngầm định}: Không tạo lại chỉ mục tường minh trên các cột đã được chỉ mục b-tree duy nhất do ràng buộc \texttt{UNIQUE} tạo ra (\texttt{system\_user.username}, \texttt{drone.serial\_number}, \texttt{landing\_station.station\_code}, \texttt{delivery\_confirmation.order\_id}).
 \end{itemize}
 
