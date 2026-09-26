@@ -1,6 +1,6 @@
 
 \section{Giới thiệu hệ thống}
-SmartDroneDelivery là nền tảng quản lý hoạt động giao hàng bằng drone, tập trung vào nghiệp vụ và logistics thay vì điều khiển trực tiếp drone. Hệ thống quản lý khách hàng, yêu cầu giao hàng, gói hàng, trạm hạ cánh, drone, lần thực hiện giao hàng, dữ liệu theo dõi, sự cố, xác nhận giao hàng, lộ trình, khuyến nghị \code{AI} và hoạt động quản trị.
+Nền tảng quản lý giao hàng bằng drone tích hợp AI là một nền tảng quản lý hoạt động giao hàng bằng drone, tập trung vào nghiệp vụ và logistics thay vì điều khiển trực tiếp drone. Hệ thống quản lý khách hàng, yêu cầu giao hàng, gói hàng, trạm hạ cánh, drone, lần thực hiện giao hàng, dữ liệu theo dõi, sự cố, xác nhận giao hàng, lộ trình, khuyến nghị \code{AI} và hoạt động quản trị.
 \section{Phạm vi hệ thống}
 
 \begin{itemize}
@@ -67,11 +67,11 @@ Cần kiểm soát quyền & \code{system\_user}, role, permission và bảng li
 =======
 % !TeX root = book.tex
 
-Sự phát triển nhanh chóng của thương mại điện tử và logistics thông minh đã làm gia tăng nhu cầu về các giải pháp giao hàng chặng cuối hiệu quả. Giao hàng bằng máy bay không người lái đã trở thành một phương thức đầy triển vọng để vận chuyển các kiện hàng nhẹ trong những môi trường như khuôn viên thông minh, khu công nghiệp, khu dân cư và vùng sâu vùng xa. Tuy nhiên, một hoạt động giao hàng bằng máy bay không người lái hiệu quả không chỉ đòi hỏi việc vận hành phương tiện. Hoạt động này còn bao gồm quản lý khách hàng, yêu cầu giao hàng, kiện hàng, trạm hạ cánh, quá trình theo dõi và xác nhận giao hàng thông qua một hệ thống thông tin tập trung, đáng tin cậy. Các hệ thống logistics hiện có chủ yếu được thiết kế cho phương thức vận chuyển truyền thống nên thường thiếu sự hỗ trợ chuyên biệt đối với quy trình giao hàng bằng máy bay không người lái. Để giải quyết những vấn đề này, dự án SmartDroneDelivery đề xuất một nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, cho phép quản lý, điều phối và giám sát hiệu quả các hoạt động giao hàng trong môi trường kinh doanh.
+Sự phát triển nhanh chóng của thương mại điện tử và logistics thông minh đã làm gia tăng nhu cầu về các giải pháp giao hàng chặng cuối hiệu quả. Giao hàng bằng máy bay không người lái đã trở thành một phương thức đầy triển vọng để vận chuyển các kiện hàng nhẹ trong những môi trường như khuôn viên thông minh, khu công nghiệp, khu dân cư và vùng sâu vùng xa. Tuy nhiên, một hoạt động giao hàng bằng máy bay không người lái hiệu quả không chỉ đòi hỏi việc vận hành phương tiện. Hoạt động này còn bao gồm quản lý khách hàng, yêu cầu giao hàng, kiện hàng, trạm hạ cánh, quá trình theo dõi và xác nhận giao hàng thông qua một hệ thống thông tin tập trung, đáng tin cậy. Các hệ thống logistics hiện có chủ yếu được thiết kế cho phương thức vận chuyển truyền thống nên thường thiếu sự hỗ trợ chuyên biệt đối với quy trình giao hàng bằng máy bay không người lái. Để giải quyết những vấn đề này, dự án đề xuất một nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, cho phép quản lý, điều phối và giám sát hiệu quả các hoạt động giao hàng trong môi trường kinh doanh.
 
-\section{Nền tảng SmartDroneDelivery}\label{s:introduction}
+\section{Nền tảng quản lý giao hàng bằng drone tích hợp AI}\label{s:introduction}
 
-SmartDroneDelivery được thiết kế để hỗ trợ toàn bộ vòng đời giao hàng, từ khi tạo yêu cầu giao hàng cho đến khi xác nhận giao hàng thành công. Nền tảng tập trung vào quản lý nghiệp vụ và logistics thay vì trực tiếp điều khiển máy bay không người lái.
+Nền tảng quản lý giao hàng bằng drone tích hợp AI được thiết kế để hỗ trợ toàn bộ vòng đời giao hàng, từ khi tạo yêu cầu giao hàng cho đến khi xác nhận giao hàng thành công. Nền tảng tập trung vào quản lý nghiệp vụ và logistics thay vì trực tiếp điều khiển máy bay không người lái.
 
 Hệ thống hỗ trợ năm quy trình nghiệp vụ chính:
 
@@ -109,15 +109,15 @@ Nền tảng được đề xuất cung cấp cổng thông tin web phục vụ 
 
 \section{Góc nhìn cơ sở dữ liệu}
 
-\qquad Trong nền tảng SmartDroneDelivery, cơ sở dữ liệu giữ vai trò trung tâm trong việc lưu trữ và quản lý thông tin phát sinh từ các quy trình nghiệp vụ khác nhau. Cơ sở dữ liệu phải hỗ trợ quản lý người dùng, khách hàng, địa chỉ, đơn giao hàng, kiện hàng, máy bay không người lái, trạm hạ cánh, hoạt động giao hàng, thông tin theo dõi, xác nhận giao hàng và các thông tin hỗ trợ khác mà hệ thống cần sử dụng.
+\qquad Trong Nền tảng quản lý giao hàng bằng drone tích hợp AI, cơ sở dữ liệu giữ vai trò trung tâm trong việc lưu trữ và quản lý thông tin phát sinh từ các quy trình nghiệp vụ khác nhau. Cơ sở dữ liệu phải hỗ trợ quản lý người dùng, khách hàng, địa chỉ, đơn giao hàng, kiện hàng, máy bay không người lái, trạm hạ cánh, hoạt động giao hàng, thông tin theo dõi, xác nhận giao hàng và các thông tin hỗ trợ khác mà hệ thống cần sử dụng.
 
 Thiết kế cơ sở dữ liệu phải bảo đảm dữ liệu được tổ chức có cấu trúc và các mối quan hệ giữa những thực thể được xác định rõ ràng. Thiết kế cũng phải duy trì tính toàn vẹn và nhất quán của dữ liệu thông qua khóa chính, khóa ngoại, các ràng buộc và những cơ chế cơ sở dữ liệu phù hợp khác.
 
-Một cơ sở dữ liệu được thiết kế tốt sẽ cung cấp nền tảng dữ liệu đáng tin cậy cho các dịch vụ phía máy chủ, đồng thời cho phép giao diện người dùng và những thành phần khác của hệ thống truy cập, xử lý dữ liệu một cách nhất quán. Vì vậy, thiết kế cơ sở dữ liệu là một phần thiết yếu của nền tảng SmartDroneDelivery.
+Một cơ sở dữ liệu được thiết kế tốt sẽ cung cấp nền tảng dữ liệu đáng tin cậy cho các dịch vụ phía máy chủ, đồng thời cho phép giao diện người dùng và những thành phần khác của hệ thống truy cập, xử lý dữ liệu một cách nhất quán. Vì vậy, thiết kế cơ sở dữ liệu là một phần thiết yếu của nền tảng quản lý giao hàng bằng drone tích hợp AI.
 
 \section{Phạm vi tài liệu}
 
-Tài liệu này tập trung vào thiết kế cơ sở dữ liệu của nền tảng SmartDroneDelivery. Các mục tiêu chính của quá trình thiết kế gồm:
+Tài liệu này tập trung vào thiết kế cơ sở dữ liệu của Nền tảng quản lý giao hàng bằng drone tích hợp AI. Các mục tiêu chính của quá trình thiết kế gồm:
 
 \begin{enumerate}
 \item Phân tích các yêu cầu dữ liệu được hình thành từ những quy trình nghiệp vụ đã đề xuất.
@@ -132,9 +132,9 @@ Tài liệu này tập trung vào thiết kế cơ sở dữ liệu của nền 
 \item Cung cấp nền tảng cơ sở dữ liệu nhất quán cho việc tích hợp phần máy chủ và giao diện người dùng trong tương lai.
 \end{enumerate}
 
-Thiết kế được trình bày trong tài liệu này vì thế sẽ đóng vai trò nền tảng dữ liệu cho SmartDroneDelivery và hỗ trợ việc triển khai các dịch vụ web, di động, API và trí tuệ nhân tạo trong tương lai.
+Thiết kế được trình bày trong tài liệu này vì thế sẽ đóng vai trò nền tảng dữ liệu cho Nền tảng quản lý giao hàng bằng drone tích hợp AI và hỗ trợ việc triển khai các dịch vụ web, di động, API và trí tuệ nhân tạo trong tương lai.
 
 \section{Cấu trúc tài liệu}
 
-\qquad Tài liệu được tổ chức thành nhiều chương trình bày quá trình phân tích và thiết kế cơ sở dữ liệu SmartDroneDelivery. Chương giới thiệu trình bày bối cảnh dự án, tổng quan hệ thống, góc nhìn cơ sở dữ liệu và phạm vi thiết kế. Các chương tiếp theo mô tả yêu cầu dữ liệu và quy tắc nghiệp vụ, sau đó trình bày mô hình cơ sở dữ liệu mức khái niệm, lược đồ quan hệ mức logic, quá trình chuẩn hóa, các ràng buộc toàn vẹn, thiết kế vật lý, triển khai và kiểm chứng. Cuối cùng, tài liệu trình bày kết quả triển khai cơ sở dữ liệu và đưa ra kết luận về thiết kế được đề xuất.
+\qquad Tài liệu được tổ chức thành nhiều chương trình bày quá trình phân tích và thiết kế cơ sở dữ liệu Nền tảng quản lý giao hàng bằng drone tích hợp AI. Chương giới thiệu trình bày bối cảnh dự án, tổng quan hệ thống, góc nhìn cơ sở dữ liệu và phạm vi thiết kế. Các chương tiếp theo mô tả yêu cầu dữ liệu và quy tắc nghiệp vụ, sau đó trình bày mô hình cơ sở dữ liệu mức khái niệm, lược đồ quan hệ mức logic, quá trình chuẩn hóa, các ràng buộc toàn vẹn, thiết kế vật lý, triển khai và kiểm chứng. Cuối cùng, tài liệu trình bày kết quả triển khai cơ sở dữ liệu và đưa ra kết luận về thiết kế được đề xuất.
 >>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6

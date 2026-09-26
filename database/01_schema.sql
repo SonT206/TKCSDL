@@ -1,5 +1,5 @@
 -- ============================================================================
--- SMARTDRONEDELIVERY - LUOC DO CO SO DU LIEU POSTGRESQL
+-- QUAN LY GIAO HANG BANG MAY BAY KHONG NGUOI LAI CO TICH HOP TRI TUYEN NHAN TAO - LUOC DO CO SO DU LIEU POSTGRESQL
 -- Tac gia dong gop: Nguyen Quoc Dung
 -- Mo ta: Tao 23 bang, rang buoc, chi muc va trigger nghiep vu chinh.
 -- Yeu cau: PostgreSQL 14 tro len. Chay tren mot co so du lieu rong.

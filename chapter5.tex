@@ -2,7 +2,7 @@
 
 \section{Kết quả thiết kế cơ sở dữ liệu}\label{s:results}
 
-\qquad Tài liệu này đã trình bày thiết kế cơ sở dữ liệu hoàn chỉnh cho nền tảng SmartDroneDelivery, bao gồm phân tích yêu cầu dữ liệu và quy tắc nghiệp vụ, mô hình thực thể mức khái niệm, lược đồ quan hệ mức logic và triển khai vật lý bằng PostgreSQL.
+\qquad Tài liệu này đã trình bày thiết kế cơ sở dữ liệu hoàn chỉnh cho nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, bao gồm phân tích yêu cầu dữ liệu và quy tắc nghiệp vụ, mô hình thực thể mức khái niệm, lược đồ quan hệ mức logic và triển khai vật lý bằng PostgreSQL.
 
 Cơ sở dữ liệu cuối cùng gồm hai mươi ba bảng được tổ chức thành bảy nhóm chức năng: người dùng và phân quyền; khách hàng và địa chỉ; đơn giao hàng và kiện hàng; quản lý trạm hạ cánh và nhân viên vận hành; thực hiện giao hàng và dữ liệu đo từ xa; xác nhận giao hàng; cùng các bảng kiểm toán, tuyến đường và đề xuất của trí tuệ nhân tạo. Thiết kế mức khái niệm và mức logic bao phủ toàn bộ ba mươi chín yêu cầu và quy tắc nghiệp vụ đã xác định. Các ràng buộc cấu trúc được thực thi ở cấp cơ sở dữ liệu; những quy tắc nghiệp vụ liên bản ghi như chuyển trạng thái, tính đồng thời của máy bay, kiểm tra tải trọng và quyền vận hành cần được thực thi bằng trigger hoặc ở cấp giao dịch.
 

@@ -1,11 +1,11 @@
 % !TeX root = book.tex
 \section{Thiết kế cơ sở dữ liệu mức khái niệm}\label{s:conceptual}
 
-Phần này trình bày mô hình cơ sở dữ liệu mức khái niệm cho nền tảng SmartDroneDelivery. Mô hình xác định các thực thể chính, thuộc tính của chúng, mối quan hệ giữa các thực thể và bản số của những mối quan hệ đó. Đây là cơ sở để xây dựng lược đồ quan hệ mức logic trong Phần~\ref{s:logical}.
+Phần này trình bày mô hình cơ sở dữ liệu mức khái niệm cho nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo. Mô hình xác định các thực thể chính, thuộc tính của chúng, mối quan hệ giữa các thực thể và bản số của những mối quan hệ đó. Đây là cơ sở để xây dựng lược đồ quan hệ mức logic trong Phần~\ref{s:logical}.
 
 \subsection{Vì sao mức khái niệm phải được xác định trước}
 
-Trong SmartDroneDelivery, mức khái niệm xác định được:
+Trong nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo, mức khái niệm xác định được:
 \begin{itemize}
     \item Phạm vi nghiệp vụ của nền tảng và ranh giới với các hệ thống/thiết bị bên ngoài.
     \item Tác nhân, trách nhiệm của từng tác nhân và điểm họ tương tác với hệ thống.
@@ -30,7 +30,7 @@ Yêu cầu chức năng và quy tắc nghiệp vụ là nguồn đầu vào củ
 
 \subsection{Ranh giới hệ thống và kịch bản nghiệp vụ}
 
-SmartDroneDelivery được xác định là nền tảng quản lý nghiệp vụ và logistics cho giao hàng bằng drone. Phạm vi gồm khách hàng, địa chỉ, đơn giao hàng, gói hàng, trạm hạ cánh, drone, lần thực hiện giao hàng, dữ liệu theo dõi, sự cố, xác nhận, lộ trình, khuyến nghị \code{AI}, phân quyền và kiểm toán. Điều khiển bay mức thấp, phần sụn, phần cứng động cơ và chi tiết bên trong kho lưu trữ đối tượng không phải là các thực thể nghiệp vụ cốt lõi của cơ sở dữ liệu này.
+Nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo được xác định là nền tảng quản lý nghiệp vụ và logistics cho giao hàng bằng drone. Phạm vi gồm khách hàng, địa chỉ, đơn giao hàng, gói hàng, trạm hạ cánh, drone, lần thực hiện giao hàng, dữ liệu theo dõi, sự cố, xác nhận, lộ trình, khuyến nghị \code{AI}, phân quyền và kiểm toán. Điều khiển bay mức thấp, phần sụn, phần cứng động cơ và chi tiết bên trong kho lưu trữ đối tượng không phải là các thực thể nghiệp vụ cốt lõi của cơ sở dữ liệu này.
 
 Một kịch bản nghiệp vụ dùng để kiểm tra mức khái niệm có thể diễn ra như sau:
 \begin{itemize}
@@ -445,7 +445,6 @@ Mối quan hệ và bản số giữa hai mươi ba thực thể được xác �
 Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức khái niệm. Lược đồ quan hệ được trình bày theo ký hiệu chuẩn, trong đó khóa chính được ký hiệu là (PK), khóa ngoại là (FK) và ràng buộc duy nhất là UNIQUE.
 
 \subsection{Lược đồ quan hệ}
->>>>>>> 43a08a4ead5b3e90f4cea4c8c297f458976cbdc6
 
 \begin{center}
 Khái niệm nghiệp vụ $\to$ Thực thể $\to$ Mối quan hệ/lực lượng số $\to$ Thuộc tính $\to$ Khóa\\
@@ -457,7 +456,7 @@ $\to$ Lược đồ quan hệ $\to$ Phụ thuộc hàm $\to$ Chuẩn hóa $\to$ 
 \clearpage
 \subsection{Thuộc tính của thực thể}\label{s:attributes}
 
-Hình dưới đây trình bày tổng thể các thực thể, thuộc tính, khóa chính, khóa ngoại và các ràng buộc của cơ sở dữ liệu SmartDroneDelivery.
+Hình dưới đây trình bày tổng thể các thực thể, thuộc tính, khóa chính, khóa ngoại và các ràng buộc của cơ sở dữ liệu quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo.
 
 \begin{figure}[H]
     \centering
