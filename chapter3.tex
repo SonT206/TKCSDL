@@ -445,10 +445,10 @@ Phần này xây dựng lược đồ quan hệ mức logic từ mô hình mức
 
 \subsection{Lược đồ quan hệ}
 
-\begin{center}
-Khái niệm nghiệp vụ $\to$ Thực thể $\to$ Mối quan hệ/lực lượng số $\to$ Thuộc tính $\to$ Khóa\\
-$\to$ Lược đồ quan hệ $\to$ Phụ thuộc hàm $\to$ Chuẩn hóa $\to$ Ràng buộc $\to$ Thiết kế vật lý
-\end{center}
+\begin{verbatim}
+app_user(user_id PK, username UNIQUE, password_hash,
+  email UNIQUE, phone_number UNIQUE, is_active,
+  created_at, updated_at)
 
 \subsection{Xác định thực thể}\label{s:entities} Dựa trên các yêu cầu và quy tắc nghiệp vụ được trình bày tại Chương~\ref{c:analysis}, hai mươi ba thực thể được xác định. Các thực thể được tổ chức thành bảy nhóm chức năng nhằm bảo đảm bao phủ đầy đủ nhưng không tạo ra dư thừa trong vận hành. \renewcommand{\arraystretch}{1.15} \small \begin{longtable}{|p{1cm}|p{4cm}|p{3.5cm}|p{7cm}|} \hline \textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Thực thể} & \textbf{Mô tả} \\ \hline \endfirsthead \hline \textbf{STT} & \textbf{Nhóm chức năng} & \textbf{Thực thể} & \textbf{Mô tả} \\ \hline \endhead 1 & Người dùng và phân quyền & \texttt{system\_user} & Lưu thông tin xác thực và trạng thái tài khoản của mọi tác nhân trong hệ thống. \\ \hline 2 & Người dùng và phân quyền & \texttt{role} & Xác định các vai trò vận hành như khách hàng, điều phối viên, nhân viên trạm và quản trị viên. \\ \hline 3 & Người dùng và phân quyền & \texttt{permission} & Xác định các quyền thao tác chi tiết trong hệ thống. \\ \hline 4 & Người dùng và phân quyền & \texttt{user\_role} & Bảng liên kết triển khai quan hệ nhiều-nhiều giữa người dùng và vai trò. \\ \hline 5 & Người dùng và phân quyền & \texttt{role\_permission} & Bảng liên kết triển khai quan hệ nhiều-nhiều giữa vai trò và quyền hạn. \\ \hline 6 & Khách hàng và địa chỉ & \texttt{customer} & Lưu hồ sơ khách hàng và liên kết với tài khoản người dùng nếu có. \\ \hline 7 & Khách hàng và địa chỉ & \texttt{customer\_address} & Lưu nhiều địa chỉ giao hàng của khách hàng kèm tọa độ địa lý. \\ \hline 8 & Đơn hàng và kiện hàng & \texttt{delivery\_order} & Đại diện cho yêu cầu giao hàng của khách hàng và vòng đời đơn hàng. \\ \hline 9 & Đơn hàng và kiện hàng & \texttt{package} & Lưu thông tin vật lý của các kiện hàng thuộc đơn giao hàng. \\ \hline 10 & Đơn hàng và kiện hàng & \texttt{order\_status\_history} & Lưu lịch sử thay đổi trạng thái đơn hàng dưới dạng chỉ ghi nối tiếp. \\ \hline 11 & Trạm hạ cánh và máy bay & \texttt{landing\_station} & Lưu thông tin các trạm cất và hạ cánh của máy bay. \\ \hline 12 & Trạm hạ cánh và máy bay & \texttt{station\_status\_history} & Lưu lịch sử thay đổi trạng thái hoạt động của trạm. \\ \hline 13 & Trạm hạ cánh và máy bay & \texttt{station\_operator\_assignment} & Lưu thông tin phân công nhân viên vận hành tại các trạm. \\ \hline 14 & Trạm hạ cánh và máy bay & \texttt{drone} & Lưu thông tin nhận dạng và tình trạng vận hành của drone. \\ \hline 15 & Thực hiện giao hàng & \texttt{delivery\_activity} & Đại diện cho một lần thực hiện giao hàng cụ thể. \\ \hline 16 & Thực hiện giao hàng & \texttt{package\_station\_event} & Lưu các sự kiện xử lý kiện hàng tại trạm. \\ \hline 17 & Thực hiện giao hàng & \texttt{tracking\_record} & Lưu dữ liệu GPS và dữ liệu đo từ xa trong chuyến bay. \\ \hline 18 & Thực hiện giao hàng & \texttt{delivery\_exception} & Lưu các sự cố, thất bại hoặc bất thường trong quá trình giao hàng. \\ \hline 19 & Xác nhận giao hàng & \texttt{delivery\_confirmation} & Lưu bằng chứng giao hàng thành công và thông tin người nhận. \\ \hline 20 & Kiểm toán, tuyến đường và AI & \texttt{audit\_log} & Lưu nhật ký kiểm toán và truy vết các thao tác trong hệ thống. \\ \hline 21 & Kiểm toán, tuyến đường và AI & \texttt{delivery\_route} & Lưu siêu dữ liệu của tuyến đường giao hàng dự kiến. \\ \hline 22 & Kiểm toán, tuyến đường và AI & \texttt{route\_point} & Lưu danh sách các điểm hành trình thuộc một tuyến đường. \\ \hline 23 & Kiểm toán, tuyến đường và AI & \texttt{ai\_recommendation} & Lưu kết quả đề xuất từ các mô hình trí tuệ nhân tạo như drone phù hợp hoặc ETA dự kiến. \\ \hline \end{longtable}
 
@@ -548,6 +548,385 @@ ASSIGNED -> PREPARING -> IN_TRANSIT -> DELIVERED / FAILED / CANCELLED
 
 \section{Thiết kế cơ sở dữ liệu mức vật lý}\label{s:physical}
 
+Phần này trình bày chi tiết việc triển khai vật lý bằng PostgreSQL. Tất cả các bảng sử dụng \texttt{BIGINT GENERATED ALWAYS AS IDENTITY} cho khóa chính, \texttt{TIMESTAMPTZ} cho trường thời gian và các miền số, hình học phù hợp.
+
+\subsection{Các câu lệnh CREATE TABLE}
+
+\begin{verbatim}
+-- 1. Nhóm người dùng và phân quyền
+
+CREATE TABLE app_user (
+  user_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  username      VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  email         VARCHAR(255) UNIQUE,
+  phone_number  VARCHAR(20)  UNIQUE,
+  is_active     BOOLEAN      NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE role (
+  role_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  role_name   VARCHAR(50)  NOT NULL UNIQUE,
+  description VARCHAR(255)
+);
+
+CREATE TABLE permission (
+  permission_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  permission_name VARCHAR(100) NOT NULL UNIQUE,
+  description     VARCHAR(255)
+);
+
+CREATE TABLE user_role (
+  user_id     BIGINT      NOT NULL,
+  role_id     BIGINT      NOT NULL,
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, role_id),
+  CONSTRAINT fk_ur_user FOREIGN KEY (user_id)
+    REFERENCES app_user(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_ur_role FOREIGN KEY (role_id)
+    REFERENCES role(role_id) ON DELETE CASCADE
+);
+
+CREATE TABLE role_permission (
+  role_id       BIGINT NOT NULL,
+  permission_id BIGINT NOT NULL,
+  PRIMARY KEY (role_id, permission_id),
+  CONSTRAINT fk_rp_role FOREIGN KEY (role_id)
+    REFERENCES role(role_id) ON DELETE CASCADE,
+  CONSTRAINT fk_rp_perm FOREIGN KEY (permission_id)
+    REFERENCES permission(permission_id) ON DELETE CASCADE
+);
+
+-- 2. Nhóm khách hàng và địa chỉ
+
+CREATE TABLE customer (
+  customer_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id       BIGINT       UNIQUE,
+  customer_name VARCHAR(100) NOT NULL,
+  phone_number  VARCHAR(20)  UNIQUE,
+  email         VARCHAR(255) UNIQUE,
+  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_customer_user FOREIGN KEY (user_id)
+    REFERENCES app_user(user_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE customer_address (
+  address_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  customer_id   BIGINT       NOT NULL,
+  address_label VARCHAR(50),
+  address_line  VARCHAR(255) NOT NULL,
+  ward          VARCHAR(100),
+  district      VARCHAR(100),
+  city          VARCHAR(100),
+  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
+  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
+  is_default    BOOLEAN      NOT NULL DEFAULT FALSE,
+  created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_addr_customer FOREIGN KEY (customer_id)
+    REFERENCES customer(customer_id) ON DELETE RESTRICT,
+  CONSTRAINT uq_customer_address UNIQUE (address_id, customer_id)
+);
+
+-- 3. Nhóm trạm hạ cánh và nhân viên vận hành
+
+CREATE TABLE landing_station (
+  station_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  station_code VARCHAR(50)  NOT NULL UNIQUE,
+  station_name VARCHAR(100) NOT NULL,
+  address      VARCHAR(255),
+  latitude     NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
+  longitude    NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
+  capacity     INTEGER      NOT NULL DEFAULT 0 CHECK (capacity >= 0),
+  status       VARCHAR(30)  NOT NULL
+    CHECK (status IN ('AVAILABLE', 'FULL', 'MAINTENANCE', 'OFFLINE')),
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE station_status_history (
+  history_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  station_id  BIGINT      NOT NULL,
+  status      VARCHAR(30) NOT NULL,
+  changed_by  BIGINT,
+  reason      VARCHAR(255),
+  changed_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ssh_station FOREIGN KEY (station_id)
+    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_ssh_user FOREIGN KEY (changed_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE station_operator_assignment (
+  assignment_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  station_id    BIGINT      NOT NULL,
+  user_id       BIGINT      NOT NULL,
+  assigned_from TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  assigned_to   TIMESTAMPTZ,
+  is_active     BOOLEAN     NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_soa_station FOREIGN KEY (station_id)
+    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_soa_user FOREIGN KEY (user_id)
+    REFERENCES app_user(user_id) ON DELETE RESTRICT,
+  CONSTRAINT chk_soa_interval CHECK (assigned_to IS NULL OR assigned_from < assigned_to)
+);
+
+-- 4. Nhóm máy bay không người lái
+
+CREATE TABLE drone (
+  drone_id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  serial_number   VARCHAR(100) NOT NULL UNIQUE,
+  model           VARCHAR(100),
+  status          VARCHAR(30)  NOT NULL
+    CHECK (status IN ('AVAILABLE', 'BUSY', 'MAINTENANCE', 'OFFLINE')),
+  max_payload_kg  NUMERIC(10,2) NOT NULL CHECK (max_payload_kg > 0),
+  battery_level   NUMERIC(5,2) CHECK (battery_level BETWEEN 0 AND 100),
+  station_id      BIGINT,
+  created_at      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_drone_station FOREIGN KEY (station_id)
+    REFERENCES landing_station(station_id) ON DELETE SET NULL
+);
+
+-- 5. Nhóm đơn giao hàng và kiện hàng
+
+CREATE TABLE delivery_order (
+  order_id                BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  customer_id             BIGINT      NOT NULL,
+  delivery_address_id     BIGINT      NOT NULL,
+  order_status            VARCHAR(30) NOT NULL
+    CHECK (order_status IN (
+      'PENDING', 'APPROVED', 'REJECTED', 'ASSIGNED',
+      'IN_TRANSIT', 'DELIVERED', 'FAILED', 'CANCELLED')),
+  requested_delivery_time TIMESTAMPTZ,
+  estimated_arrival_at    TIMESTAMPTZ,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  completed_at            TIMESTAMPTZ,
+  cancelled_at            TIMESTAMPTZ,
+  cancellation_reason     VARCHAR(255),
+  CONSTRAINT fk_order_customer FOREIGN KEY (customer_id)
+    REFERENCES customer(customer_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_order_address  FOREIGN KEY (delivery_address_id, customer_id)
+    REFERENCES customer_address(address_id, customer_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE package (
+  package_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  order_id       BIGINT        NOT NULL,
+  description    VARCHAR(500),
+  weight_kg      NUMERIC(10,2) NOT NULL CHECK (weight_kg > 0),
+  length_cm      NUMERIC(10,2) CHECK (length_cm > 0),
+  width_cm       NUMERIC(10,2) CHECK (width_cm > 0),
+  height_cm      NUMERIC(10,2) CHECK (height_cm > 0),
+  package_status VARCHAR(30)   NOT NULL
+    CHECK (package_status IN (
+      'CREATED', 'AT_STATION', 'PICKED_UP', 'IN_TRANSIT',
+      'DELIVERED', 'FAILED', 'RETURNED', 'DAMAGED')),
+  created_at     TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pkg_order FOREIGN KEY (order_id)
+    REFERENCES delivery_order(order_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE order_status_history (
+  status_history_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  order_id          BIGINT      NOT NULL,
+  status            VARCHAR(30) NOT NULL,
+  changed_by        BIGINT,
+  reason            VARCHAR(255),
+  changed_at        TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_osh_order FOREIGN KEY (order_id)
+    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_osh_user FOREIGN KEY (changed_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+-- 6. Nhóm thực hiện giao hàng và sự kiện
+
+CREATE TABLE delivery_activity (
+  activity_id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  order_id               BIGINT      NOT NULL,
+  drone_id               BIGINT      NOT NULL,
+  pickup_station_id      BIGINT,
+  destination_station_id BIGINT,
+  assigned_by            BIGINT,
+  scheduled_at           TIMESTAMPTZ,
+  activity_status        VARCHAR(30) NOT NULL
+    CHECK (activity_status IN (
+      'ASSIGNED', 'PREPARING', 'IN_TRANSIT',
+      'DELIVERED', 'FAILED', 'CANCELLED')),
+  started_at             TIMESTAMPTZ,
+  ended_at               TIMESTAMPTZ,
+  previous_activity_id   BIGINT,
+  created_at             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_act_order FOREIGN KEY (order_id)
+    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_act_drone FOREIGN KEY (drone_id)
+    REFERENCES drone(drone_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_act_pickup FOREIGN KEY (pickup_station_id)
+    REFERENCES landing_station(station_id) ON DELETE SET NULL,
+  CONSTRAINT fk_act_dest FOREIGN KEY (destination_station_id)
+    REFERENCES landing_station(station_id) ON DELETE SET NULL,
+  CONSTRAINT fk_act_user FOREIGN KEY (assigned_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL,
+  CONSTRAINT fk_act_prev FOREIGN KEY (previous_activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
+  CONSTRAINT chk_act_time CHECK (ended_at IS NULL OR started_at <= ended_at)
+);
+
+CREATE TABLE package_station_event (
+  event_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  package_id   BIGINT      NOT NULL,
+  station_id   BIGINT      NOT NULL,
+  event_type   VARCHAR(30) NOT NULL
+    CHECK (event_type IN ('ARRIVED', 'PICKUP_CONFIRMED', 'LOADED', 'UNLOADED')),
+  performed_by BIGINT,
+  occurred_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  note         VARCHAR(255),
+  CONSTRAINT fk_pse_package FOREIGN KEY (package_id)
+    REFERENCES package(package_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_pse_station FOREIGN KEY (station_id)
+    REFERENCES landing_station(station_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_pse_user FOREIGN KEY (performed_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE tracking_record (
+  tracking_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  activity_id   BIGINT       NOT NULL,
+  latitude      NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
+  longitude     NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
+  altitude_m    NUMERIC(10,2) CHECK (altitude_m >= 0),
+  speed_kmh     NUMERIC(10,2) CHECK (speed_kmh >= 0),
+  battery_level NUMERIC(5,2)  CHECK (battery_level BETWEEN 0 AND 100),
+  recorded_at   TIMESTAMPTZ  NOT NULL,
+  CONSTRAINT fk_tr_activity FOREIGN KEY (activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE delivery_confirmation (
+  confirmation_id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  order_id            BIGINT       NOT NULL UNIQUE,
+  activity_id         BIGINT       NOT NULL UNIQUE,
+  confirmed_by        BIGINT,
+  receiver_name       VARCHAR(100) NOT NULL,
+  receiver_phone      VARCHAR(20),
+  confirmation_method VARCHAR(30)  NOT NULL,
+  evidence_object_key VARCHAR(255),
+  confirmed_at        TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  note                VARCHAR(500),
+  CONSTRAINT fk_conf_order FOREIGN KEY (order_id)
+    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_conf_activity FOREIGN KEY (activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_conf_user FOREIGN KEY (confirmed_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE delivery_exception (
+  exception_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  activity_id    BIGINT      NOT NULL,
+  exception_type VARCHAR(50) NOT NULL,
+  description    TEXT,
+  detected_at    TIMESTAMPTZ NOT NULL,
+  resolved_at    TIMESTAMPTZ,
+  resolved_by    BIGINT,
+  resolution     TEXT,
+  CONSTRAINT fk_exc_activity FOREIGN KEY (activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_exc_resolver FOREIGN KEY (resolved_by)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+-- 7. Nhóm kiểm toán, tuyến đường và trí tuệ nhân tạo
+
+CREATE TABLE audit_log (
+  log_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id     BIGINT,
+  entity_name VARCHAR(100) NOT NULL,
+  record_id   BIGINT,
+  action_type VARCHAR(50)  NOT NULL,
+  old_value   JSONB,
+  new_value   JSONB,
+  action_time TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ip_address  INET,
+  CONSTRAINT fk_al_user FOREIGN KEY (user_id)
+    REFERENCES app_user(user_id) ON DELETE SET NULL
+);
+
+CREATE TABLE delivery_route (
+  route_id               BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  activity_id            BIGINT        NOT NULL UNIQUE,
+  total_distance_km      NUMERIC(12,3) CHECK (total_distance_km >= 0),
+  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
+  created_at             TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_route_activity FOREIGN KEY (activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE route_point (
+  route_point_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  route_id        BIGINT       NOT NULL,
+  sequence_number INTEGER      NOT NULL,
+  latitude        NUMERIC(9,6) CHECK (latitude BETWEEN -90 AND 90),
+  longitude       NUMERIC(9,6) CHECK (longitude BETWEEN -180 AND 180),
+  altitude_m      NUMERIC(10,2) CHECK (altitude_m >= 0),
+  CONSTRAINT fk_rp_route FOREIGN KEY (route_id)
+    REFERENCES delivery_route(route_id) ON DELETE CASCADE,
+  CONSTRAINT uq_rp_seq UNIQUE (route_id, sequence_number)
+);
+
+CREATE TABLE ai_recommendation (
+  recommendation_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  order_id               BIGINT       NOT NULL,
+  activity_id            BIGINT,
+  recommendation_type    VARCHAR(50)  NOT NULL,
+  recommended_drone_id   BIGINT,
+  estimated_duration_min NUMERIC(10,2) CHECK (estimated_duration_min >= 0),
+  confidence_score       NUMERIC(5,4) CHECK (confidence_score BETWEEN 0 AND 1),
+  model_version          VARCHAR(50),
+  created_at             TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ai_order    FOREIGN KEY (order_id)
+    REFERENCES delivery_order(order_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_ai_activity FOREIGN KEY (activity_id)
+    REFERENCES delivery_activity(activity_id) ON DELETE SET NULL,
+  CONSTRAINT fk_ai_drone    FOREIGN KEY (recommended_drone_id)
+    REFERENCES drone(drone_id) ON DELETE SET NULL
+);
+\end{verbatim}
+
+\subsection{Chiến lược chỉ mục}\label{s:indexes}
+
+Chỉ mục được ưu tiên cho khóa ngoại và các điều kiện lọc truy vấn thường xuyên, đồng thời tránh tạo chỉ mục dư thừa trên những cột đã được bao phủ bởi ràng buộc duy nhất:
+
+\begin{verbatim}
+-- Chỉ mục khóa ngoại phục vụ các phép nối dữ liệu vận hành
+CREATE INDEX idx_order_customer    ON delivery_order(customer_id);
+CREATE INDEX idx_order_address     ON delivery_order(delivery_address_id);
+CREATE INDEX idx_osh_order         ON order_status_history(order_id);
+CREATE INDEX idx_pkg_order         ON package(order_id);
+CREATE INDEX idx_activity_order    ON delivery_activity(order_id);
+CREATE INDEX idx_activity_drone    ON delivery_activity(drone_id);
+CREATE INDEX idx_activity_prev     ON delivery_activity(previous_activity_id);
+CREATE INDEX idx_tracking_activity ON tracking_record(activity_id);
+CREATE INDEX idx_exception_activity ON delivery_exception(activity_id);
+CREATE INDEX idx_ssh_station       ON station_status_history(station_id);
+CREATE INDEX idx_soa_station       ON station_operator_assignment(station_id);
+CREATE INDEX idx_soa_user          ON station_operator_assignment(user_id);
+CREATE INDEX idx_pse_package       ON package_station_event(package_id);
+CREATE INDEX idx_pse_station       ON package_station_event(station_id);
+CREATE INDEX idx_audit_user        ON audit_log(user_id);
+CREATE INDEX idx_audit_time        ON audit_log(action_time);
+
+-- Chỉ mục ghép phục vụ truy vấn dữ liệu đo từ xa gần nhất
+CREATE INDEX idx_tracking_activity_time
+  ON tracking_record(activity_id, recorded_at DESC);
+
+-- Chỉ mục duy nhất từng phần bảo đảm mỗi khách hàng có tối đa một địa chỉ mặc định (BR-05)
+CREATE UNIQUE INDEX uq_customer_default_address
+  ON customer_address(customer_id)
+  WHERE is_default = TRUE;
+\end{verbatim}
+
 \subsection{Các truy vấn nghiệp vụ tiêu biểu}
 
 Các truy vấn sau xác nhận thiết kế vật lý đáp ứng trực tiếp nhu cầu vận hành:
@@ -567,7 +946,7 @@ SELECT pse.event_id, pse.package_id, ls.station_name,
        pse.event_type, su.username AS operator_name, pse.occurred_at
 FROM   package_station_event pse
 JOIN   landing_station ls ON ls.station_id = pse.station_id
-LEFT   JOIN system_user su ON su.user_id = pse.performed_by
+LEFT   JOIN app_user su ON su.user_id = pse.performed_by
 WHERE  pse.package_id = :package_id
 ORDER  BY pse.occurred_at ASC;
 \end{verbatim}

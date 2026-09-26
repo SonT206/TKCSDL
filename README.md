@@ -1,6 +1,6 @@
-# SmartDroneDelivery — Database Design Report
+# Nền tảng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo 
 
-This repository contains the LaTeX source for the **SmartDroneDelivery Database Design** report, submitted as a course assignment for the *Database Search and Design* subject at the University of Technology (UT), Ho Chi Minh City.
+This repository contains the LaTeX source for the **Quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo** report, submitted as a course assignment for the *Database Search and Design* subject at the University of Technology (UT), Ho Chi Minh City.
 
 The report focuses exclusively on the **database design** of an AI-powered Drone Delivery Management Platform. It covers data requirements analysis, conceptual modeling (ERD), logical relational schema, normalization, physical PostgreSQL implementation, and database testing.
 
@@ -8,7 +8,7 @@ The report focuses exclusively on the **database design** of an AI-powered Drone
 
 | Field | Detail |
 |---|---|
-| **Project name** | SmartDroneDelivery — AI-powered Drone Delivery Management Platform |
+| **Project name** | Nền tằng quản lý giao hàng bằng máy bay không người lái có tích hợp trí tuệ nhân tạo |
 | **Subject** | Database Search and Design (Thiết kế cơ sở dữ liệu) |
 | **Group** | Group 4 |
 | **Members** | 089206011070 – Tran Tan Phat |

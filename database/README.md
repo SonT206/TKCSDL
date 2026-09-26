@@ -1,4 +1,4 @@
-# Cơ sở dữ liệu SmartDroneDelivery
+# Cơ sở dữ liệu QUẢN LÝ GIAO HÀNG BẰNG MÁY BAY KHÔNG NGƯỜI LÁI CÓ TÍCH HỢP TRÍ TUỆ NHÂN TẠO
 
 Thư mục này chứa mã nguồn PostgreSQL cho nền tảng quản lý giao hàng bằng máy bay không người lái ứng dụng trí tuệ nhân tạo.
 
